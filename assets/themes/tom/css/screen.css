@@ -35,15 +35,18 @@ p {
 }
 
 a {
-  color: #00a;
+  color: #3378FF;
+  text-decoration:  none;
 }
 
 a:hover {
   color: black;
+  text-decoration:  underline;
 }
 
 a:visited {
-  color: #a0a;
+  color: #444444;
+  text-decoration:  none;
 }
 
 table {
@@ -85,7 +88,7 @@ ul.related {
 .site {
   font-size: 110%;
   text-align: justify;
-  width: 40em;
+  width: 70em;
   margin: 3em auto 2em auto;
   line-height: 1.5em;
 }
