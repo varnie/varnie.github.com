@@ -1,13 +1,13 @@
 ---
 layout: page
-title: Главная страница
+title: Блог о программировании
 tagline: Supporting tagline
 ---
 {% include JB/setup %}
 
 Всем привет. здесь буду постить заметки на интересующие меня технические темы.
 
-Список постов
+Список постов:
 ---------------------
 {% if site.posts.size > 0 %}
 <ul class="related">
