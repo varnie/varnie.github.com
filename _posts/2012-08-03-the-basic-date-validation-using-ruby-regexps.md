@@ -19,7 +19,37 @@ One of the drawbacks of that regexp is that it is not smart enough to know wheth
 
 Alrighty, let's look at the code!
 
-{% gistnocache 1199866 dateCheck.rb %}
+    =begin rdoc
+    Checks that the supplied date has the correct date format '#YYYY:MM:DD' with the separators both be either - or : or /.
+    A year cannot start from the zero, while a month and a day can.
+    Doesn't check that the supplied day is within the specified month's day range. It may be further improved.
+    =end
+    def checkDate(aDate)
+      %r{
+        (?<year>
+          (^            #no input before the start
+            [1-9]\d{3}  #a year cannot start from the zero
+          ) 
+        )
+        (?<sep>-|:|/)   #a separator can be either - or : or / 
+        (?<month>       
+          (0[1-9])      #a month can start from the zero
+          |
+          (1[0-2])      #or it could be just 10, 11 or 12 of course
+        )
+        \k<sep>         #the 2nd separator must be the same as the 1st met
+        (?<day>
+          (0[1-9])      #a day can start from the zero
+          |(1[0-9])     #or should fall into the range [1..31]
+          |(2[0-9])
+          |30
+          |31
+        )$              #marks there should be the end of the input
+      }x =~ aDate
+    end
+
+    date  = "1234:12:31"
+    print "date is #{checkDate(date) ? "" : "not "}correct"
 
 A curious reader might have already noticed I used lots of spaces in the regexp. Yes, it is possible in Ruby regexps if you specify 'x' option (as I did). It makes it much easier to understand. Effective comments also worth mentioning. Without them the regexp might not be so straightforward and clear.
 
@@ -27,7 +57,57 @@ Okay, let's get rid of the mentioned flaws. All we need is to look at Ruby's han
 
 Here is a final solution:
 
-{% gistnocache 1200030 dateCheckUpdated.rb %}
+    =begin rdoc
+    Checks that the supplied date has the correct date format '#YYYY:MM:DD' with the separators both be either - or : or /.
+    A year cannot start from the zero, while a month and a day can.
+    Performs additional checkings that the date is valid.
+    =end
+    def checkDateUpdated(aDate)
+      matched =
+        %r{
+            (?<year>
+            (^            #no input before the start
+              [1-9]\d{3}  #a year cannot start from the zero
+            )
+          )
+          (?<sep>-|:|/)   #a separator can be either - or : or /
+          (?<month>
+            (0[1-9])      #a month can start from the zero
+            |
+            (1[0-2])      #or it could be just 10, 11 or 12 of course
+          )
+          \k<sep>         #the 2nd separator must be the same as the 1st met
+          (?<day>
+            (0[1-9])      #a day can start from the zero
+            |(1[0-9])     #or should fall into the range [1..31]
+            |(2[0-9])
+            |30
+            |31
+          )$              #marks there should be the end of the input
+        }x.match(aDate)
+
+        if (matched)
+          day, month, year = matched[:day], matched[:month], matched[:year]
+          day = day[-1] if day[0] == "0"
+          month = month[-1] if month[0] == "0"
+
+          year, month, day = year.to_i, month.to_i, day.to_i
+
+          require 'date'
+          begin
+            date = Date.new(year, month, day)
+          rescue ArgumentError => e
+            return false
+          end
+
+          true
+        else
+          false
+        end
+    end
+     
+    date  = "2011:11:30"
+    print "date is #{checkDateUpdated(date) ? "" : "not "}correct"
 
 It discards wrong entries such as "2011:11:31", "2011:02:29" etc.
 
