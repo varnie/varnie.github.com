@@ -60,7 +60,7 @@ tags: [perl]
 Если мы усложним немного условие задачи, запретив строки оканчивающиеся на разделитель (к примеру, *foo\**), то потребуется чуть-чуть изменить подпрограмму find_separator:
 
     sub find_separator {
-        my $str = shift @_;
+        my $str = shift;
         
         my ($result, $separator);
         while ($str =~ s/^\w+(?<SEPARATOR>\W)//) {
@@ -87,7 +87,7 @@ tags: [perl]
     sub find_separator {
         return undef unless @_ > 0; #added
         
-        my ($str, $result, $separator) = (shift @_);
+        my ($str, $result, $separator) = shift;
         while ($str =~ s/^\w+(?<SEPARATOR>\W)//) {
             if ($separator && $separator ne $+{SEPARATOR} || length $str == 0) {
                 $result = 0;
