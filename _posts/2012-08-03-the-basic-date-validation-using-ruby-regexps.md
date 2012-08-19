@@ -112,4 +112,3 @@ print "date is #{checkDateUpdated(date) ? "" : "not "}correct"
 It discards wrong entries such as "2011:11:31", "2011:02:29" etc.
 
 Cheers!
-

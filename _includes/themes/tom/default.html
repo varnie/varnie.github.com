@@ -15,43 +15,62 @@
    <!-- Typekit -->
    <script type="text/javascript" src="http://use.typekit.com/jpd0pfm.js"></script>
    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+   <script type="text/javascript" language="javascript" src="/js/jquery.min.js"></script>
 </head>
 <body>
-
-  <div class="site">
-    <div class="title">
-      <a href="{{ HOME_PATH }}" title="{{ site.title }}">{{ site.title }}</a>
-
-      <a class="extra" href="{{ BASE_PATH }}{{ site.JB.archive_path }}" title="Blog archive">Archive</a>
-      <a class="extra" href="{{ BASE_PATH }}{{ site.JB.pages_path }}" title="Pages">Pages</a>
-      <a class="extra" href="{{ BASE_PATH }}{{ site.JB.categories_path }}" title="Categories">Categories</a>
-      <a class="extra" href="{{ BASE_PATH }}{{ site.JB.tags_path }}" title="Tags">Tags</a>
-    </div>
-  
-    {{ content }}   
-    
-    <div class="footer">
-      <div class="contact">
+  <div id="wrapper">
+  <div id="left_column">
+    <a href="{{ HOME_PATH }}" title="Programming blog">
+        <h1>Codebits</br> that rocks!</h1>
+    </a>
+    <div id="tags">
         <p>
-          {{ site.author.name }}<br />
-          {{ site.tagline }}<br />
-          {{ site.email }}<br />
+            {% include tag_cloud.html %}
         </p>
-      </div>
-      <div class="contact">
-        <p>
-          <a href="http://github.com/{{ site.author.github }}" target="_blank" title="github.com/{{ site.author.github }}">github.com/{{ site.author.github }}</a><br />
-          <a href="http://twitter.com/{{ site.author.twitter }}" target="_blank" title="twitter.com/{{ site.author.twitter }}">twitter.com/{{ site.author.twitter }}</a><br />
-          <a href='mailto:{{ site.author.email }}'>{{ site.author.email }}</a><br />
-        </p>
-      </div>
-      <div class="rss">
-        <a href="http://feeds.feedburner.com/{{ site.author.feedburner }}">
-          <img src="{{ ASSET_PATH }}/images/rss.png" alt="Subscribe to RSS Feed" />
-        </a>
-      </div>
     </div>
   </div>
+
+  <div id="content">
+      <div class="site">
+          <div class="title">
+              <a href="{{ BASE_PATH }}{{ site.JB.archive_path }}" title="Blog archive">Archive</a>
+              <a href="{{ BASE_PATH }}{{ site.JB.pages_path }}" title="Pages">Pages</a>
+          </div>
+  
+          {{ content }}   
+    
+          <div class="footer">
+              <div class="contact">
+                  <b>
+                      <p>
+                          github<br />
+                          {{ site.tagline }}<br />
+                          {{ site.email }}<br />
+                      </p>
+                  </b>
+              </div>
+              <div class="contact">
+                  <p>
+                      <a href="http://github.com/{{ site.author.github }}" target="_blank" title="github.com/{{ site.author.github }}">github.com/{{ site.author.github }}</a><br />
+                      <a href="http://twitter.com/{{ site.author.twitter }}" target="_blank" title="twitter.com/{{ site.author.twitter }}">twitter.com/{{ site.author.twitter }}</a><br />
+                      <a href='mailto:{{ site.author.email }}'>{{ site.author.email }}</a><br />
+                  </p>
+              </div>
+              <div class="rss">
+                  <a href="http://feeds.feedburner.com/{{ site.author.feedburner }}" title="Subscribe to RSS Feed!">
+                      <img src="{{ ASSET_PATH }}/images/rss.png" alt="Subscribe to RSS Feed" />
+                  </a>
+                  <p>
+                    &copy;2012 &ndash; varnie
+                  </p>
+              </div>
+              
+      </div>
+  </div>
+      
+  </div>
+</div>
+  
   <a href="http://github.com/{{ site.author.github }}" target="_blank" title="Fork me on GitHub!"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" /></a>
 
   {% include JB/analytics %}
