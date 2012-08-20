@@ -1,13 +1,10 @@
 @import url(http://fonts.googleapis.com/css?family=Love+Ya+Like+A+Sister);
-
 /*****************************************************************************/
 /*
 /* Common
 /*
 /*****************************************************************************/
-
 /* Global Reset */
-
 * {
     margin: 0;
     padding: 0;
@@ -34,44 +31,40 @@ h1 {
 }
 
 p {
-  margin: 1em 0;
 }
 
 a {
-  color: #3399CC;
-  text-decoration:  none;
+    color: #3399CC;
+    text-decoration:  none;
 }
 
 table {
-  font-size: inherit;
-  font: 100%;
+    font-size: inherit;
+    font: 100%;
 }
-
 /*****************************************************************************/
 /*
 /* Home
 /*
 /*****************************************************************************/
-
-
 ul.posts {
-  list-style-type: none;
-  margin-bottom: 2em;
+    list-style-type: none;
+    margin-bottom: 2em;
 }
 
 ul.posts li {
-  line-height: 1.75em;
+    line-height: 1.75em;
 }
 
 ul.posts span {
-  color: #aaa;
-  font-family: Monaco, "Courier New", monospace;
-  font-size: 80%;
+    color: #aaa;
+    font-family: Monaco, "Courier New", monospace;
+    font-size: 80%;
 }
 
 ul.related {
-  margin-left:18px;
-  margin-bottom: 2em;
+    margin-left:18px;
+    margin-bottom: 2em;
 }
 /*****************************************************************************/
 /*
@@ -80,37 +73,36 @@ ul.related {
 /*****************************************************************************/
 
 .site {
-  font-size: 110%;
-  text-align: justify;
-  line-height: 1.5em;
+    font-size: 110%;
+    text-align: justify;
+    line-height: 1.5em;
 }
 
 .site .meta {
-  color: #aaa;
-  font-family: Monaco,"Courier New",monospace;
-  font-size: 80%;
+    color: #aaa;
+    font-family: Monaco,"Courier New",monospace;
+    font-size: 80%;
 }
 
 .site .footer {
-font-size: 80%;
-color: #666;
-border-top: 1px dotted #c4c4c4;
-margin-top: 2em;
-overflow: hidden;
+    font-size: 80%;
+    color: #666;
+    border-top: 1px dotted #c4c4c4;
+    overflow: hidden;
 }
 
 .site .footer .contact {
-  float: left;
-  margin-right: 3em;
+    float: left;
+    margin-right: 3em;
 }
 
 .site .footer .rss {
-  margin-top: 1.1em;
-  float: right;
+    margin-top: 4px;
+    float: right;
 }
 
 .site .footer .rss img {
-  border: 0;
+    border: 0;
 }
 
 
@@ -121,52 +113,49 @@ overflow: hidden;
 /*****************************************************************************/
 
 .post {
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 #post {
 
 }
 
-  /* standard */
-  #post pre {
+/* standard */
+#post pre {
     border: 1px solid #ddd;
     background-color: #eef;
     padding: 0 1.4em;
-  }
+}
 
-  ul,
-  ol {
+ul,ol {
     display: inline-block;
     text-align: left;
-  }
+}
   
-
-  #post code {
+#post code {
     border: 1px solid #ddd;
     background-color: #eef;
     font-size: 100%;
     padding: 0 .2em;
-  }
+}
 
-    #post pre code {
-      border: none;
-    }
+#post pre code {
+    border: none;
+}
 
-  /* terminal */
-
-  #post pre.terminal {
+/* terminal */
+#post pre.terminal {
     border: 1px solid black;
     background-color: #333;
     color: white;
-  }
+}
 
-  #post pre.terminal code {
+#post pre.terminal code {
     background-color: #333;
-  }
+}
 
 #related {
-  margin-top: 2em;
+    margin-top: 2em;
 }
 
   #related h2 {
@@ -175,16 +164,14 @@ overflow: hidden;
   
 #content {
     float: left;
-    margin-left: 10px;
     margin-top: 20px;
-    width: 700px;
+    width: 66%;
 }
 
 #left_column {
     float: left;
     margin-top: 20px;
-    margin-left: 300px;
-    width: 300px;
+    width: 18%;
 }
 
 #left_column h1 {
@@ -204,5 +191,16 @@ overflow: hidden;
 }
 
 #tags p {
-   margin: 0px;
+    margin: 0px;
+}
+
+.twitter-share-button {
+    margin-top: 10px;   
+}
+
+.copyright {
+    color: #aaa;
+    font-family: Monaco,"Courier New",monospace;
+    font-size: 80%;
+    text-align: center;
 }
