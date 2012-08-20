@@ -2,6 +2,7 @@
 layout: post
 title: "Пример работы модуля Deparse для perl"
 description: "небольшой очерк на тему использования Deparse"
+keywords: perl,deparse,howto,tutorial
 category: 
 tags: [perl]
 ---

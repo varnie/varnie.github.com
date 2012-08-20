@@ -1,7 +1,8 @@
 ---
 layout: post
 title: "Learning perl: regular expressions"
-description: "Изучаю перл: регулярные выражения"
+description: "Изучаю perl: регулярные выражения"
+keywords: perl,regexp,regular expressions
 category: 
 tags: [perl]
 ---

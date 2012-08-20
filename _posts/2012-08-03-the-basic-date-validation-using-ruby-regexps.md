@@ -1,7 +1,8 @@
 ---
 layout: post
 title: "The basic date validation using Ruby regexps"
-description: ""
+description: "basic date validation using Ruby regexps"
+keywords: ruby,date,validation,regexp
 category: 
 tags: [ruby]
 ---

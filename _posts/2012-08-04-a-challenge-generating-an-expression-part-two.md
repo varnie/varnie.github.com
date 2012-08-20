@@ -1,8 +1,8 @@
 ---
 layout: post
 title: "A challenge: generating an expression: part two"
-description: ""
-category: 
+description: "A challenge: generating an expression"
+keywords: java,challenge
 tags: [java]
 ---
 {% include JB/setup %}

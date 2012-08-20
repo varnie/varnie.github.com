@@ -1,7 +1,8 @@
 ---
 layout: post
 title: "A challenge: generating an expression: part three"
-description: ""
+description: "A challenge: generating an expression"
+keywords: php,challenge,generating expression
 category: 
 tags: [php]
 ---

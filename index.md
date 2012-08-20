@@ -11,7 +11,7 @@ tagline: Supporting tagline
   {% include show_post.html %}
 {% endfor %}
 
-<h2>Older posts</h2>
+<h2>Старые посты</h2>
 
 <ul class="posts">
   {% for post in site.posts offset:5 %}

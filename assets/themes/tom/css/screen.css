@@ -127,6 +127,12 @@ ul.related {
     padding: 0 1.4em;
 }
 
+#highlight pre {
+    border: 1px solid #ddd;
+    background-color: #eef;
+    padding: 0 1.4em;
+}
+
 ul,ol {
     display: inline-block;
     text-align: left;
@@ -158,9 +164,9 @@ ul,ol {
     margin-top: 2em;
 }
 
-  #related h2 {
+#related h2 {
     margin-bottom: 1em;
-  }
+}
   
 #content {
     float: left;
