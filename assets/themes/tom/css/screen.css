@@ -15,10 +15,9 @@ html, body {
 }
 
 body {
-    background-color: #F7F7F7;
     font-family: "Helvetica Neue",Arial,Helvetica,sans-serif;
     text-align: center;
-    color: #333333;
+    color: #657B83;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -119,7 +118,7 @@ ul.related {
 /* standard */
 .post pre {
     /*border: 1px solid #ddd;*/
-    /*background-color: #eef;*/
+    background-color: #EEE8D5;
     border-left: 1px solid #ddd;
     padding: 0 1.4em;
 }
