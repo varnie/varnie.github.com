@@ -1,11 +1,12 @@
 ---
 layout: page
 title: Блог о программировании
+description: "programming blog"
+keywords: "perl,programming,coding,challenge,examples,howto,tutorial"
 tagline: Supporting tagline
 ---
 {% include JB/setup %}
 
-Всем привет. здесь буду постить заметки на интересующие меня технические темы.
 {% if site.posts.size > 0 %}
 {% for post in site.posts limit:5 %}
   {% include show_post.html %}

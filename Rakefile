@@ -275,8 +275,10 @@ task :tags => :tag_cloud do
 ---
 layout: default
 title: "Tag archive: #{tag}"
+description: "Posts about #{tag}"
+keywords: "#{tag}"
 ---
-<h1>Posts tagged with "#{tag}"</h1>
+<h2>Posts tagged with "#{tag}"</h2>
 
 {% for post in site.tags.#{tag} %}
 {% include show_post.html %}

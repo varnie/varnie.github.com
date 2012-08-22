@@ -2,11 +2,11 @@
   <div class="meta">{{ post.date | date: "%b %d, %Y" }}</div>
   <h2 class="title"><a class="title" href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a></h2>
   <div class="meta">
-    posted by varnie &#183;
+    posted by varnie &bull;
     Tags:
     {% for tag in post.tags %}
       <b><a class="title" href="/tags/{{ tag }}" title="View posts tagged with &quot;{{ tag }}&quot;">{{ tag }}</a></b>{% if forloop.last != true %}, {% endif %}
-    {% endfor %} &#183;
+    {% endfor %} &bull;
     <a href="{{ post.url }}#disqus_thread">Show comments</a>
   </div>
   <div class="body">
