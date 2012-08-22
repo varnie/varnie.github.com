@@ -111,17 +111,12 @@ ul.related {
 /* Posts
 /*
 /*****************************************************************************/
-
 .post {
-    margin-bottom: 30px;
-}
-
-#post {
 
 }
 
 /* standard */
-#post pre {
+.post pre {
     /*border: 1px solid #ddd;*/
     /*background-color: #eef;*/
     border-left: 1px solid #ddd;
@@ -139,29 +134,29 @@ ul,ol {
     text-align: left;
 }
   
-#post code {
+.post code {
     /*border: 1px solid #ddd;
     background-color: #eef;*/
     font-size: 100%;
     padding: 0 .2em;
 }
 
-#post pre code {
+.post pre code {
     border: none;
 }
 
-#post ul,ol {
+.post ul,ol {
     margin-left: 32px;
 }
 
 /* terminal */
-#post pre.terminal {
+.post pre.terminal {
     border: none;
     background-color: #444;
     color: white;
 }
 
-#post pre.terminal code {
+.post pre.terminal code {
     background-color: #333;
 }
 
