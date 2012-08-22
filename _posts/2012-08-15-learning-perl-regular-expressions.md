@@ -83,7 +83,7 @@ sub find_separator {
 {% endhighlight %}
     
 Для вышеуказаной работы с подпрограммой *find_separator* этого достаточно, но что если мы попытаемся вызвать её без передачи строки? Мы получим warning:
-> Use of uninitialized value $str in substitution (s///) at /home/varnie/foo/regexp.pl.
+<pre class="terminal">Use of uninitialized value $str in substitution (s///) at /home/varnie/foo/regexp.pl.</pre>
 
 Для защиты от подобных неприятностей немного допилим подпрограмму *find_separator*:
 {% highlight perl %}
