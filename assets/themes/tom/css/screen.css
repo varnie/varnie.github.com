@@ -122,8 +122,9 @@ ul.related {
 
 /* standard */
 #post pre {
-    border: 1px solid #ddd;
-    background-color: #eef;
+    /*border: 1px solid #ddd;*/
+    /*background-color: #eef;*/
+    border-left: 1px solid #ddd;
     padding: 0 1.4em;
 }
 
@@ -139,8 +140,8 @@ ul,ol {
 }
   
 #post code {
-    border: 1px solid #ddd;
-    background-color: #eef;
+    /*border: 1px solid #ddd;
+    background-color: #eef;*/
     font-size: 100%;
     padding: 0 .2em;
 }
@@ -149,10 +150,14 @@ ul,ol {
     border: none;
 }
 
+#post ul,ol {
+    margin-left: 32px;
+}
+
 /* terminal */
 #post pre.terminal {
-    border: 1px solid black;
-    background-color: #333;
+    border: none;
+    background-color: #444;
     color: white;
 }
 
