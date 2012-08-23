@@ -5,208 +5,58 @@
 /*
 /*****************************************************************************/
 /* Global Reset */
-* {
-    margin: 0;
-    padding: 0;
-}
-
-html, body {
-    height: 100%;
-}
-
-body {
-    font-family: "Helvetica Neue",Arial,Helvetica,sans-serif;
-    text-align: center;
-    color: #657B83;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    font-weight: bold;
-}
-
-h1 {
-    font-size: 2.2em;
-    line-height: 1.2em;
-}
-
-p {
-}
-
-a {
-    color: #3399CC;
-    text-decoration:  none;
-}
-
-table {
-    font-size: inherit;
-    font: 100%;
-}
+* {margin: 0;padding: 0;}
+html, body {height: 100%;}
+body {font-family: "Helvetica Neue",Arial,Helvetica,sans-serif;text-align: center;color: #657B83;}
+h1, h2, h3, h4, h5, h6 {font-weight: bold;}
+h1 {font-size: 2.2em;line-height: 1.2em;}
+p {}
+a {color: #3399CC;text-decoration:  none;}
+table {font-size: inherit;font: 100%;}
 /*****************************************************************************/
 /*
 /* Home
 /*
 /*****************************************************************************/
-ul.posts {
-    list-style-type: none;
-    margin-bottom: 2em;
-}
-
-ul.posts li {
-    line-height: 1.75em;
-}
-
-ul.posts span {
-    color: #aaa;
-    font-family: Monaco, "Courier New", monospace;
-    font-size: 80%;
-}
-
-ul.related {
-    margin-left:18px;
-    margin-bottom: 2em;
-}
+ul.posts {list-style-type: none;margin-bottom: 2em;}
+ul.posts li {line-height: 1.75em;}
+ul.posts span {color: #aaa;font-family: Monaco, "Courier New", monospace;font-size: 80%;}
+ul.related {margin-left:18px;margin-bottom: 2em;}
 /*****************************************************************************/
 /*
 /* Site
 /*
 /*****************************************************************************/
-.site {
-    font-size: 110%;
-    text-align: justify;
-    line-height: 1.5em;
-}
-
-.site .meta {
-    color: #aaa;
-    font-family: Monaco,"Courier New",monospace;
-    font-size: 80%;
-}
-
-.site .footer {
-    font-size: 80%;
-    color: #666;
-    border-top: 1px dotted #c4c4c4;
-    overflow: hidden;
-}
-
-.site .footer .contact {
-    float: left;
-    margin-right: 3em;
-}
-
-.site .footer .rss {
-    margin-top: 4px;
-    float: right;
-}
-
-.site .footer .rss img {
-    border: 0;
-}
-
-.site .title {
-    margin-bottom: 20px;
-}
+.site { font-size: 110%;text-align: justify;line-height: 1.5em;}
+.site .meta {color: #aaa;font-family: Monaco,"Courier New",monospace;font-size: 80%;}
+.site .footer {font-size: 80%;color: #666;border-top: 1px dotted #c4c4c4;overflow: hidden;}
+.site .footer .contact {float: left;margin-right: 3em;}
+.site .footer .rss {margin-top: 4px;float: right;}
+.site .footer .rss img {border: 0;}
+.site .title {margin-bottom: 20px;}
 /*****************************************************************************/
 /*
 /* Posts
 /*
 /*****************************************************************************/
-.post {
-
-}
-
+.post {}
 /* standard */
-.post pre {
-    /*border: 1px solid #ddd;*/
-    background-color: #EEE8D5;
-    border-left: 1px solid #ddd;
-    padding: 0 1.4em;
-}
-
-#highlight pre {
-    border: 1px solid #ddd;
-    background-color: #eef;
-    padding: 0 1.4em;
-}
-
-ul,ol {
-    display: inline-block;
-    text-align: left;
-}
-  
-.post code {
-    /*border: 1px solid #ddd;
-    background-color: #eef;*/
-    font-size: 100%;
-    padding: 0 .2em;
-}
-
-.post pre code {
-    border: none;
-}
-
-.post ul,ol {
-    margin-left: 32px;
-}
-
+.post pre {/*border: 1px solid #ddd;*/background-color: #EEE8D5; border-left: 1px solid #ddd; padding: 0 1.4em;}
+#highlight pre {border: 1px solid #ddd;background-color: #eef;padding: 0 1.4em;}
+ul,ol {display: inline-block;text-align: left;}
+.post code {/*border: 1px solid #ddd;background-color: #eef;*/font-size: 100%;padding: 0 .2em;}
+.post pre code {border: none;}
+.post ul,ol {margin-left: 32px;}
 /* terminal */
-.post pre.terminal {
-    border: none;
-    background-color: #444;
-    color: white;
-}
-
-.post pre.terminal code {
-    background-color: #333;
-}
-
-#related {
-    margin-top: 2em;
-}
-
-#related h2 {
-    margin-bottom: 1em;
-}
-  
-#content {
-    float: left;
-    margin-top: 20px;
-    width: 66%;
-}
-
-#left_column {
-    float: left;
-    margin-top: 20px;
-    width: 18%;
-}
-
-#left_column h1 {
-    font-family: 'Love Ya Like A Sister', cursive;
-    font-size: 28px;
-    margin-bottom: 10px;
-}
-
-#wrapper {
-    margin: 0px auto;
-}
-
-#left_column h3 {
-    font-family: 'Love Ya Like A Sister', cursive;
-    font-size: 14px;
-    margin-bottom: 0px;
-}
-
-#tags p {
-    margin: 0px;
-}
-
-.twitter-share-button {
-    margin-top: 10px;   
-}
-
-.copyright {
-    color: #aaa;
-    font-family: Monaco,"Courier New",monospace;
-    font-size: 80%;
-    text-align: center;
-}
+.post pre.terminal {border: none;background-color: #444;color: white;}
+.post pre.terminal code {background-color: #333;}
+#related {margin-top: 2em;}
+#related h2 { margin-bottom: 1em;} 
+#content { float: left; margin-top: 20px; width: 66%;}
+#left_column {float: left; margin-top: 20px; width: 18%;}
+#left_column h1 {font-family: 'Love Ya Like A Sister', cursive; font-size: 28px; margin-bottom: 10px;}
+#wrapper { margin: 0px auto;}
+#left_column h3 {font-family: 'Love Ya Like A Sister', cursive; font-size: 14px; margin-bottom: 0px;}
+#tags p { margin: 0px;}
+.twitter-share-button { margin-top: 10px;}
+.copyright {color: #aaa;font-family: Monaco,"Courier New",monospace;font-size: 80%;text-align: center;}
