@@ -34,16 +34,7 @@ Usage:
   
     {% if forloop.last %}
       </ul>
-    {% else %}
-      {% if this_year != next_year %}
-        </ul>
-        <ul class="posts">
-      {% else %}    
-        {% if this_month != next_month %}
-          </ul>
-          <ul class="posts">
-        {% endif %}
-      {% endif %}
+    
     {% endif %}
   {% endfor %}
 {% endif %}

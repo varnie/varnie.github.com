@@ -7,7 +7,7 @@
 /* Global Reset */
 * {margin: 0;padding: 0;}
 html, body {height: 100%;}
-body {font-family: "Helvetica Neue",Arial,Helvetica,sans-serif;text-align: center;color: #657B83;}
+body {font-family: "Helvetica Neue",Arial,Helvetica,sans-serif;text-align: center;color: #657B83; background-color: #FBFBFC;}
 h1, h2, h3, h4, h5, h6 {font-weight: bold;}
 h1 {font-size: 2.2em;line-height: 1.2em;}
 p {}
@@ -33,13 +33,13 @@ ul.related {margin-left:18px;margin-bottom: 2em;}
 .site .footer .contact {float: left;margin-right: 3em;}
 .site .footer .rss {margin-top: 4px;float: right;}
 .site .footer .rss img {border: 0;}
-.site .title {margin-bottom: 20px;}
+.site .title {margin-bottom: 10px;}
 /*****************************************************************************/
 /*
 /* Posts
 /*
 /*****************************************************************************/
-.post {}
+.post {padding-top: 5em;}
 /* standard */
 .post pre {/*border: 1px solid #ddd;*/background-color: #EEE8D5; border-left: 1px solid #ddd; padding: 0 1.4em;}
 #highlight pre {border: 1px solid #ddd;background-color: #eef;padding: 0 1.4em;}
@@ -60,3 +60,7 @@ ul,ol {display: inline-block;text-align: left;}
 #tags p {margin: 0px;}
 .twitter-share-button { margin-top: 10px;}
 .copyright {color: #aaa;font-family: Monaco,"Courier New",monospace;font-size: 80%;text-align: center;}
+
+.post h2.title::before {
+content: "» ";
+}
