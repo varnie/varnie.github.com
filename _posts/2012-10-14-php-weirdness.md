@@ -171,6 +171,20 @@ estimate with sorted array
 
 elapsed time: 11.11 sec
 
+<b>Go (version go1)</b>
+
+estimate with not sorted array
+
+317447800000
+
+elapsed time: 24.855818 sec 
+
+estimate with sorted array
+
+317447800000
+
+elapsed time: 13.112228s
+
 <b>Rust (rustc 0.4 (39c0d35 2012-10-11 21:01:16 -0700))</b>:
 
 estimate with not sorted array
@@ -214,5 +228,48 @@ sum: 317376400000
 elapsed time: 500 seconds
 
 </br>
-Результаты PHP выглядят просто ужасно, даже Perl его обгоняет.
 
+Поигрался с оптимизациями, в итоге результаты следующие:
+
+<b>C++ (gcc version 4.4.5, пример билдил с флагом -O3)</b>
+
+estimate with not sorted array
+
+314931600000
+
+elapsed time: 18.86 sec
+
+estimate with sorted array
+
+314931600000
+
+elapsed time: 7.74 sec
+
+<b>Go (version go1, пример билдил с -gccgoflags '-O3')</b>
+
+estimate with not sorted array
+
+317447800000
+
+elapsed time: 24.956293s
+
+estimate with sorted array
+
+317447800000
+
+elapsed time: 13.127326s
+
+<b>Rust (rustc 0.4, пример билдил с флагом --opt-level=3 (39c0d35 2012-10-11 21:01:16 -0700))</b>:
+
+estimate with not sorted array
+
+320484300000
+
+elapsed time: 20333.950295 ms
+
+estimate with sorted array
+
+320484300000
+
+elapsed time: 7764.199734 ms<br/>
+Результаты PHP выглядят просто ужасно, даже Perl его обгоняет.
