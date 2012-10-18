@@ -30,8 +30,8 @@ ul.related {margin-left:18px;margin-bottom: 2em;}
 .site { font-size: 110%;text-align: justify;line-height: 1.5em;}
 .site .meta {color: #aaa;font-family: Monaco,"Courier New",monospace;font-size: 80%;}
 .site .footer {font-size: 80%;color: #666;border-top: 1px dotted #c4c4c4;overflow: hidden;}
-.site .footer .contact {float: left;margin-right: 3em;}
-.site .footer .rss {margin-top: 4px;float: right;}
+.site .footer .contact {float: left;margin-right: 3em; margin-top:5px;}
+.site .footer .rss {margin-top: 4px;float: right; margin-top:10px;}
 .site .footer .rss img {border: 0;}
 .site .title {margin-bottom: 10px;}
 /*****************************************************************************/
@@ -64,3 +64,5 @@ ul,ol {display: inline-block;text-align: left;}
 .post h2.title::before {
 content: "» ";
 }
+
+.site .old_posts {padding-top:20px;}

@@ -12,6 +12,7 @@ tagline: Supporting tagline
   {% include show_post.html %}
 {% endfor %}
 
+<div class="old_posts">
 <h2>Старые посты</h2>
 
 <ul class="posts">
@@ -19,6 +20,7 @@ tagline: Supporting tagline
     <li><span class="date">{{ post.date | date: "%b %d, %Y" }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
   {% endfor %}
 </ul>
+</div>
 
 {% else %}
 пока ничего нет
