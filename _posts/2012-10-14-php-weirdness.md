@@ -185,7 +185,7 @@ estimate with sorted array
 
 elapsed time: 13.112228s
 
-<b>Rust (rustc 0.4 (39c0d35 2012-10-11 21:01:16 -0700))</b>:
+<b>Rust (rustc 0.4 (39c0d35 2012-10-11 21:01:16 -0700))</b>
 
 estimate with not sorted array
 
@@ -199,7 +199,7 @@ estimate with sorted array
 
 elapsed time: 356.501 ms
 
-<b>PHP (PHP 5.3.3-1ubuntu9.10 with Suhosin-Patch)</b>:
+<b>PHP (PHP 5.3.3-1ubuntu9.10 with Suhosin-Patch)</b>
 
 estimate with not sorted array
 
@@ -213,7 +213,7 @@ elapsed time: 1135 seconds
 
 sum: 316930100000
 
-<b>Perl (v5.10.1)</b>:
+<b>Perl (v5.10.1)</b>
 
 estimate with not sorted array
 
@@ -259,7 +259,7 @@ estimate with sorted array
 
 elapsed time: 13.127326s
 
-<b>Rust (rustc 0.4, пример билдил с флагом --opt-level=3 (39c0d35 2012-10-11 21:01:16 -0700))</b>:
+<b>Rust (rustc 0.4, пример билдил с флагом --opt-level=3 (39c0d35 2012-10-11 21:01:16 -0700))</b>
 
 estimate with not sorted array
 
