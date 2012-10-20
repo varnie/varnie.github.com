@@ -1,9 +1,15 @@
 <div class="post">
-  <h2>{{ page.title }}</h2>
-  <p class="meta">
-    {{ page.date | date_to_long_string }} 
-    {% if page.location %}{{ page.location }}{% endif %}
-  </p>
+
+  <div class="meta">{{ page.date | date: "%b %d, %Y" }}</div>
+  <h2 class="title"><a class="title" href="{{ page.url }}" title="{{ page.title }}">{{ page.title }}</a></h2>
+  <div class="meta">
+    posted by varnie &bull;
+    Tags:
+    {% for tag in page.tags %}
+      <b><a class="title" href="/tags/{{ tag }}" title="View posts tagged with &quot;{{ tag }}&quot;">{{ tag }}</a></b>{% if forloop.last != true %}, {% endif %}
+    {% endfor %} &bull;
+    <a href="{{ post.url }}#disqus_thread">Show comments</a>
+  </div>
   {{ content }}
 </div>
 <br/>

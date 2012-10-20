@@ -13,7 +13,7 @@ tagline: Supporting tagline
 {% endfor %}
 
 <div class="old_posts">
-<h2>Старые посты</h2>
+<h2 class="title">Старые посты</h2>
 
 <ul class="posts">
   {% for post in site.posts offset:5 %}

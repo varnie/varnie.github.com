@@ -1,4 +1,5 @@
 @import url(http://fonts.googleapis.com/css?family=Love+Ya+Like+A+Sister);
+@import url(http://fonts.googleapis.com/css?family=Passion+One|Ubuntu+Mono:400,700|Signika+Negative:400,300,600)
 /*****************************************************************************/
 /*
 /* Common
@@ -7,12 +8,14 @@
 /* Global Reset */
 * {margin: 0;padding: 0;}
 html, body {height: 100%;}
-body {font-family: "Helvetica Neue",Arial,Helvetica,sans-serif;text-align: center;color: #657B83; background-color: #FBFBFC;}
+body {font-family: 'Signika Negative',sans-serif,Arial,Helvetica,sans-serif;text-align: center;color: #657B83; background-color: #FBFBFC;}
 h1, h2, h3, h4, h5, h6 {font-weight: bold;}
 h1 {font-size: 2.2em;line-height: 1.2em;}
 p {}
 a {color: #3399CC;text-decoration:  none;}
 table {font-size: inherit;font: 100%;}
+
+h2.title {font-family:'Passion One','Arial Black','Arial';font-weight:400;line-height:1em;margin:0 0 .1em 0;text-transform:uppercase}
 /*****************************************************************************/
 /*
 /* Home
@@ -27,11 +30,11 @@ ul.related {margin-left:18px;margin-bottom: 2em;}
 /* Site
 /*
 /*****************************************************************************/
-.site { font-size: 110%;text-align: justify;line-height: 1.5em;}
-.site .meta {color: #aaa;font-family: Monaco,"Courier New",monospace;font-size: 80%;}
+.site { font-size: 100%;text-align: justify;line-height: 1.5em;}
+.site .meta {color: #aaa;font-size: .8em;}
 .site .footer {font-size: 80%;color: #666;border-top: 1px dotted #c4c4c4;overflow: hidden;}
 .site .footer .contact {float: left;margin-right: 3em; margin-top:5px;}
-.site .footer .rss {margin-top: 4px;float: right; margin-top:10px;}
+.site .footer .rss {float: right; margin-top:22px;}
 .site .footer .rss img {border: 0;}
 .site .title {margin-bottom: 10px;}
 /*****************************************************************************/
@@ -59,7 +62,7 @@ ul,ol {display: inline-block;text-align: left;}
 #left_column h3 {font-family: 'Love Ya Like A Sister', cursive; font-size: 14px; margin-bottom: 0px;}
 #tags p {margin: 0px;}
 .twitter-share-button { margin-top: 10px;}
-.copyright {color: #aaa;font-family: Monaco,"Courier New",monospace;font-size: 80%;text-align: center;}
+.copyright {color: #aaa;font-size: 80%;text-align: center;}
 
 .post h2.title::before {
 content: "» ";
