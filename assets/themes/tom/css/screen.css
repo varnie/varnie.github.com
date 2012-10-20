@@ -1,4 +1,3 @@
-@import url(http://fonts.googleapis.com/css?family=Love+Ya+Like+A+Sister);
 @import url(http://fonts.googleapis.com/css?family=Passion+One|Ubuntu+Mono:400,700|Signika+Negative:400,300,600)
 /*****************************************************************************/
 /*
@@ -15,7 +14,7 @@ p {}
 a {color: #3399CC;text-decoration:  none;}
 table {font-size: inherit;font: 100%;}
 
-h2.title {font-family:'Passion One','Arial Black','Arial';font-weight:400;line-height:1em;margin:0 0 .1em 0;text-transform:uppercase}
+h2.title {font-family:'Passion One','Arial Black','Arial';font-weight:400;margin:0 0 .1em 0;text-transform:uppercase}
 /*****************************************************************************/
 /*
 /* Home
@@ -57,9 +56,7 @@ ul,ol {display: inline-block;text-align: left;}
 #related h2 { margin-bottom: 1em;} 
 #content { float: left; margin-top: 20px; width: 66%;}
 #left_column {float: left; margin-top: 20px; width: 18%;}
-#left_column h1 {font-family: 'Love Ya Like A Sister', cursive; font-size: 28px; margin-bottom: 10px;}
 #wrapper { margin: 0px auto;}
-#left_column h3 {font-family: 'Love Ya Like A Sister', cursive; font-size: 14px; margin-bottom: 0px;}
 #tags p {margin: 0px;}
 .twitter-share-button { margin-top: 10px;}
 .copyright {color: #aaa;font-size: 80%;text-align: center;}
