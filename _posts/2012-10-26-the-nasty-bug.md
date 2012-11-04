@@ -25,13 +25,14 @@ switch ($alias) {
         break;            
 {%endhighlight%}
 
-Кто-то похерил <b>break</b> у кейса '<b>galleryData</b>' и теперь даже если <b>$alias</b> равен <b>'galleryData'</b>, исполнение пойдет далее и <b>$link</b> переприсвоится и станет <b>'/main/foobarcheck'</b>.
+Кто-то похерил __break__ у кейса __'galleryData'__ и теперь даже если __$alias__ равен __'galleryData'__, исполнение пойдет далее и __$link__ переприсвоится и станет __'/main/foobarcheck'__.
+
 Повезло, что проблему так быстро выявили и пофиксили.
 
-Занятно, что в новомодных языках, таких как Go эту проблему решили на корню: проход сквозь несколько веток свитча запрещен на уровне языка. Если же требуется такое поведение (что случается крайне редко), то нужно использовать ключевое слово <b>fallthrough</b>:
+Занятно, что в новомодных языках, таких как Go эту проблему решили на корню: проход сквозь несколько веток свитча запрещен на уровне языка. Если же требуется такое поведение (что случается крайне редко), то нужно использовать ключевое слово __fallthrough__:
 
 
-<i>"In a switch statement, case labels do not fall through. You can make them fall through using the fallthrough keyword. This applies even to adjacent cases."</i>
+_"In a switch statement, case labels do not fall through. You can make them fall through using the fallthrough keyword. This applies even to adjacent cases."_
 
-В Perl же аналогичного поведения можно добиться используя явное указание ключевого слова <b>next</b> или же используя <b>use Switch 'fallthrough';</b>.
+В Perl же аналогичного поведения можно добиться используя явное указание ключевого слова __next__ или же используя __use Switch 'fallthrough';__.
 Линк на <a href="http://perldoc.perl.org/Switch.html#Allowing-fall-through" target="_blank" title="Perl docs">доку</a>.

@@ -157,7 +157,7 @@ fn main() {
 Также для полноты картины и для того, чтобы было с чем сравнивать, прогнал исходную программу на С++ у себя на компе.
 На моем Core2Duo E6600 2.4 GHZ и с 4 гигами оперативки имеем сл. результаты:
 
-<b>C++ (gcc version 4.4.5)</b>
+__C++ (gcc version 4.4.5)__
 
 estimate with not sorted array
 
@@ -171,7 +171,7 @@ estimate with sorted array
 
 elapsed time: 11.11 sec
 
-<b>Go (version go1)</b>
+__Go (version go1)__
 
 estimate with not sorted array
 
@@ -185,7 +185,7 @@ estimate with sorted array
 
 elapsed time: 13.112228s
 
-<b>Rust (rustc 0.4 (39c0d35 2012-10-11 21:01:16 -0700))</b>
+__Rust (rustc 0.4 (39c0d35 2012-10-11 21:01:16 -0700))__
 
 estimate with not sorted array
 
@@ -199,7 +199,7 @@ estimate with sorted array
 
 elapsed time: 356.501 ms
 
-<b>PHP (PHP 5.3.3-1ubuntu9.10 with Suhosin-Patch)</b>
+__PHP (PHP 5.3.3-1ubuntu9.10 with Suhosin-Patch)__
 
 estimate with not sorted array
 
@@ -213,7 +213,7 @@ elapsed time: 1135 seconds
 
 sum: 316930100000
 
-<b>Perl (v5.10.1)</b>
+__Perl (v5.10.1)__
 
 estimate with not sorted array
 
@@ -225,13 +225,12 @@ estimate with sorted array
 
 sum: 317376400000
 
-elapsed time: 500 seconds
+elapsed time: 500 seconds  
 
-</br>
-
+</br>  
 Поигрался с оптимизациями, в итоге результаты следующие:
 
-<b>C++ (gcc version 4.4.5, пример билдил с флагом -O3)</b>
+__C++ (gcc version 4.4.5, пример билдил с флагом -O3)__
 
 estimate with not sorted array
 
@@ -245,7 +244,7 @@ estimate with sorted array
 
 elapsed time: 7.74 sec
 
-<b>Go (version go1, пример билдил с -gccgoflags '-O3')</b>
+__Go (version go1, пример билдил с -gccgoflags '-O3')__
 
 estimate with not sorted array
 
@@ -259,7 +258,7 @@ estimate with sorted array
 
 elapsed time: 13.127326s
 
-<b>Rust (rustc 0.4, пример билдил с флагом --opt-level=3 (39c0d35 2012-10-11 21:01:16 -0700))</b>
+__Rust (rustc 0.4, пример билдил с флагом --opt-level=3 (39c0d35 2012-10-11 21:01:16 -0700))__
 
 estimate with not sorted array
 
@@ -271,5 +270,8 @@ estimate with sorted array
 
 320484300000
 
-elapsed time: 7764.199734 ms<br/>
+elapsed time: 7764.199734 ms
+
+</br>
+
 Результаты PHP выглядят просто ужасно, даже Perl его обгоняет.
