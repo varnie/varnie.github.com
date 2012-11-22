@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Go language: revese a singly linked list"
-description: "Go language: revese a singly linked list"
+title: "Go language: reverse a singly linked list"
+description: "Go language: reverse a singly linked list"
 keywords: golang
 category: 
 tags: [golang]
