@@ -21,4 +21,4 @@ my $count =()= /\s/gp;
 {% endhighlight %}
 
 Да, так называемый "goatse operator". Не буду разглашать принцип его работы, т.к. мне самому доставило удовольствие разобраться с этим. Кому интересны подробности - можно почитать <a href="http://www.perlmonks.org/?node_id=527975" target="_blank" title="Goatse operator">дискуссию на perlmonks.org</a>
-Далее, кому интересны выкладки по перфомансу: <a href="http://stackoverflow.com/questions/3991766/is-the-perl-goatse-secret-operator-efficient" target="_blank" title="Goatse operator">дискуссия на StackOverflow</a>
+Далее, кому интересны выкладки по перфомансу: <a href="http://stackoverflow.com/questions/3991766/is-the-perl-goatse-secret-operator-efficient" target="_blank" title="Goatse operator">дискуссия на StackOverflow</a>.

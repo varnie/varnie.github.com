@@ -23,9 +23,9 @@ tags: []
 {% endhighlight %}
 
 Вывод:
-<pre class="terminal">
+<p class="terminal">
 1 2 3 4 5 6 7 8 9 10
-</pre>
+</p>
 
 __>updated:__
 Теперь перепишем то же самое, но немного усложним - величину, до которой выводить значения, будем запрашивать у юзера. Реализация:
@@ -40,11 +40,11 @@ __>updated:__
 {% endhighlight %}
 
 Вывод:
-<pre class="terminal">
+<p class="terminal">
 Befunge-93 Interpreter/Debugger v2.23
 20
 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
-</pre>
+</p>
 
 Т.е запросили выводить до 20; вывод корректный.
 

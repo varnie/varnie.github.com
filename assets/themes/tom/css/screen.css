@@ -50,8 +50,8 @@ ul,ol {display: inline-block;text-align: left;}
 .post pre code {border: none;}
 .post ul,ol {margin-left: 32px;}
 /* terminal */
-.post pre.terminal {border: none;background-color: #444;color: white;}
-.post pre.terminal code {background-color: #333;}
+.post .terminal {/*border: 1px solid #ddd;*/background-color: #EEE8D5; border-left: 1px solid #ddd; padding: 0 1.4em; border: none;background-color: #444;color: white;}
+.post .terminal code {background-color: #333;}
 #related {margin-top: 2em;}
 #related h2 { margin-bottom: 1em;} 
 #content { float: left; margin-top: 20px; width: 66%;}

@@ -13,12 +13,12 @@ tags: [js]
 {% highlight javascript %}
 var myFooObj = (function(){
 
-    var FooClass = function() {};    
+    var FooClass = function() {};
     FooClass.prototype = { 
         //some data
     };
 
-    return new FooClass();    
+    return new FooClass(); 
 })();
 {% endhighlight %}
 
@@ -26,12 +26,12 @@ var myFooObj = (function(){
 {% highlight javascript %}
 var myFooObj = (function(val){
 
-    var FooClass = function() {};    
+    var FooClass = function() {}; 
     FooClass.prototype = { 
         value: val
     };
 
-    return new FooClass();    
+    return new FooClass(); 
 })(43);
 
 console.log(myFooObj.value); //43
@@ -43,7 +43,7 @@ console.log(myFooObj.value); //43
 {% highlight javascript %}
 var myChildObj = (function(){
 
-    var ParentClass = function() {};    
+    var ParentClass = function() {}; 
     ParentClass.prototype = { 
         //some data
     };
@@ -66,7 +66,7 @@ var myChildObj = (function(){
     }
 
     extendsClass(ChildClass, ParentClass, false);
-    return new PhotoGallerySingle();    
+    return new PhotoGallerySingle(); 
 })();
 {% endhighlight %}
 

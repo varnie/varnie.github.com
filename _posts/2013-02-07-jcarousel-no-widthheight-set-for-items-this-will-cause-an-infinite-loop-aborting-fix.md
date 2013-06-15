@@ -6,7 +6,7 @@ keywords: "jQuery, jCarousel, infinite loop, IE8 bug, fix"
 category: 
 tags: [js]
 ---
-{% include JB/setup %}                                  
+{% include JB/setup %} 
 
 При использовании jQuery плагина jCarousel в IE8 (будь он проклят трижды) словил баг:
 

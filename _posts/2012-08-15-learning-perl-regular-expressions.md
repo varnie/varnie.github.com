@@ -30,7 +30,7 @@ use Modern::Perl;
 print "please enter a test string, or q/Q for exit: ";
 chomp(my $input = <STDIN>);
  
-while (lc($input) ne "q") {    
+while (lc($input) ne "q") { 
     my $separator = find_separator($input);
     
     print "correct. separator is `$separator`\n" if $separator;
@@ -84,7 +84,7 @@ sub find_separator {
     
 Для вышеуказаной работы с подпрограммой *find_separator* этого достаточно, но что если мы попытаемся вызвать её без передачи строки? Мы получим warning:
 
-<pre class="terminal">Use of uninitialized value $str in substitution (s///) at /home/varnie/foo/regexp.pl.</pre>
+<p class="terminal">Use of uninitialized value $str in substitution (s///) at /home/varnie/foo/regexp.pl.</p>
 
 Для защиты от подобных неприятностей немного допилим подпрограмму *find_separator*:
 

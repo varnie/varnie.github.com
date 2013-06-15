@@ -8,7 +8,7 @@ tags: [perl]
 ---
 {% include JB/setup %}
 
-Столкнулся с проблемой при использовании WWW:Mechanize - после многократной отправки POST запросов с большими данными Perl падал с <pre class="terminal">Out of memory</pre>. 
+Столкнулся с проблемой при использовании WWW:Mechanize - после многократной отправки POST запросов с большими данными Perl падал с <p class="terminal">Out of memory</p>. 
 Вот этот очень простой пример:
 
 {% highlight perl %}
@@ -62,11 +62,11 @@ foreach (1..1000) {
 
 Для нашего случая хранить эти данные абсолютно не нужно, поэтому идём на сайт <a href="http://search.cpan.org/~jesse/WWW-Mechanize-1.72/lib/WWW/Mechanize.pm#___top" title="WWW::Mechanize" target="_blank">WWW::Mechanize</a> и читаем:
 
-<pre class="terminal">
+<p class="terminal">
 stack_depth => $value
 
 Sets the depth of the page stack that keeps track of all the downloaded pages. Default is effectively infinite stack size. If the stack is eating up your memory, then set this to a smaller number, say 5 or 10. Setting this to zero means Mech will keep no history.
-</pre>
+</p>
 
 Итоговый, рабочий вариант, который не жрёт память аки конь:
 {% highlight perl %}

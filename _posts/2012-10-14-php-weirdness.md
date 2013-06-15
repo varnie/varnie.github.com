@@ -136,7 +136,7 @@ fn main() {
 
     let iterations_count = 100000;
 
-    io::println("estimate with not sorted array");    
+    io::println("estimate with not sorted array");
     let mut start = std::time::precise_time_s();
     let mut result = calculate(data, iterations_count);
     let mut stop = std::time::precise_time_s();
@@ -225,9 +225,9 @@ estimate with sorted array
 
 sum: 317376400000
 
-elapsed time: 500 seconds  
+elapsed time: 500 seconds 
 
-</br>  
+</br> 
 Поигрался с оптимизациями, в итоге результаты следующие:
 
 __C++ (gcc version 4.4.5, пример билдил с флагом -O3)__
