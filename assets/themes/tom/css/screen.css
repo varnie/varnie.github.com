@@ -43,7 +43,7 @@ ul.related {margin-left:18px;margin-bottom: 2em;}
 /*****************************************************************************/
 .post {padding-top: 5em;}
 /* standard */
-.post pre {/*border: 1px solid #ddd;*/background-color: #EEE8D5; border-left: 1px solid #ddd; padding: 0 1.4em;}
+.post pre {/*border: 1px solid #ddd;*/background-color: #EEE8D5; border-left: 1px solid #ddd; padding: 0 1.4em; overflow: auto;}
 #highlight pre {border: 1px solid #ddd;background-color: #eef;padding: 0 1.4em;}
 ul,ol {display: inline-block;text-align: left;}
 .post code {/*border: 1px solid #ddd;background-color: #eef;*/font-size: 100%;padding: 0 .2em;}
