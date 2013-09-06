@@ -9,6 +9,8 @@
   {% include JB/analytics-providers/mixpanel %}
 {% when "custom" %}
   {% include custom/analytics %}
+{% when "statcounter" %}
+  {% include JB/analytics-providers/statcounter %}
 {% endcase %}
 
 {% endif %}
