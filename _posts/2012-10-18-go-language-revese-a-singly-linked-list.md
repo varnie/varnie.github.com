@@ -76,7 +76,7 @@ func main() {
 }
 {% endhighlight %}
 Вывод:
-<pre class="terminal">
+
 abcdefghijklmnopqrstuvwxyz
 zyxwvutsrqponmlkjihgfedcba
-</pre>
+
