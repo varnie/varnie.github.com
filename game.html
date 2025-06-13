@@ -103,10 +103,10 @@
         <option value="hard">Hard</option>
       </select>
       <br>
-      <button onclick="startGame()" class="button bg-green-600 text-white p-3 rounded-lg font-semibold">Begin</button>
-      <button onclick="showTutorial()" class="button bg-blue-600 text-white p-3 rounded-lg font-semibold ml-2">How to Play</button>
-      <button onclick="showMilestones()" class="button bg-purple-600 text-white p-3 rounded-lg font-semibold ml-2">View Milestones</button>
-      <button onclick="showEndings()" class="button bg-red-600 text-white p-3 rounded-lg font-semibold ml-2">View Endings</button>
+      <button id="begin-btn" class="button bg-green-600 text-white p-3 rounded-lg font-semibold">Begin</button>
+      <button id="tutorial-btn" class="button bg-blue-600 text-white p-3 rounded-lg font-semibold ml-2">How to Play</button>
+      <button id="milestones-btn" class="button bg-purple-600 text-white p-3 rounded-lg font-semibold ml-2">View Milestones</button>
+      <button id="endings-btn" class="button bg-red-600 text-white p-3 rounded-lg font-semibold ml-2">View Endings</button>
     </div>
     <div id="game-screen" class="hidden">
       <h1 class="text-4xl text-center mb-6 font-bold text-brown-800">Plague and Plenty</h1>
@@ -134,9 +134,9 @@
       <div class="modal-content">
         <h2 class="text-2xl mb-4">Upgrade Village</h2>
         <p class="mb-4">Choose thy upgrade:</p>
-        <button onclick="performUpgrade('granary')" class="button bg-orange-600 text-white p-2 rounded-lg mb-2" id="granary-btn">Granary (50 Food or Wealth, 5 Pop)</button>
-        <button onclick="performUpgrade('infirmary')" class="button bg-orange-600 text-white p-2 rounded-lg mb-2" id="infirmary-btn">Infirmary (30 Food or Wealth, 5 Pop)</button>
-        <button onclick="performUpgrade('walls')" class="button bg-orange-600 text-white p-2 rounded-lg mb-2" id="walls-btn">Walls (40 Food or Wealth, 10 Pop)</button>
+        <button onclick="performUpgrade('granary')" class="button bg-orange-600 text-white p-2 rounded-lg mb-2" id="granary-btn">Granary (50 Food or Wealth, 5 Pop or none)</button>
+        <button onclick="performUpgrade('infirmary')" class="button bg-orange-600 text-white p-2 rounded-lg mb-2" id="infirmary-btn">Infirmary (30 Food or Wealth, 5 Pop or none)</button>
+        <button onclick="performUpgrade('walls')" class="button bg-orange-600 text-white p-2 rounded-lg mb-2" id="walls-btn">Walls (40 Food or Wealth, 10 Pop or none)</button>
         <button onclick="closeModal('upgrade-modal')" class="button bg-gray-600 text-white p-2 rounded-lg">Cancel</button>
       </div>
     </div>
@@ -144,9 +144,9 @@
       <div class="modal-content">
         <h2 class="text-2xl mb-4">Appease Faction</h2>
         <p class="mb-4">Choose whom to appease:</p>
-        <button onclick="performAppease('peasants')" class="button bg-green-600 text-white p-2 rounded-lg mb-2">Peasants (20 Food)</button>
-        <button onclick="performAppease('clergy')" class="button bg-blue-600 text-white p-2 rounded-lg mb-2">Clergy (20 Food)</button>
-        <button onclick="performAppease('warriors')" class="button bg-red-600 text-white p-2 rounded-lg mb-2">Warriors (20 Food)</button>
+        <button onclick="performAppease('peasants')" class="button bg-green-600 text-white p-2 rounded-lg mb-2">Peasants (15 Food)</button>
+        <button onclick="performAppease('clergy')" class="button bg-blue-600 text-white p-2 rounded-lg mb-2">Clergy (15 Food)</button>
+        <button onclick="performAppease('warriors')" class="button bg-red-600 text-white p-2 rounded-lg mb-2">Warriors (15 Food)</button>
         <button onclick="closeModal('appease-modal')" class="button bg-gray-600 text-white p-2 rounded-lg">Cancel</button>
       </div>
     </div>
@@ -163,17 +163,17 @@
         <h2 class="text-2xl mb-4">How to Play</h2>
         <p class="mb-4">Guide thy village through 10 years of plague and plenty. Manage Population, Food, Health, Wealth, and Morale:</p>
         <ul class="text-left mb-4">
-          <li><b>Till the Fields</b>: Gain ~30 Food, boosted in Autumn.</li>
-          <li><b>Tend the Sick</b>: Gain ~12 Health, boosted in Winter.</li>
-          <li><b>Call Newcomers</b>: Gain ~10 Population, weaker in Spring.</li>
+          <li><b>Till the Fields</b>: Gain ~40 Food, boosted in Spring.</li>
+          <li><b>Tend the Sick</b>: Gain ~15 Health, boosted in Winter.</li>
+          <li><b>Call Newcomers</b>: Gain ~12 Population, weaker in Spring.</li>
           <li><b>Fortify Village</b>: Spend 20 Food to halve damage, lasts longer with Walls.</li>
           <li><b>Trade</b>: Swap 10 Population/Food once.</li>
           <li><b>Hold Festival</b>: Spend 30 Food for 15 Population if Health > 80.</li>
           <li><b>Upgrade Village</b>: Build Granary, Infirmary, or Walls.</li>
-          <li><b>Tax Villagers</b>: Gain ~15 Wealth, angers Peasants.</li>
-          <li><b>Appease Faction</b>: Spend 20 Food to boost Morale.</li>
+          <li><b>Tax Villagers</b>: Gain ~20 Wealth, angers Peasants.</li>
+          <li><b>Appease Faction</b>: Spend 15 Food to boost Morale.</li>
           <li><b>Hire Mercenaries</b>: Spend 30 Wealth for 15 Population.</li>
-          <li><b>Double Down</b>: Spend 10 Wealth to double action gains, risks failure.</li>
+          <li><b>Double Down</b>: Spend 5 Wealth to double action gains, low failure risk.</li>
         </ul>
         <p class="mb-4">Seasons shift strategies: Farm in Spring, Fortify in Winter. Events and relics test thy wits—choose wisely!</p>
         <p class="mb-4">Campaign weaves a tale with Loyalist, Rebel, or Mystic paths; Classic seeks high Legacy Scores.</p>
@@ -215,7 +215,7 @@
       food: 100,
       health: 30,
       wealth: 0,
-      morale: { peasants: 50, clergy: 50, warriors: 50 },
+      morale: { peasants: 60, clergy: 60, warriors: 60 },
       upgrades: { granary: false, infirmary: false, walls: false },
       relics: { plenty: false, vitality: false, valor: false }
     };
@@ -226,7 +226,7 @@
     ];
     const randomEvents = [
       { name: "Plague Scours the Land", effect: () => {
-          const damage = Math.floor(25 * (100 - village.health) / 100 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1));
+          const damage = Math.min(15, Math.floor(25 * (100 - village.health) / 100 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1)));
           village.population = Math.max(0, village.population - Math.floor(damage * (fortifiedRounds > 0 || village.relics.valor ? 0.5 : 1)));
         }, color: "text-red-600", weight: season === 'winter' ? 0.3 : 0.1 },
       { name: "Meager Harvest", effect: () => {
@@ -236,9 +236,9 @@
           village.health = Math.min(100, village.health + Math.floor(15 * (difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 0.8 : 1) * (village.upgrades.infirmary ? 1.2 : 1) * (village.relics.vitality ? 1.1 : 1)));
         }, color: "text-blue-600", weight: 0.1 },
       { name: "Bitter Winter", effect: () => {
-          village.food -= 40 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
-          village.health -= 20 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
-          village.population -= 5 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
+          village.food -= Math.min(30, 40 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1));
+          village.health -= Math.min(15, 20 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1));
+          village.population -= Math.min(5, 5 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1));
         }, color: "text-red-600", weight: season === 'winter' ? 0.3 : 0.05 },
       { name: "Refugees Beg Entry", effect: () => {
           village.population += 25 * (village.relics.valor ? 0.9 : 1);
@@ -255,12 +255,15 @@
       { name: "Catastrophe", effect: () => {
           village.food = Math.floor(village.food / 2);
           village.population = Math.floor(village.population / 2);
-        }, color: "text-red-600", weight: difficulty === 'hard' ? 0.1 : 0 },
+        }, color: "text-red-600", weight: difficulty === 'hard' ? 0.05 : 0 },
       { name: "Relic’s Curse", effect: () => {
           village.food -= 10;
           village.health -= 10;
-          village.population -= 10;
-        }, color: "text-red-600", weight: Object.values(village.relics).some(r => r) ? 0.2 : 0 }
+          village.population -= 5;
+        }, color: "text-red-600", weight: Object.values(village.relics).some(r => r) ? 0.1 : 0 },
+      { name: "Merchant’s Gift", effect: () => {
+          village.wealth += 20;
+        }, color: "text-purple-600", weight: 0.05 }
     ];
     const choiceEvents = [
       { name: "Merchant Caravan", description: "A caravan offers trade. Accept?", choice1: { text: "Accept", effect: () => { village.wealth += 30; village.population -= 10; } }, choice2: { text: "Reject", effect: () => {} }, color: "text-purple-600" },
@@ -273,7 +276,7 @@
     const chainEvents = [
       { name: "Bandit Saga: Hunt or Pay", description: "Bandits demand tribute. Respond?", choice1: { text: "Hunt", effect: () => { village.population -= 10; gameState.eventChains.banditSaga.active = false; village.morale.warriors += 10; } }, choice2: { text: "Pay", effect: () => { village.wealth -= 20; gameState.eventChains.banditSaga.stage = 2; } }, color: "text-red-600" },
       { name: "Bandit Saga: Alliance", description: "Bandits offer alliance. Accept?", choice1: { text: "Accept", effect: () => { village.population += 15; village.morale.peasants -= 20; village.morale.clergy -= 20; village.morale.warriors -= 20; gameState.eventChains.banditSaga.active = false; } }, choice2: { text: "Reject", effect: () => { village.food -= 30; gameState.eventChains.banditSaga.active = false; } }, color: "text-red-600" },
-      { name: "Relic Curse: Spreads", description: "The relic’s curse grows. Purify it?", choice1: { text: "Purify", effect: () => { village.wealth -= 30; Object.keys(village.relics).forEach(r => village.relics[r] = false); gameState.eventChains.relicCurse.active = false; } }, choice2: { text: "Ignore", effect: () => { village.health -= 15; gameState.eventChains.relicCurse.active = false; } }, color: "text-red-600" },
+      { name: "Relic Curse: Spreads", description: "The relic’s curse grows. Purify it?", choice1: { text: "Purify", effect: () => { village.wealth -= 30; Object.keys(village.relics).forEach(r => village.relics[r] = false); gameState.eventChains.relicCurse.active = false; gameState.campaignProgress.curseLifted = true; } }, choice2: { text: "Ignore", effect: () => { village.health -= 15; gameState.eventChains.relicCurse.active = false; } }, color: "text-red-600" },
       { name: "Royal Intrigue: Spy Uncovered", description: "A spy is found. Expose them?", choice1: { text: "Expose", effect: () => { village.wealth += 10; gameState.eventChains.royalIntrigue.active = false; } }, choice2: { text: "Ignore", effect: () => { village.food -= 20; gameState.eventChains.royalIntrigue.active = false; } }, color: "text-red-600" }
     ];
     const campaignEvents = [
@@ -284,7 +287,7 @@
       { round: 5, name: "Healer’s Aid", description: "A healer offers help if aided. Accept?", choice1: { text: "Accept", effect: () => { village.food -= 15; village.health += 20; village.morale.clergy += 10; } }, choice2: { text: "Refuse", effect: () => { village.morale.clergy -= 10; } }, color: "text-blue-600" },
       { round: 6, name: "Bandit Threat", description: "Bandits near. Pay tribute?", choice1: { text: "Pay", effect: () => { village.wealth -= 30; } }, choice2: { text: "Fight", effect: () => { village.population -= 10; village.morale.warriors += 10; gameState.eventChains.banditSaga = { active: true, stage: 1 }; } }, color: "text-red-600" },
       { round: 7, name: "Refugee Plight", description: "Refugees beg entry. Accept?", choice1: { text: "Accept", effect: () => { village.population += 20; village.food -= 25; village.morale.peasants += 5; } }, choice2: { text: "Reject", effect: () => { village.health -= 5; village.morale.peasants -= 10; } }, color: "text-purple-600" },
-      { round: 8, name: "Curse Resurges", description: "The curse returns. Pray?", choice1: { text: "Pray", effect: () => { village.health += 10; village.morale.clergy += 10; } }, choice2: { text: "Defy", effect: () => { village.population -= 10; village.morale.clergy -= 10; } }, color: "text-red-600" },
+      { round: 8, name: "Curse Resurges", description: "The curse returns. Pray?", choice1: { text: "Pray", effect: () => { village.health += 10; village.morale.clergy += 10; gameState.campaignProgress.curseLifted = true; } }, choice2: { text: "Defy", effect: () => { village.population -= 10; village.morale.clergy -= 10; } }, color: "text-red-600" },
       { round: 9, name: "Final Stand", description: "The King tests thee. Submit?", choice1: { text: "Submit", effect: () => { village.wealth -= 20; village.morale.peasants -= 10; } }, choice2: { text: "Resist", effect: () => { village.population -= 15; village.morale.warriors += 10; } }, color: "text-red-600" },
       { round: 10, name: "Curse Climax", description: gameState.campaignProgress.loyal ? "The King audits thy loyalty. Pay tribute?" : gameState.campaignProgress.rebel ? "A royal siege threatens. Fight?" : "The curse peaks. Sacrifice relic?", choice1: { text: gameState.campaignProgress.loyal ? "Pay" : gameState.campaignProgress.rebel ? "Fight" : "Sacrifice", effect: () => { 
           if (gameState.campaignProgress.loyal) village.wealth -= 50;
@@ -324,7 +327,7 @@
       village.food = Math.floor((difficulty === 'easy' ? 150 : 100) * resourceMultiplier);
       village.health = Math.floor(30 * resourceMultiplier);
       village.wealth = 0;
-      village.morale = { peasants: 50, clergy: 50, warriors: 50 };
+      village.morale = { peasants: 60, clergy: 60, warriors: 60 };
       village.upgrades = { granary: false, infirmary: false, walls: false };
       village.relics = { plenty: false, vitality: false, valor: false };
       tradeUsed = false;
@@ -362,7 +365,9 @@
     }
 
     function updateSeason() {
-      season = seasons[round - 1].name.toLowerCase();
+      if (round <= maxRounds) {
+        season = seasons[round - 1].name.toLowerCase();
+      }
     }
 
     function applyRandomEvent() {
@@ -413,12 +418,12 @@
     }
 
     function showEventModal(event) {
-      document.getElementById('event-title').innerText = event.name;
-      document.getElementById('event-description').innerText = event.description;
+      document.getElementById('event-title').textContent = event.name;
+      document.getElementById('event-description').textContent = event.description;
       const choice1Btn = document.getElementById('event-choice-1');
       const choice2Btn = document.getElementById('event-choice-2');
-      choice1Btn.innerText = event.choice1.text;
-      choice2Btn.innerText = event.choice2.text;
+      choice1Btn.textContent = event.choice1.text;
+      choice2Btn.textContent = event.choice2.text;
       choice1Btn.onclick = () => {
         event.choice1.effect();
         addToLog(`<span class="${event.color}">${event.name}: ${event.choice1.text}</span>`);
@@ -438,52 +443,52 @@
 
     function checkFactionEvents() {
       if (village.morale.peasants < 30) {
-        village.population -= 10;
-        addToLog(`<span class="text-red-600">Peasant Revolt: 10 flee!</span>`);
+        village.population -= 5;
+        addToLog('<span class="text-red-600">Peasant Revolt: 5 flee!</span>');
         village.morale.peasants = Math.min(100, village.morale.peasants + 10);
       }
       if (village.morale.clergy < 30) {
-        village.health = Math.max(0, Math.floor(village.health / 2));
-        addToLog(`<span class="text-red-600">Clergy Schism: Health halved!</span>`);
+        village.health = Math.max(0, Math.floor(village.health * 0.75));
+        addToLog('<span class="text-red-600">Clergy Schism: Health reduced!</span>');
         village.morale.clergy = Math.min(100, village.morale.clergy + 10);
       }
       if (village.morale.warriors < 30) {
-        village.food -= 20;
-        addToLog(`<span class="text-red-600">Warrior Mutiny: 20 Food lost!</span>`);
+        village.food -= 10;
+        addToLog('<span class="text-red-600">Warrior Mutiny: 10 Food lost!</span>');
         village.morale.warriors = Math.min(100, village.morale.warriors + 10);
       }
     }
 
     function applyConsumptionAndArmy() {
-      const consumptionRate = (difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 1.8 : 1.5) * (season === 'summer' ? 1.1 : 1) * (village.relics.plenty ? 1.1 : 1);
+      const consumptionRate = (difficulty === 'easy' ? 1.0 : difficulty === 'hard' ? 1.6 : 1.3) * (season === 'summer' ? 1.1 : 1) * (village.relics.plenty ? 1.1 : 1);
       const foodNeeded = village.population * consumptionRate;
       if (village.food < foodNeeded) {
         const deaths = Math.floor((foodNeeded - village.food) / consumptionRate);
         village.population = Math.max(0, village.population - deaths);
         addToLog(`<span class="text-red-600">Hunger slays ${deaths} villagers!</span>`);
-        village.morale.peasants -= 15;
-        village.morale.clergy -= 15;
-        village.morale.warriors -= 15;
+        village.morale.peasants -= 10;
+        village.morale.clergy -= 10;
+        village.morale.warriors -= 10;
       }
       village.food = Math.max(0, village.food - foodNeeded);
       const healthThreshold = difficulty === 'easy' ? 60 : 50;
       if (village.health < healthThreshold) {
-        const maxDeaths = difficulty === 'easy' ? 15 : difficulty === 'hard' ? 25 : 20;
-        const deaths = Math.min(maxDeaths, Math.floor(20 * (healthThreshold - village.health) / healthThreshold * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1)));
+        const maxDeaths = difficulty === 'easy' ? 10 : difficulty === 'hard' ? 20 : 15;
+        const deaths = Math.min(maxDeaths, Math.floor(15 * (healthThreshold - village.health) / healthThreshold * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1)));
         village.population = Math.max(0, village.population - deaths);
         addToLog(`<span class="text-red-600">Pestilence claims ${deaths} souls!</span>`);
-        village.morale.clergy -= 15;
+        village.morale.clergy -= 10;
       }
-      if ([3, 6, 9].includes(round) && !window.skipNextArmyDemand) {
-        let armyDemand = Math.floor((difficulty === 'normal' ? (40 + Math.random() * 40) : (30 + Math.random() * 70)) * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1) * (season === 'autumn' ? 1.2 : 1));
+      if ([6, 9].includes(round) && !window.skipNextArmyDemand) {
+        let armyDemand = Math.min(difficulty === 'easy' ? 50 : difficulty === 'hard' ? 70 : 60, Math.floor((difficulty === 'normal' ? (30 + Math.random() * 30) : (20 + Math.random() * 50)) * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1) * (season === 'autumn' ? 1.2 : 1)));
         if (window.nextArmyDemandDoubled) {
           armyDemand *= 2;
           window.nextArmyDemandDoubled = false;
         }
         if (gameState.campaignProgress.loyal) armyDemand *= 0.8;
         village.food = Math.max(0, village.food - armyDemand);
-        addToLog(`<span class="text-red-600">The King seizes ${armyDemand} bushels for his host!</span>`);
-        village.morale.peasants -= 10;
+        addToLog(`<span class="text-red-600">The King seizes ${armyDemand} bushels!</span>`);
+        village.morale.peasants -= 5;
         window.skipNextArmyDemand = false;
       }
     }
@@ -497,22 +502,22 @@
       let message = '';
       let proceed = true;
 
-      if (doubleDown && village.wealth < 10) {
+      if (doubleDown && village.wealth < 5) {
         message = `Not enough Wealth to Double Down!`;
         proceed = false;
-      } else if (doubleDown && Math.random() < 0.2) {
+      } else if (doubleDown && Math.random() < 0.1) {
         message = `Double Down fails—gains halved!`;
         actionMultiplier *= 0.5;
-        village.morale.peasants -= 10;
-        village.morale.clergy -= 10;
-        village.morale.warriors -= 10;
-        village.wealth -= 10;
+        village.morale.peasants -= 5;
+        village.morale.clergy -= 5;
+        village.morale.warriors -= 5;
+        village.wealth -= 5;
       } else if (doubleDown) {
-        village.wealth -= 10;
+        village.wealth -= 5;
       }
 
       if (action === 'farm') {
-        let foodGain = Math.floor(30 * randomFactor * actionMultiplier * (village.upgrades.granary ? 1.2 : 1) * (village.relics.plenty ? 1.1 : 1));
+        let foodGain = Math.floor(40 * randomFactor * actionMultiplier * (village.upgrades.granary ? 1.2 : 1) * (village.relics.plenty ? 1.1 : 1));
         if (season === 'autumn' && village.upgrades.granary && Math.random() < 0.1) {
           foodGain += 20;
           message = `Bumper Crop yields ${foodGain} bushels!`;
@@ -525,7 +530,7 @@
         village.food += foodGain;
         village.morale.peasants += 10;
       } else if (action === 'heal') {
-        let healthGain = Math.floor(12 * randomFactor * actionMultiplier * (village.upgrades.infirmary ? 1.2 : 1) * (village.relics.vitality ? 1.1 : 1));
+        let healthGain = Math.floor(15 * randomFactor * actionMultiplier * (village.upgrades.infirmary ? 1.2 : 1) * (village.relics.vitality ? 1.1 : 1));
         if (village.health < 30 && Math.random() < 0.2) {
           window.healerFatigue = true;
           healthGain = 0;
@@ -540,7 +545,7 @@
         village.morale.clergy += 10;
         if (window.healerFatigue && healthGain > 0) window.healerFatigue = false;
       } else if (action === 'recruit') {
-        let popGain = Math.floor(10 * randomFactor * actionMultiplier * (village.relics.valor ? 0.9 : 1));
+        let popGain = Math.floor(12 * randomFactor * actionMultiplier * (village.relics.valor ? 0.9 : 1));
         if (season === 'summer' && village.morale.peasants > 70) {
           popGain += 5;
           message = `Peasants draw ${popGain} souls!`;
@@ -584,7 +589,7 @@
         document.getElementById('upgrade-modal').style.display = 'block';
         return;
       } else if (action === 'tax') {
-        const wealthGain = Math.floor(10 + randomFactor * 10);
+        const wealthGain = Math.floor(15 + randomFactor * 10);
         village.wealth += wealthGain;
         message = `Taxes yield ${wealthGain} gold!`;
         village.morale.peasants -= 10;
@@ -604,12 +609,16 @@
         }
       }
 
+      if (village.health > 90 && Math.random() < 0.1) {
+        fortifiedRounds = 1;
+        addToLog(`<span class="text-green-600">Thy village’s vigor inspires free fortification!</span>`);
+      }
+
       addToLog(`<span class="text-brown-800">${message}</span>`);
       if (proceed && !['trade', 'upgrade', 'appease'].includes(action)) {
         applyConsumptionAndArmy();
         applyRandomEvent();
         round++;
-        updateSeason();
       }
       checkGameOver();
     }
@@ -638,7 +647,6 @@
         applyConsumptionAndArmy();
         applyRandomEvent();
         round++;
-        updateSeason();
       }
       closeModal('trade-modal');
       checkGameOver();
@@ -646,20 +654,24 @@
 
     function performUpgrade(type) {
       let message = '';
-      let paidWithWealth = village.food < (type === 'granary' ? 50 : type === 'infirmary' ? 30 : 40);
-      if (type === 'granary' && !village.upgrades.granary && ((village.food >= 50 && village.population >= 5) || (village.wealth >= 50 && village.population >= 5))) {
-        if (paidWithWealth) village.wealth -= 50; else village.food -= 50;
-        village.population -= 5;
+      let cost = type === 'granary' ? 50 : type === 'infirmary' ? 30 : 40;
+      let popCost = type === 'granary' ? 5 : type === 'infirmary' ? 5 : 10;
+      let paidWithWealth = village.food < cost;
+      let useWealthOnly = village.wealth > 60;
+
+      if (type === 'granary' && !village.upgrades.granary && ((village.food >= cost && (village.population >= popCost || useWealthOnly)) || (village.wealth >= cost && (village.population >= popCost || useWealthOnly)))) {
+        if (paidWithWealth) village.wealth -= cost; else village.food -= cost;
+        if (!useWealthOnly) village.population -= popCost;
         village.upgrades.granary = true;
         message = `Thy village builds a Granary!`;
-      } else if (type === 'infirmary' && !village.upgrades.infirmary && ((village.food >= 30 && village.population >= 5) || (village.wealth >= 30 && village.population >= 5))) {
-        if (paidWithWealth) village.wealth -= 30; else village.food -= 30;
-        village.population -= 5;
+      } else if (type === 'infirmary' && !village.upgrades.infirmary && ((village.food >= cost && (village.population >= popCost || useWealthOnly)) || (village.wealth >= cost && (village.population >= popCost || useWealthOnly)))) {
+        if (paidWithWealth) village.wealth -= cost; else village.food -= cost;
+        if (!useWealthOnly) village.population -= popCost;
         village.upgrades.infirmary = true;
         message = `Thy village builds an Infirmary!`;
-      } else if (type === 'walls' && !village.upgrades.walls && ((village.food >= 40 && village.population >= 10) || (village.wealth >= 40 && village.population >= 10))) {
-        if (paidWithWealth) village.wealth -= 40; else village.food -= 40;
-        village.population -= 10;
+      } else if (type === 'walls' && !village.upgrades.walls && ((village.food >= cost && (village.population >= popCost || useWealthOnly)) || (village.wealth >= cost && (village.population >= popCost || useWealthOnly)))) {
+        if (paidWithWealth) village.wealth -= cost; else village.food -= cost;
+        if (!useWealthOnly) village.population -= popCost;
         village.upgrades.walls = true;
         message = `Thy village raises Walls!`;
       } else {
@@ -670,7 +682,6 @@
         applyConsumptionAndArmy();
         applyRandomEvent();
         round++;
-        updateSeason();
       }
       closeModal('upgrade-modal');
       checkGameOver();
@@ -678,8 +689,8 @@
 
     function performAppease(faction) {
       let message = '';
-      if (village.food >= 20) {
-        village.food -= 20;
+      if (village.food >= 15) {
+        village.food -= 15;
         village.morale[faction] = Math.min(100, village.morale[faction] + 20);
         message = `Appeased ${faction.charAt(0).toUpperCase() + faction.slice(1)}—Morale rises!`;
       } else {
@@ -690,7 +701,6 @@
         applyConsumptionAndArmy();
         applyRandomEvent();
         round++;
-        updateSeason();
       }
       closeModal('appease-modal');
       checkGameOver();
@@ -735,10 +745,10 @@
 
     function checkGameOver() {
       calculateLegacyScore();
-      if (round > maxRounds || village.population <= 0) {
+      if (round >= maxRounds || village.population <= 0) {
         let message = '';
         if (mode === 'campaign') {
-          const goalsMet = village.population > 100 && village.health > 80;
+          const goalsMet = village.population > 80 && village.health > 70;
           if (goalsMet && gameState.campaignProgress.curseLifted) {
             gameState.campaignProgress.ending = 'True Victory';
             endings[0].achieved = true;
@@ -771,6 +781,7 @@
         document.getElementById('warnings').innerHTML = '';
         document.getElementById('round-progress').style.width = '100%';
       } else {
+        updateSeason();
         startTurn();
       }
     }
@@ -803,13 +814,13 @@
         <p><span class="font-semibold">Upgrades:</span> ${upgrades}</p>
         <p><span class="font-semibold">Relics:</span> ${relics}</p>
         <p><span class="font-semibold">Legacy Score:</span> ${Math.floor(village.food + village.population * 2 + village.health * 3 + (village.morale.peasants + village.morale.clergy + village.morale.warriors))}</p>
-        ${mode === 'campaign' ? `<p><span class="font-semibold">Goals:</span> Population > 100 (${village.population}/100), Health > 80 (${village.health}/80)</p><p><span class="font-semibold">Path:</span> ${arc}</p>` : ''}
+        ${mode === 'campaign' ? `<p><span class="font-semibold">Goals:</span> Population > ${80} (${Math.floor(village.population)}/80), Health > ${70} (${Math.floor(village.health)}/70)</p><p><span class="font-semibold">Path:</span> ${arc}</p>` : ''}
       `;
-      document.getElementById('game-status').innerHTML = `<p class="text-xl">Year ${round} of ${maxRounds} (${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}, ${season.charAt(0).toUpperCase() + season.slice(1)})</p>`;
-      document.getElementById('round-progress').style.width = `${(round / maxRounds) * 100}%`;
+	  document.getElementById('game-status').innerHTML = `<p class="text-xl">Year ${Math.floor(round)} of ${maxRounds} (${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}, ${season.charAt(0).toUpperCase() + season.slice(1)})</p>`;
+      document.getElementById('round-progress').style.width = `${Math.floor((round / maxRounds) * 100)}%`;
 
       const warnings = [];
-      const consumptionRate = (difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 1.8 : 1.5) * (season === 'summer' ? 1.1 : 1) * (village.relics.plenty ? 1.1 : 1);
+      const consumptionRate = (difficulty === 'easy' ? 1.0 : difficulty === 'hard' ? 1.6 : 1.3) * (season === 'summer' ? 1.1 : 1) * (village.relics.plenty ? 1.1 : 1);
       if (village.food < village.population * consumptionRate) {
         warnings.push(difficulty === 'easy' ? "Stores wane—till the fields!" : "Famine looms—till the fields!");
       }
@@ -819,7 +830,7 @@
       if (village.population < criticalThresholds.population) {
         warnings.push("Thy village teeters—call newcomers!");
       }
-      if ([3, 6, 9].includes(round)) {
+      if ([6, 9].includes(round)) {
         warnings.push(difficulty === 'hard' ? "The King’s host hungers!" : "The King’s men demand tribute!");
       }
       if (village.health > 80 && village.food >= 30) {
@@ -828,14 +839,14 @@
       if (season === 'winter' && village.food >= 20) {
         warnings.push("Winter aids fortification—build now!");
       }
-      if (!village.upgrades.granary && (village.food >= 50 || village.wealth >= 50) && village.population >= 5) {
+      if (!village.upgrades.granary && (village.food >= 50 || village.wealth >= 50) && (village.population >= 5 || village.wealth > 60)) {
         warnings.push(difficulty === 'easy' ? "Build a Granary for bounty!" : "A Granary strengthens thy stores!");
       }
       if (village.morale.peasants < criticalThresholds.morale) {
         warnings.push("Peasants revolt—appease them!");
       }
       if (village.morale.clergy < criticalThresholds.morale) {
-        warnings.push("Clergy falter—appease them!");
+        warnings.push("Clergy falters—appease them!");
       }
       if (village.morale.warriors < criticalThresholds.morale) {
         warnings.push("Warriors mutiny—appease them!");
@@ -846,7 +857,7 @@
       if (gameState.eventChains.banditSaga.active) {
         warnings.push("Bandits grow bolder—prepare!");
       }
-      if (village.wealth < 40 && [3, 6, 9].includes(round)) {
+      if (village.wealth < 40 && [6, 9].includes(round)) {
         warnings.push("Royal Summons nears—gather Wealth!");
       }
       document.getElementById('warnings').innerHTML = warnings.length
@@ -860,40 +871,40 @@
         checkGameOver();
         return;
       }
-      const actionMultiplier = difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 0.8 : 1;
+      const actionMultiplier = (difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 0.8 : 1);
       document.getElementById('actions').innerHTML = `
         <div class="flex justify-center gap-4 flex-wrap">
           <div class="tooltip">
             <button onclick="performAction('farm')" class="button bg-green-600 text-white p-3 rounded-lg font-semibold">Till the Fields</button>
-            <span class="tooltiptext">Gain ~${Math.floor(30 * actionMultiplier * (season === 'spring' ? 1.2 : 1))} Food${season === 'autumn' ? ", chance of Bumper Crop" : ""}</span>
+            <span class="tooltiptext">Gain ~${Math.floor(40 * actionMultiplier * (season === 'spring' ? 1.2 : 1))} Food${season === 'autumn' ? ", chance of Bumper Crop" : ""}</span>
           </div>
           <div class="tooltip">
-            <button onclick="performAction('farm', true)" class="button bg-green-800 text-white p-3 rounded-lg font-semibold" ${village.wealth < 10 ? 'disabled' : ''}>Double Down Farm</button>
-            <span class="tooltiptext">Spend 10 Wealth for ~${Math.floor(60 * actionMultiplier * (season === 'spring' ? 1.2 : 1))} Food, 20% fail risk</span>
+            <button onclick="performAction('farm', true)" class="button bg-green-800 text-white p-3 rounded-lg font-semibold" ${village.wealth < 5 ? 'disabled' : ''}>Double Down Farm</button>
+            <span class="tooltiptext">Spend 5 Wealth for ~${Math.floor(80 * actionMultiplier * (season === 'spring' ? 1.2 : 1))} Food, 10% fail risk</span>
           </div>
           <div class="tooltip">
             <button onclick="performAction('heal')" class="button bg-blue-600 text-white p-3 rounded-lg font-semibold">Tend the Sick</button>
-            <span class="tooltiptext">Gain ~${Math.floor(12 * actionMultiplier * (season === 'summer' ? 1.2 : 1))} Health${season === 'winter' ? ", bonus with high Clergy" : ""}</span>
+            <span class="tooltiptext">Gain ~${Math.floor(15 * actionMultiplier * (season === 'summer' ? 1.2 : 1))} Health${season === 'winter' ? ", bonus with high Clergy" : ""}</span>
           </div>
           <div class="tooltip">
-            <button onclick="performAction('heal', true)" class="button bg-blue-800 text-white p-3 rounded-lg font-semibold" ${village.wealth < 10 ? 'disabled' : ''}>Double Down Heal</button>
-            <span class="tooltiptext">Spend 10 Wealth for ~${Math.floor(24 * actionMultiplier * (season === 'summer' ? 1.2 : 1))} Health, 20% fail risk</span>
+            <button onclick="performAction('heal', true)" class="button bg-blue-800 text-white p-3 rounded-lg font-semibold" ${village.wealth < 5 ? 'disabled' : ''}>Double Down Heal</button>
+            <span class="tooltiptext">Spend 5 Wealth for ~${Math.floor(30 * actionMultiplier * (season === 'summer' ? 1.2 : 1))} Health, 10% fail risk</span>
           </div>
           <div class="tooltip">
             <button onclick="performAction('recruit')" class="button bg-purple-600 text-white p-3 rounded-lg font-semibold">Call Newcomers</button>
-            <span class="tooltiptext">Gain ~${Math.floor(10 * actionMultiplier * (season === 'spring' ? 0.8 : 1))} Population${season === 'summer' ? ", bonus with high Peasants" : ""}</span>
+            <span class="tooltiptext">Gain ~${Math.floor(12 * actionMultiplier * (season === 'spring' ? 0.8 : 1))} Population${season === 'summer' ? ", bonus with high Peasants" : ""}</span>
           </div>
           <div class="tooltip">
-            <button onclick="performAction('recruit', true)" class="button bg-purple-800 text-white p-3 rounded-lg font-semibold" ${village.wealth < 10 ? 'disabled' : ''}>Double Down Recruit</button>
-            <span class="tooltiptext">Spend 10 Wealth for ~${Math.floor(20 * actionMultiplier * (season === 'spring' ? 0.8 : 1))} Population, 20% fail risk</span>
+            <button onclick="performAction('recruit', true)" class="button bg-purple-800 text-white p-3 rounded-lg font-semibold" ${village.wealth < 5 ? 'disabled' : ''}>Double Down Recruit</button>
+            <span class="tooltiptext">Spend 5 Wealth for ~${Math.floor(24 * actionMultiplier * (season === 'spring' ? 0.8 : 1))} Population, 10% fail risk</span>
           </div>
           <div class="tooltip">
             <button onclick="performAction('fortify')" class="button bg-gray-600 text-white p-3 rounded-lg font-semibold">Fortify Village</button>
             <span class="tooltiptext">Spend ${Math.floor(20 * (season === 'winter' ? 0.8 : season === 'spring' ? 1.1 : 1))} Food to halve damage</span>
           </div>
           <div class="tooltip">
-            <button onclick="performAction('fortify', true)" class="button bg-gray-800 text-white p-3 rounded-lg font-semibold" ${village.wealth < 10 ? 'disabled' : ''}>Double Down Fortify</button>
-            <span class="tooltiptext">Spend 10 Wealth, ${Math.floor(20 * (season === 'winter' ? 0.8 : season === 'spring' ? 1.1 : 1))} Food for stronger defense, 20% fail risk</span>
+            <button onclick="performAction('fortify', true)" class="button bg-gray-800 text-white p-3 rounded-lg font-semibold" ${village.wealth < 5 ? 'disabled' : ''}>Double Down Fortify</button>
+            <span class="tooltiptext">Spend 5 Wealth, ${Math.floor(20 * (season === 'winter' ? 0.8 : season === 'spring' ? 1.1 : 1))} Food for stronger defense, 10% fail risk</span>
           </div>
           <div class="tooltip">
             <button onclick="performAction('trade')" class="button bg-yellow-600 text-white p-3 rounded-lg font-semibold" ${tradeUsed ? 'disabled' : ''}>Trade</button>
@@ -904,8 +915,8 @@
             <span class="tooltiptext">Spend 30 Food for ~${Math.floor(15 * actionMultiplier)} Population</span>
           </div>
           <div class="tooltip">
-            <button onclick="performAction('festival', true)" class="button bg-red-800 text-white p-3 rounded-lg font-semibold" ${village.health <= 80 || village.food < 30 || village.wealth < 10 ? 'disabled' : ''}>Double Down Festival</button>
-            <span class="tooltiptext">Spend 10 Wealth, 30 Food for ~${Math.floor(30 * actionMultiplier)} Population, 20% fail risk</span>
+            <button onclick="performAction('festival', true)" class="button bg-red-800 text-white p-3 rounded-lg font-semibold" ${village.health <= 80 || village.food < 30 || village.wealth < 5 ? 'disabled' : ''}>Double Down Festival</button>
+            <span class="tooltiptext">Spend 5 Wealth, 30 Food for ~${Math.floor(30 * actionMultiplier)} Population, 10% fail risk</span>
           </div>
           <div class="tooltip">
             <button onclick="performAction('upgrade')" class="button bg-orange-600 text-white p-3 rounded-lg font-semibold">Upgrade Village</button>
@@ -913,11 +924,11 @@
           </div>
           <div class="tooltip">
             <button onclick="performAction('tax')" class="button bg-yellow-800 text-white p-3 rounded-lg font-semibold">Tax Villagers</button>
-            <span class="tooltiptext">Gain ~15 Wealth, angers Peasants</span>
+            <span class="tooltiptext">Gain ~20 Wealth, angers Peasants</span>
           </div>
           <div class="tooltip">
             <button onclick="performAction('appease')" class="button bg-green-700 text-white p-3 rounded-lg font-semibold">Appease Faction</button>
-            <span class="tooltiptext">Spend 20 Food to boost Morale</span>
+            <span class="tooltiptext">Spend 15 Food to boost Morale</span>
           </div>
           <div class="tooltip">
             <button onclick="performAction('mercenaries')" class="button bg-red-700 text-white p-3 rounded-lg font-semibold">Hire Mercenaries</button>
@@ -926,6 +937,12 @@
         </div>
       `;
     }
+
+    // Bind event listeners for start screen buttons
+    document.getElementById('begin-btn').addEventListener('click', startGame);
+    document.getElementById('tutorial-btn').addEventListener('click', showTutorial);
+    document.getElementById('milestones-btn').addEventListener('click', showMilestones);
+    document.getElementById('endings-btn').addEventListener('click', showEndings);
   </script>
 </body>
 </html>
