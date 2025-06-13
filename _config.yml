@@ -4,6 +4,9 @@ permalink: /:categories/:year/:month/:day/:title
 
 theme: minima
 
+include:
+  - game.html
+
 exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
 auto: true
 pygments: true
