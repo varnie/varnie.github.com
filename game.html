@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plague and Plenty</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+      background-color: #f4e4bc;
+      color: #2c1b0e;
+      font-family: 'Georgia', serif;
+    }
+    .parchment {
+      background-color: #fff8e1;
+      border: 2px solid #8b5a2b;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+    .button:hover {
+      filter: brightness(1.2);
+    }
+    .critical {
+      color: #b91c1c;
+      font-weight: bold;
+    }
+    .warning {
+      color: #b45309;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+  <div class="container max-w-3xl mx-auto p-6 parchment rounded-lg">
+    <div id="start-screen" class="text-center">
+      <h1 class="text-4xl mb-6 font-bold text-brown-800">Plague and Plenty</h1>
+      <p class="text-lg mb-4">Choose thy challenge:</p>
+      <select id="difficulty-select" class="p-2 bg-brown-100 rounded-lg mb-4">
+        <option value="easy">Easy</option>
+        <option value="normal" selected>Normal</option>
+        <option value="hard">Hard</option>
+      </select>
+      <br>
+      <button onclick="startGame()" class="button bg-green-600 text-white p-3 rounded-lg font-semibold">Begin</button>
+    </div>
+    <div id="game-screen" class="hidden">
+      <h1 class="text-4xl text-center mb-6 font-bold text-brown-800">Plague and Plenty</h1>
+      <div class="mb-4">
+        <div id="game-status" class="text-center text-xl mb-2"></div>
+        <div class="w-full bg-gray-300 rounded-full h-4">
+          <div id="round-progress" class="bg-green-600 h-4 rounded-full" style="width: 10%"></div>
+        </div>
+      </div>
+      <div id="village" class="p-6 bg-brown-100 rounded-lg mb-4 text-center"></div>
+      <div id="warnings" class="text-center mb-4"></div>
+      <div id="actions" class="text-center mb-4 flex justify-center gap-4 flex-wrap"></div>
+      <div id="event-log" class="p-4 bg-brown-50 rounded-lg max-h-48 overflow-y-auto"></div>
+    </div>
+  </div>
+
+  <script>
+    let difficulty = 'normal';
+    const village = {
+      name: "Thy Village",
+      population: 60,
+      food: 100,
+      health: 30
+    };
+    const events = [
+      { name: "Plague Scours the Land", effect: () => {
+          const damage = Math.floor(25 * (100 - village.health) / 100 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1));
+          village.population = Math.max(0, village.population - Math.floor(damage * (village.fortified ? 0.5 : 1)));
+        }, color: "text-red-600" },
+      { name: "Meager Harvest", effect: () => {
+          village.food += Math.floor(30 * (difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 0.8 : 1));
+        }, color: "text-green-600" },
+      { name: "Bandits Ravage Stores", effect: () => {
+          const damage = 60 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
+          village.food = Math.max(0, village.food - Math.floor(damage * (village.fortified ? 0.5 : 1)));
+        }, color: "text-red-600" },
+      { name: "Healer Passes By", effect: () => {
+          village.health = Math.min(100, village.health + Math.floor(15 * (difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 0.8 : 1)));
+        }, color: "text-blue-600" },
+      { name: "Bitter Winter", effect: () => {
+          village.food -= 40 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
+          village.health -= 20 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
+          village.population -= 5 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
+        }, color: "text-red-600" },
+      { name: "Refugees Beg Entry", effect: () => {
+          village.population += 25;
+          village.food -= 30 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
+          village.health -= 10 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
+        }, color: "text-purple-600" },
+      { name: "Crop Blight", effect: () => {
+          village.food = Math.max(0, village.food - Math.floor(village.food * 0.5 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1)));
+        }, color: "text-red-600" },
+      { name: "Royal Tax", effect: () => {
+          village.food = Math.max(0, village.food - 50 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1));
+        }, color: "text-red-600" }
+    ];
+    let round = 1;
+    const maxRounds = 10;
+    const eventLog = [];
+    let tradeUsed = false;
+    let villageFortified = false;
+
+    function startGame() {
+      difficulty = document.getElementById('difficulty-select').value;
+      const resourceMultiplier = difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 0.8 : 1;
+      village.population = Math.floor(60 * resourceMultiplier);
+      village.food = Math.floor(100 * resourceMultiplier);
+      village.health = Math.floor(30 * resourceMultiplier);
+      village.fortified = false;
+      tradeUsed = false;
+      round = 1;
+      eventLog.length = 0;
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('game-screen').classList.remove('hidden');
+      initializeGame();
+    }
+
+    function resetGame() {
+      document.getElementById('game-screen').classList.add('hidden');
+      document.getElementById('start-screen').classList.remove('hidden');
+      document.getElementById('event-log').innerHTML = '';
+    }
+
+    function initializeGame() {
+      updateUI();
+      startTurn();
+    }
+
+    function applyRandomEvent() {
+      const event = events[Math.floor(Math.random() * events.length)];
+      event.effect();
+      addToLog(`<span class="${event.color}">${event.name}!</span>`);
+      village.fortified = false;
+    }
+
+    function applyConsumptionAndArmy() {
+      const consumptionRate = difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 1.8 : 1.5;
+      const foodNeeded = village.population * consumptionRate;
+      if (village.food < foodNeeded) {
+        const deaths = Math.floor((foodNeeded - village.food) / consumptionRate);
+        village.population = Math.max(0, village.population - deaths);
+        addToLog(`<span class="text-red-600">Hunger slays ${deaths} villagers!</span>`);
+      }
+      village.food = Math.max(0, village.food - foodNeeded);
+      if (village.health < 50) {
+        const deaths = Math.floor(20 * (50 - village.health) / 50 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1));
+        village.population = Math.max(0, village.population - deaths);
+        addToLog(`<span class="text-red-600">Pestilence claims ${deaths} souls!</span>`);
+      }
+      if ([3, 6, 9].includes(round)) {
+        const armyDemand = Math.floor((30 + Math.random() * 70) * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1));
+        village.food = Math.max(0, village.food - armyDemand);
+        addToLog(`<span class="text-red-600">The King seizes ${armyDemand} bushels for his host!</span>`);
+      }
+    }
+
+    function performAction(action) {
+      const actionMultiplier = difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 0.8 : 1;
+      const randomFactor = 0.9 + Math.random() * 0.2;
+      let message = '';
+
+      if (action === 'farm') {
+        const foodGain = Math.floor(30 * randomFactor * actionMultiplier);
+        village.food += foodGain;
+        message = `Thy fields yield ${foodGain} bushels!`;
+      } else if (action === 'heal') {
+        const healthGain = Math.floor(12 * randomFactor * actionMultiplier);
+        village.health = Math.min(100, village.health + healthGain);
+        message = `Leeches restore ${healthGain} vigor!`;
+      } else if (action === 'recruit') {
+        const popGain = Math.floor(10 * randomFactor * actionMultiplier);
+        village.population += popGain;
+        message = `${popGain} weary souls join thy fold!`;
+      } else if (action === 'fortify') {
+        const fortifyCost = 20;
+        if (village.food >= fortifyCost) {
+          village.food -= fortifyCost;
+          village.fortified = true;
+          message = `Thy village fortifies against calamity!`;
+        } else {
+          message = `Not enough Food to fortify!`;
+        }
+      } else if (action === 'trade') {
+        const tradeType = prompt("Trade: 'pop' for 10 Population to 50 Food, 'food' for 50 Food to 10 Population");
+        if (!tradeUsed && tradeType) {
+          if (tradeType === 'pop' && village.population >= 10) {
+            village.population -= 10;
+            village.food += 50;
+            message = `Traded 10 souls for 50 bushels!`;
+            tradeUsed = true;
+          } else if (tradeType === 'food' && village.food >= 50) {
+            village.food -= 50;
+            village.population += 10;
+            message = `Traded 50 bushels for 10 souls!`;
+            tradeUsed = true;
+          } else {
+            message = `Trade failed—insufficient resources!`;
+          }
+        } else {
+          message = tradeUsed ? `Trade already used!` : `Invalid trade choice!`;
+        }
+      } else if (action === 'festival') {
+        if (village.health > 80 && village.food >= 30) {
+          village.food -= 30;
+          village.population += Math.floor(15 * actionMultiplier);
+          message = `A grand festival draws ${Math.floor(15 * actionMultiplier)} new souls!`;
+        } else {
+          message = `Need Health > 80 and 30 Food for a festival!`;
+        }
+      }
+
+      addToLog(`<span class="text-brown-800">${message}</span>`);
+      if (['farm', 'heal', 'recruit', 'fortify', 'trade', 'festival'].includes(action) && !message.includes('failed') && !message.includes('enough') && !message.includes('already')) {
+        applyConsumptionAndArmy();
+        applyRandomEvent();
+        round++;
+      }
+      checkGameOver();
+    }
+
+    function addToLog(message) {
+      eventLog.unshift(message);
+      if (eventLog.length > 5) eventLog.pop();
+      document.getElementById('event-log').innerHTML = eventLog.join('<br>');
+    }
+
+    function checkGameOver() {
+      if (round > maxRounds || village.population <= 0) {
+        document.getElementById('game-status').innerHTML = village.population > 0
+          ? `<p class="text-2xl text-green-600">Thy village clings to life with ${village.food} bushels! (${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)})</p>`
+          : `<p class="text-2xl text-red-600">Thy village is no more! (${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)})</p>`;
+        document.getElementById('actions').innerHTML = `
+          <div class="flex justify-center mt-4">
+            <button onclick="resetGame()" class="button bg-blue-600 text-white p-3 rounded-lg font-semibold">Restart Game</button>
+          </div>
+        `;
+        document.getElementById('warnings').innerHTML = '';
+        document.getElementById('round-progress').style.width = '100%';
+      } else {
+        startTurn();
+      }
+    }
+
+    function updateUI() {
+      const criticalThresholds = {
+        population: difficulty === 'easy' ? 20 : difficulty === 'hard' ? 10 : 15,
+        food: difficulty === 'easy' ? 50 : difficulty === 'hard' ? 20 : 30,
+        health: 50
+      };
+      const popClass = village.population < criticalThresholds.population ? 'critical' : '';
+      const foodClass = village.food < criticalThresholds.food ? 'critical' : '';
+      const healthClass = village.health < criticalThresholds.health ? 'critical' : '';
+      document.getElementById('village').innerHTML = `
+        <h2 class="text-2xl font-bold">${village.name}</h2>
+        <p><span class="font-semibold">Population:</span> <span class="${popClass}">${Math.floor(village.population)}</span></p>
+        <p><span class="font-semibold">Food:</span> <span class="${foodClass}">${Math.floor(village.food)} bushels</span></p>
+        <p><span class="font-semibold">Health:</span> <span class="${healthClass}">${Math.floor(village.health)}</span></p>
+      `;
+      document.getElementById('game-status').innerHTML = `<p class="text-xl">Year ${round} of ${maxRounds} (${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)})</p>`;
+      document.getElementById('round-progress').style.width = `${(round / maxRounds) * 100}%`;
+
+      const warnings = [];
+      if (village.food < village.population * (difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 1.8 : 1.5)) {
+        warnings.push(difficulty === 'easy' ? "Stores wane—till the fields!" : "Famine looms—till the fields!");
+      }
+      if (village.health < 50) {
+        warnings.push(difficulty === 'hard' ? "Death stalks—tend the sick!" : "Sickness festers—tend the sick!");
+      }
+      if (village.population < criticalThresholds.population) {
+        warnings.push("Thy village teeters—call newcomers!");
+      }
+      if ([3, 6, 9].includes(round)) {
+        warnings.push(difficulty === 'hard' ? "The King’s host hungers!" : "The King’s men demand tribute!");
+      }
+      if (village.health > 80 && village.food >= 30) {
+        warnings.push("Hold a festival to draw souls!");
+      }
+      document.getElementById('warnings').innerHTML = warnings.length
+        ? `<p class="warning">${warnings.join(' ')}</p>`
+        : '';
+    }
+
+    function startTurn() {
+      updateUI();
+      if (village.population <= 0) {
+        checkGameOver();
+        return;
+      }
+      document.getElementById('actions').innerHTML = `
+        <div class="flex justify-center gap-4 flex-wrap">
+          <button onclick="performAction('farm')" class="button bg-green-600 text-white p-3 rounded-lg font-semibold">Till the Fields</button>
+          <button onclick="performAction('heal')" class="button bg-blue-600 text-white p-3 rounded-lg font-semibold">Tend the Sick</button>
+          <button onclick="performAction('recruit')" class="button bg-purple-600 text-white p-3 rounded-lg font-semibold">Call Newcomers</button>
+          <button onclick="performAction('fortify')" class="button bg-gray-600 text-white p-3 rounded-lg font-semibold">Fortify Village</button>
+          <button onclick="performAction('trade')" class="button bg-yellow-600 text-white p-3 rounded-lg font-semibold" ${tradeUsed ? 'disabled' : ''}>Trade</button>
+          <button onclick="performAction('festival')" class="button bg-red-600 text-white p-3 rounded-lg font-semibold" ${village.health <= 80 || village.food < 30 ? 'disabled' : ''}>Hold Festival</button>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
