@@ -5,12 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plague and Plenty</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Uncial+Antiqua&display=swap" rel="stylesheet">
   <style>
     body {
       background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
       background-color: #f4e4bc;
       color: #2c1b0e;
       font-family: 'Georgia', serif;
+    }
+    h1, h2 {
+      font-family: 'Uncial Antiqua', cursive;
     }
     .parchment {
       background-color: #fff8e1;
@@ -23,10 +27,63 @@
     .critical {
       color: #b91c1c;
       font-weight: bold;
+      animation: pulse 1s infinite;
     }
     .warning {
       color: #b45309;
       font-style: italic;
+    }
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 120px;
+      background-color: #8b5a2b;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -60px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    #round-progress {
+      transition: width 0.5s ease-in-out;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background-color: #fff8e1;
+      margin: 15% auto;
+      padding: 20px;
+      border: 2px solid #8b5a2b;
+      width: 80%;
+      max-width: 500px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
     }
   </style>
 </head>
@@ -34,6 +91,11 @@
   <div class="container max-w-3xl mx-auto p-6 parchment rounded-lg">
     <div id="start-screen" class="text-center">
       <h1 class="text-4xl mb-6 font-bold text-brown-800">Plague and Plenty</h1>
+      <p class="text-lg mb-4">Choose thy path:</p>
+      <select id="mode-select" class="p-2 bg-brown-100 rounded-lg mb-4">
+        <option value="classic">Classic</option>
+        <option value="campaign">Campaign</option>
+      </select>
       <p class="text-lg mb-4">Choose thy challenge:</p>
       <select id="difficulty-select" class="p-2 bg-brown-100 rounded-lg mb-4">
         <option value="easy">Easy</option>
@@ -42,6 +104,8 @@
       </select>
       <br>
       <button onclick="startGame()" class="button bg-green-600 text-white p-3 rounded-lg font-semibold">Begin</button>
+      <button onclick="showTutorial()" class="button bg-blue-600 text-white p-3 rounded-lg font-semibold ml-2">How to Play</button>
+      <button onclick="showMilestones()" class="button bg-purple-600 text-white p-3 rounded-lg font-semibold ml-2">View Milestones</button>
     </div>
     <div id="game-screen" class="hidden">
       <h1 class="text-4xl text-center mb-6 font-bold text-brown-800">Plague and Plenty</h1>
@@ -56,64 +120,164 @@
       <div id="actions" class="text-center mb-4 flex justify-center gap-4 flex-wrap"></div>
       <div id="event-log" class="p-4 bg-brown-50 rounded-lg max-h-48 overflow-y-auto"></div>
     </div>
+    <div id="trade-modal" class="modal">
+      <div class="modal-content">
+        <h2 class="text-2xl mb-4">Trade Offer</h2>
+        <p class="mb-4">Choose thy trade:</p>
+        <button onclick="performTrade('pop')" class="button bg-yellow-600 text-white p-2 rounded-lg mb-2">10 Population → 50 Food</button>
+        <button onclick="performTrade('food')" class="button bg-yellow-600 text-white p-2 rounded-lg mb-2">50 Food → 10 Population</button>
+        <button onclick="closeModal('trade-modal')" class="button bg-gray-600 text-white p-2 rounded-lg">Cancel</button>
+      </div>
+    </div>
+    <div id="upgrade-modal" class="modal">
+      <div class="modal-content">
+        <h2 class="text-2xl mb-4">Upgrade Village</h2>
+        <p class="mb-4">Choose thy upgrade:</p>
+        <button onclick="performUpgrade('granary')" class="button bg-orange-600 text-white p-2 rounded-lg mb-2" id="granary-btn">Granary (50 Food, 5 Pop)</button>
+        <button onclick="performUpgrade('infirmary')" class="button bg-orange-600 text-white p-2 rounded-lg mb-2" id="infirmary-btn">Infirmary (30 Food, 5 Pop)</button>
+        <button onclick="performUpgrade('walls')" class="button bg-orange-600 text-white p-2 rounded-lg mb-2" id="walls-btn">Walls (40 Food, 10 Pop)</button>
+        <button onclick="closeModal('upgrade-modal')" class="button bg-gray-600 text-white p-2 rounded-lg">Cancel</button>
+      </div>
+    </div>
+    <div id="event-modal" class="modal">
+      <div class="modal-content">
+        <h2 class="text-2xl mb-4" id="event-title"></h2>
+        <p class="mb-4" id="event-description"></p>
+        <button id="event-choice-1" class="button bg-blue-600 text-white p-2 rounded-lg mb-2"></button>
+        <button id="event-choice-2" class="button bg-blue-600 text-white p-2 rounded-lg mb-2"></button>
+      </div>
+    </div>
+    <div id="tutorial-modal" class="modal">
+      <div class="modal-content">
+        <h2 class="text-2xl mb-4">How to Play</h2>
+        <p class="mb-4">Guide thy village through 10 years of plague and plenty. Manage Population, Food, and Health:</p>
+        <ul class="text-left mb-4">
+          <li><b>Till the Fields</b>: Gain ~30 Food to feed thy people.</li>
+          <li><b>Tend the Sick</b>: Gain ~12 Health to ward off disease.</li>
+          <li><b>Call Newcomers</b>: Gain ~10 Population to grow.</li>
+          <li><b>Fortify Village</b>: Spend 20 Food to halve Plague/Bandit damage.</li>
+          <li><b>Trade</b>: Swap 10 Population for 50 Food or vice versa, once.</li>
+          <li><b>Hold Festival</b>: Spend 30 Food for 15 Population if Health > 80.</li>
+          <li><b>Upgrade Village</b>: Build Granary, Infirmary, or Walls for lasting boons.</li>
+        </ul>
+        <p class="mb-4">Seasons shift strategies: Farm in Spring, Heal in Summer. Events test thy wits—choose wisely!</p>
+        <p class="mb-4">Campaign mode weaves a tale with goals; Classic mode is random. Survive to earn a Legacy Score!</p>
+        <button onclick="closeModal('tutorial-modal')" class="button bg-gray-600 text-white p-2 rounded-lg">Close</button>
+      </div>
+    </div>
+    <div id="milestones-modal" class="modal">
+      <div class="modal-content">
+        <h2 class="text-2xl mb-4">Milestones</h2>
+        <ul id="milestones-list" class="text-left mb-4"></ul>
+        <button onclick="closeModal('milestones-modal')" class="button bg-gray-600 text-white p-2 rounded-lg">Close</button>
+      </div>
+    </div>
   </div>
 
   <script>
     let difficulty = 'normal';
+    let mode = 'classic';
+    let season = 'spring';
+    let fortifiedRounds = 0;
     const village = {
       name: "Thy Village",
       population: 60,
       food: 100,
-      health: 30
+      health: 30,
+      upgrades: { granary: false, infirmary: false, walls: false }
     };
-    const events = [
+    const seasons = [
+      { round: 1, name: 'Spring' }, { round: 2, name: 'Summer' }, { round: 3, name: 'Autumn' }, { round: 4, name: 'Winter' },
+      { round: 5, name: 'Spring' }, { round: 6, name: 'Summer' }, { round: 7, name: 'Autumn' }, { round: 8, name: 'Winter' },
+      { round: 9, name: 'Spring' }, { round: 10, name: 'Summer' }
+    ];
+    const randomEvents = [
       { name: "Plague Scours the Land", effect: () => {
           const damage = Math.floor(25 * (100 - village.health) / 100 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1));
-          village.population = Math.max(0, village.population - Math.floor(damage * (village.fortified ? 0.5 : 1)));
-        }, color: "text-red-600" },
+          village.population = Math.max(0, village.population - Math.floor(damage * (fortifiedRounds > 0 ? 0.5 : 1)));
+        }, color: "text-red-600", weight: season === 'winter' ? 0.3 : 0.1 },
       { name: "Meager Harvest", effect: () => {
-          village.food += Math.floor(30 * (difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 0.8 : 1));
-        }, color: "text-green-600" },
+          village.food += Math.floor(30 * (difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 0.8 : 1) * (village.upgrades.granary ? 1.2 : 1));
+        }, color: "text-green-600", weight: season === 'autumn' ? 0.3 : 0.1 },
       { name: "Bandits Ravage Stores", effect: () => {
           const damage = 60 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
-          village.food = Math.max(0, village.food - Math.floor(damage * (village.fortified ? 0.5 : 1)));
-        }, color: "text-red-600" },
+          village.food = Math.max(0, village.food - Math.floor(damage * (fortifiedRounds > 0 ? 0.5 : 1)));
+        }, color: "text-red-600", weight: 0.1 },
       { name: "Healer Passes By", effect: () => {
-          village.health = Math.min(100, village.health + Math.floor(15 * (difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 0.8 : 1)));
-        }, color: "text-blue-600" },
+          village.health = Math.min(100, village.health + Math.floor(15 * (difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 0.8 : 1) * (village.upgrades.infirmary ? 1.2 : 1)));
+        }, color: "text-blue-600", weight: 0.1 },
       { name: "Bitter Winter", effect: () => {
           village.food -= 40 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
           village.health -= 20 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
           village.population -= 5 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
-        }, color: "text-red-600" },
+        }, color: "text-red-600", weight: season === 'winter' ? 0.3 : 0.05 },
       { name: "Refugees Beg Entry", effect: () => {
           village.population += 25;
           village.food -= 30 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
           village.health -= 10 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
-        }, color: "text-purple-600" },
-      { name: "Crop Blight", effect: () => {
-          village.food = Math.max(0, village.food - Math.floor(village.food * 0.5 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1)));
-        }, color: "text-red-600" },
-      { name: "Royal Tax", effect: () => {
-          village.food = Math.max(0, village.food - 50 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1));
-        }, color: "text-red-600" }
+        }, color: "text-purple-600", weight: 0.1 },
+      { name: "Spring Flood", effect: () => {
+          village.food -= 20 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
+        }, color: "text-red-600", weight: season === 'spring' ? 0.2 : 0.05 },
+      { name: "Summer Fair", effect: () => {
+          village.population += 10;
+          village.food -= 15 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1);
+        }, color: "text-green-600", weight: season === 'summer' ? 0.2 : 0.05 },
+      { name: "Catastrophe", effect: () => {
+          village.food = Math.floor(village.food / 2);
+          village.population = Math.floor(village.population / 2);
+        }, color: "text-red-600", weight: difficulty === 'hard' ? 0.1 : 0 }
+    ];
+    const choiceEvents = [
+      { name: "Merchant Caravan", description: "A caravan offers trade. Accept?", choice1: { text: "Accept", effect: () => { village.food += 40; village.population -= 10; } }, choice2: { text: "Reject", effect: () => {} }, color: "text-purple-600" },
+      { name: "Witch Accusation", description: "Villagers accuse a healer of witchcraft. Banish her?", choice1: { text: "Banish", effect: () => { village.health += 10; window.nextRoundPlagueChance = 0.2; } }, choice2: { text: "Protect", effect: () => { village.population -= 10; } }, color: "text-red-600" },
+      { name: "Royal Summons", description: "The King demands troops. Send them?", choice1: { text: "Send", effect: () => { village.population -= 15; window.skipNextArmyDemand = true; } }, choice2: { text: "Defy", effect: () => { window.nextArmyDemandDoubled = true; } }, color: "text-red-600" },
+      { name: "Stranded Pilgrims", description: "Pilgrims seek shelter. Welcome them?", choice1: { text: "Welcome", effect: () => { village.population += 15; village.food -= 20; village.health -= 5; } }, choice2: { text: "Turn Away", effect: () => { village.health -= 10; } }, color: "text-purple-600" },
+      { name: "Mysterious Relic", description: "A relic is found. Keep it?", choice1: { text: "Keep", effect: () => { village.health -= 15; village.food += 50; } }, choice2: { text: "Destroy", effect: () => { village.health += 5; } }, color: "text-blue-600" }
+    ];
+    const campaignEvents = [
+      { round: 1, name: "Curse Revealed", description: "A curse plagues thy village. Seek aid?", choice1: { text: "Seek Aid", effect: () => { village.health -= 10; window.campaignAidSought = true; } }, choice2: { text: "Endure", effect: () => { village.population -= 5; } }, color: "text-red-600" },
+      { round: 2, name: "Hermit’s Warning", description: "A hermit warns of famine. Stockpile?", choice1: { text: "Stockpile", effect: () => { village.food -= 20; window.campaignFaminePrepared = true; } }, choice2: { text: "Ignore", effect: () => {} }, color: "text-purple-600" },
+      { round: 3, name: "Royal Envoy", description: "The King demands loyalty. Pledge?", choice1: { text: "Pledge", effect: () => { window.campaignLoyal = true; } }, choice2: { text: "Rebel", effect: () => { village.food -= 30; window.campaignRebel = true; } }, color: "text-red-600" },
+      { round: 4, name: "Dark Winter", description: "Winter bites. Share food?", choice1: { text: "Share", effect: () => { village.food -= 20; village.population += 10; } }, choice2: { text: "Hoard", effect: () => { village.health -= 10; } }, color: "text-red-600" },
+      { round: 5, name: "Healer’s Aid", description: "A healer offers help if aided. Accept?", choice1: { text: "Accept", effect: () => { village.food -= 15; village.health += 20; } }, choice2: { text: "Refuse", effect: () => {} }, color: "text-blue-600" },
+      { round: 6, name: "Bandit Threat", description: "Bandits near. Pay tribute?", choice1: { text: "Pay", effect: () => { village.food -= 30; } }, choice2: { text: "Fight", effect: () => { village.population -= 10; } }, color: "text-red-600" },
+      { round: 7, name: "Refugee Plight", description: "Refugees beg entry. Accept?", choice1: { text: "Accept", effect: () => { village.population += 20; village.food -= 25; } }, choice2: { text: "Reject", effect: () => { village.health -= 5; } }, color: "text-purple-600" },
+      { round: 8, name: "Curse Resurges", description: "The curse returns. Pray?", choice1: { text: "Pray", effect: () => { village.health += 10; } }, choice2: { text: "Defy", effect: () => { village.population -= 10; } }, color: "text-red-600" },
+      { round: 9, name: "Final Stand", description: "The King tests thee. Submit?", choice1: { text: "Submit", effect: () => { village.food -= 20; } }, choice2: { text: "Resist", effect: () => { village.population -= 15; } }, color: "text-red-600" },
+      { round: 10, name: "Curse Lifted", description: "The curse may end. Sacrifice?", choice1: { text: "Sacrifice", effect: () => { village.population -= 10; window.campaignCurseLifted = true; } }, choice2: { text: "Preserve", effect: () => {} }, color: "text-blue-600" }
     ];
     let round = 1;
     const maxRounds = 10;
     const eventLog = [];
     let tradeUsed = false;
-    let villageFortified = false;
+    let legacyScore = 0;
+    let highScore = localStorage.getItem('plagueHighScore') || 0;
+    const milestones = [
+      { name: "Survivor", score: 200, achieved: false },
+      { name: "Steward", score: 350, achieved: false },
+      { name: "Hero", score: 500, achieved: false },
+      { name: "Legend", score: 750, achieved: false }
+    ];
+    let campaignProgress = { aidSought: false, faminePrepared: false, loyal: false, rebel: false, curseLifted: false };
 
     function startGame() {
+      mode = document.getElementById('mode-select').value;
       difficulty = document.getElementById('difficulty-select').value;
-      const resourceMultiplier = difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 0.8 : 1;
+      const resourceMultiplier = difficulty === 'easy' ? 1.25 : difficulty === 'hard' ? 0.8 : 1;
       village.population = Math.floor(60 * resourceMultiplier);
-      village.food = Math.floor(100 * resourceMultiplier);
+      village.food = Math.floor((difficulty === 'easy' ? 150 : 100) * resourceMultiplier);
       village.health = Math.floor(30 * resourceMultiplier);
-      village.fortified = false;
+      village.upgrades = { granary: false, infirmary: false, walls: false };
       tradeUsed = false;
       round = 1;
       eventLog.length = 0;
+      fortifiedRounds = 0;
+      legacyScore = 0;
+      campaignProgress = { aidSought: false, faminePrepared: false, loyal: false, rebel: false, curseLifted: false };
+      window.nextRoundPlagueChance = 0;
+      window.skipNextArmyDemand = false;
+      window.nextArmyDemandDoubled = false;
       document.getElementById('start-screen').classList.add('hidden');
       document.getElementById('game-screen').classList.remove('hidden');
       initializeGame();
@@ -126,19 +290,68 @@
     }
 
     function initializeGame() {
+      updateSeason();
       updateUI();
       startTurn();
     }
 
+    function updateSeason() {
+      season = seasons[round - 1].name.toLowerCase();
+    }
+
     function applyRandomEvent() {
-      const event = events[Math.floor(Math.random() * events.length)];
-      event.effect();
-      addToLog(`<span class="${event.color}">${event.name}!</span>`);
-      village.fortified = false;
+      if (mode === 'campaign') {
+        const event = campaignEvents[round - 1];
+        showEventModal(event);
+      } else {
+        const totalWeight = randomEvents.reduce((sum, e) => sum + e.weight, 0);
+        let random = Math.random() * totalWeight;
+        let selectedEvent;
+        for (const event of randomEvents) {
+          random -= event.weight;
+          if (random <= 0) {
+            selectedEvent = event;
+            break;
+          }
+        }
+        if (window.nextRoundPlagueChance > 0 && Math.random() < window.nextRoundPlagueChance) {
+          selectedEvent = randomEvents.find(e => e.name === "Plague Scours the Land");
+          window.nextRoundPlagueChance = 0;
+        }
+        if (choiceEvents.some(e => e.name === selectedEvent.name)) {
+          showEventModal(choiceEvents.find(e => e.name === selectedEvent.name));
+        } else {
+          selectedEvent.effect();
+          addToLog(`<span class="${selectedEvent.color}">${selectedEvent.name}!</span>`);
+          if (fortifiedRounds > 0) fortifiedRounds--;
+        }
+      }
+    }
+
+    function showEventModal(event) {
+      document.getElementById('event-title').innerText = event.name;
+      document.getElementById('event-description').innerText = event.description;
+      const choice1Btn = document.getElementById('event-choice-1');
+      const choice2Btn = document.getElementById('event-choice-2');
+      choice1Btn.innerText = event.choice1.text;
+      choice2Btn.innerText = event.choice2.text;
+      choice1Btn.onclick = () => {
+        event.choice1.effect();
+        addToLog(`<span class="${event.color}">${event.name}: ${event.choice1.text}</span>`);
+        closeModal('event-modal');
+        if (fortifiedRounds > 0) fortifiedRounds--;
+      };
+      choice2Btn.onclick = () => {
+        event.choice2.effect();
+        addToLog(`<span class="${event.color}">${event.name}: ${event.choice2.text}</span>`);
+        closeModal('event-modal');
+        if (fortifiedRounds > 0) fortifiedRounds--;
+      };
+      document.getElementById('event-modal').style.display = 'block';
     }
 
     function applyConsumptionAndArmy() {
-      const consumptionRate = difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 1.8 : 1.5;
+      const consumptionRate = (difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 1.8 : 1.5) * (season === 'summer' ? 1.1 : 1);
       const foodNeeded = village.population * consumptionRate;
       if (village.food < foodNeeded) {
         const deaths = Math.floor((foodNeeded - village.food) / consumptionRate);
@@ -146,29 +359,36 @@
         addToLog(`<span class="text-red-600">Hunger slays ${deaths} villagers!</span>`);
       }
       village.food = Math.max(0, village.food - foodNeeded);
-      if (village.health < 50) {
-        const deaths = Math.floor(20 * (50 - village.health) / 50 * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1));
+      const healthThreshold = difficulty === 'easy' ? 60 : 50;
+      if (village.health < healthThreshold) {
+        const maxDeaths = difficulty === 'easy' ? 15 : difficulty === 'hard' ? 25 : 20;
+        const deaths = Math.min(maxDeaths, Math.floor(20 * (healthThreshold - village.health) / healthThreshold * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1)));
         village.population = Math.max(0, village.population - deaths);
         addToLog(`<span class="text-red-600">Pestilence claims ${deaths} souls!</span>`);
       }
-      if ([3, 6, 9].includes(round)) {
-        const armyDemand = Math.floor((30 + Math.random() * 70) * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1));
+      if ([3, 6, 9].includes(round) && !window.skipNextArmyDemand) {
+        let armyDemand = Math.floor((difficulty === 'normal' ? (40 + Math.random() * 40) : (30 + Math.random() * 70)) * (difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.3 : 1) * (season === 'autumn' ? 1.2 : 1));
+        if (window.nextArmyDemandDoubled) {
+          armyDemand *= 2;
+          window.nextArmyDemandDoubled = false;
+        }
         village.food = Math.max(0, village.food - armyDemand);
         addToLog(`<span class="text-red-600">The King seizes ${armyDemand} bushels for his host!</span>`);
+        window.skipNextArmyDemand = false;
       }
     }
 
     function performAction(action) {
-      const actionMultiplier = difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 0.8 : 1;
+      const actionMultiplier = (difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 0.8 : 1) * (season === 'spring' && action === 'farm' ? 1.2 : season === 'summer' && action === 'heal' ? 1.2 : season === 'spring' && action === 'recruit' ? 0.8 : 1);
       const randomFactor = 0.9 + Math.random() * 0.2;
       let message = '';
 
       if (action === 'farm') {
-        const foodGain = Math.floor(30 * randomFactor * actionMultiplier);
+        const foodGain = Math.floor(30 * randomFactor * actionMultiplier * (village.upgrades.granary ? 1.2 : 1));
         village.food += foodGain;
         message = `Thy fields yield ${foodGain} bushels!`;
       } else if (action === 'heal') {
-        const healthGain = Math.floor(12 * randomFactor * actionMultiplier);
+        const healthGain = Math.floor(12 * randomFactor * actionMultiplier * (village.upgrades.infirmary ? 1.2 : 1));
         village.health = Math.min(100, village.health + healthGain);
         message = `Leeches restore ${healthGain} vigor!`;
       } else if (action === 'recruit') {
@@ -176,33 +396,17 @@
         village.population += popGain;
         message = `${popGain} weary souls join thy fold!`;
       } else if (action === 'fortify') {
-        const fortifyCost = 20;
+        const fortifyCost = 20 * (season === 'winter' ? 0.8 : 1);
         if (village.food >= fortifyCost) {
           village.food -= fortifyCost;
-          village.fortified = true;
+          fortifiedRounds = village.upgrades.walls ? 2 : 1;
           message = `Thy village fortifies against calamity!`;
         } else {
           message = `Not enough Food to fortify!`;
         }
       } else if (action === 'trade') {
-        const tradeType = prompt("Trade: 'pop' for 10 Population to 50 Food, 'food' for 50 Food to 10 Population");
-        if (!tradeUsed && tradeType) {
-          if (tradeType === 'pop' && village.population >= 10) {
-            village.population -= 10;
-            village.food += 50;
-            message = `Traded 10 souls for 50 bushels!`;
-            tradeUsed = true;
-          } else if (tradeType === 'food' && village.food >= 50) {
-            village.food -= 50;
-            village.population += 10;
-            message = `Traded 50 bushels for 10 souls!`;
-            tradeUsed = true;
-          } else {
-            message = `Trade failed—insufficient resources!`;
-          }
-        } else {
-          message = tradeUsed ? `Trade already used!` : `Invalid trade choice!`;
-        }
+        document.getElementById('trade-modal').style.display = 'block';
+        return;
       } else if (action === 'festival') {
         if (village.health > 80 && village.food >= 30) {
           village.food -= 30;
@@ -211,15 +415,108 @@
         } else {
           message = `Need Health > 80 and 30 Food for a festival!`;
         }
+      } else if (action === 'upgrade') {
+        document.getElementById('granary-btn').disabled = village.upgrades.granary;
+        document.getElementById('infirmary-btn').disabled = village.upgrades.infirmary;
+        document.getElementById('walls-btn').disabled = village.upgrades.walls;
+        document.getElementById('upgrade-modal').style.display = 'block';
+        return;
       }
 
       addToLog(`<span class="text-brown-800">${message}</span>`);
-      if (['farm', 'heal', 'recruit', 'fortify', 'trade', 'festival'].includes(action) && !message.includes('failed') && !message.includes('enough') && !message.includes('already')) {
+      if (['farm', 'heal', 'recruit', 'fortify', 'festival'].includes(action) && !message.includes('failed') && !message.includes('enough')) {
         applyConsumptionAndArmy();
         applyRandomEvent();
         round++;
+        updateSeason();
       }
       checkGameOver();
+    }
+
+    function performTrade(type) {
+      let message = '';
+      if (!tradeUsed) {
+        if (type === 'pop' && village.population >= 10) {
+          village.population -= 10;
+          village.food += 50;
+          message = `Traded 10 souls for 50 bushels!`;
+          tradeUsed = true;
+        } else if (type === 'food' && village.food >= 50) {
+          village.food -= 50;
+          village.population += 10;
+          message = `Traded 50 bushels for 10 souls!`;
+          tradeUsed = true;
+        } else {
+          message = `Trade failed—insufficient resources!`;
+        }
+      } else {
+        message = `Trade already used!`;
+      }
+      addToLog(`<span class="text-brown-800">${message}</span>`);
+      if (!message.includes('failed') && !message.includes('already')) {
+        applyConsumptionAndArmy();
+        applyRandomEvent();
+        round++;
+        updateSeason();
+      }
+      closeModal('trade-modal');
+      checkGameOver();
+    }
+
+    function performUpgrade(type) {
+      let message = '';
+      if (type === 'granary' && !village.upgrades.granary && village.food >= 50 && village.population >= 5) {
+        village.food -= 50;
+        village.population -= 5;
+        village.upgrades.granary = true;
+        message = `Thy village builds a Granary!`;
+      } else if (type === 'infirmary' && !village.upgrades.infirmary && village.food >= 30 && village.population >= 5) {
+        village.food -= 30;
+        village.population -= 5;
+        village.upgrades.infirmary = true;
+        message = `Thy village builds an Infirmary!`;
+      } else if (type === 'walls' && !village.upgrades.walls && village.food >= 40 && village.population >= 10) {
+        village.food -= 40;
+        village.population -= 10;
+        village.upgrades.walls = true;
+        message = `Thy village raises Walls!`;
+      } else {
+        message = `Upgrade failed—insufficient resources or already built!`;
+      }
+      addToLog(`<span class="text-brown-800">${message}</span>`);
+      if (!message.includes('failed')) {
+        applyConsumptionAndArmy();
+        applyRandomEvent();
+        round++;
+        updateSeason();
+      }
+      closeModal('upgrade-modal');
+      checkGameOver();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    function showTutorial() {
+      document.getElementById('tutorial-modal').style.display = 'block';
+    }
+
+    function showMilestones() {
+      const list = document.getElementById('milestones-list');
+      list.innerHTML = milestones.map(m => `<li>${m.name}: ${m.score} Legacy Score (${m.achieved ? 'Achieved' : 'Locked'})</li>`).join('');
+      document.getElementById('milestones-modal').style.display = 'block';
+    }
+
+    function calculateLegacyScore() {
+      legacyScore = Math.floor((village.food + village.population * 2 + village.health * 3) * (difficulty === 'easy' ? 0.8 : difficulty === 'hard' ? 1.2 : 1));
+      if (legacyScore > highScore) {
+        highScore = legacyScore;
+        localStorage.setItem('plagueHighScore', highScore);
+      }
+      milestones.forEach(m => {
+        if (legacyScore >= m.score && !m.achieved) m.achieved = true;
+      });
     }
 
     function addToLog(message) {
@@ -229,10 +526,20 @@
     }
 
     function checkGameOver() {
+      calculateLegacyScore();
       if (round > maxRounds || village.population <= 0) {
-        document.getElementById('game-status').innerHTML = village.population > 0
-          ? `<p class="text-2xl text-green-600">Thy village clings to life with ${village.food} bushels! (${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)})</p>`
-          : `<p class="text-2xl text-red-600">Thy village is no more! (${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)})</p>`;
+        let message = '';
+        if (mode === 'campaign') {
+          const goalsMet = village.population > 100 && village.health > 80 && campaignProgress.curseLifted;
+          message = goalsMet
+            ? `<p class="text-2xl text-green-600">Thy village thrives, curse lifted! Legacy Score: ${legacyScore} (High: ${highScore})</p>`
+            : `<p class="text-2xl text-red-600">Thy village falters, curse endures! Legacy Score: ${legacyScore} (High: ${highScore})</p>`;
+        } else {
+          message = village.population > 0
+            ? `<p class="text-2xl text-green-600">Thy village clings to life! Legacy Score: ${legacyScore} (High: ${highScore})</p>`
+            : `<p class="text-2xl text-red-600">Thy village is no more! Legacy Score: ${legacyScore} (High: ${highScore})</p>`;
+        }
+        document.getElementById('game-status').innerHTML = message;
         document.getElementById('actions').innerHTML = `
           <div class="flex justify-center mt-4">
             <button onclick="resetGame()" class="button bg-blue-600 text-white p-3 rounded-lg font-semibold">Restart Game</button>
@@ -249,25 +556,30 @@
       const criticalThresholds = {
         population: difficulty === 'easy' ? 20 : difficulty === 'hard' ? 10 : 15,
         food: difficulty === 'easy' ? 50 : difficulty === 'hard' ? 20 : 30,
-        health: 50
+        health: difficulty === 'easy' ? 60 : 50
       };
       const popClass = village.population < criticalThresholds.population ? 'critical' : '';
       const foodClass = village.food < criticalThresholds.food ? 'critical' : '';
       const healthClass = village.health < criticalThresholds.health ? 'critical' : '';
+      const upgrades = Object.keys(village.upgrades).filter(u => village.upgrades[u]).map(u => u.charAt(0).toUpperCase() + u.slice(1)).join(', ') || 'None';
       document.getElementById('village').innerHTML = `
         <h2 class="text-2xl font-bold">${village.name}</h2>
         <p><span class="font-semibold">Population:</span> <span class="${popClass}">${Math.floor(village.population)}</span></p>
         <p><span class="font-semibold">Food:</span> <span class="${foodClass}">${Math.floor(village.food)} bushels</span></p>
         <p><span class="font-semibold">Health:</span> <span class="${healthClass}">${Math.floor(village.health)}</span></p>
+        <p><span class="font-semibold">Upgrades:</span> ${upgrades}</p>
+        <p><span class="font-semibold">Legacy Score:</span> ${Math.floor(village.food + village.population * 2 + village.health * 3)}</p>
+        ${mode === 'campaign' ? `<p><span class="font-semibold">Goals:</span> Population > 100 (${village.population}/100), Health > 80 (${village.health}/80)</p>` : ''}
       `;
-      document.getElementById('game-status').innerHTML = `<p class="text-xl">Year ${round} of ${maxRounds} (${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)})</p>`;
+      document.getElementById('game-status').innerHTML = `<p class="text-xl">Year ${round} of ${maxRounds} (${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}, ${season.charAt(0).toUpperCase() + season.slice(1)})</p>`;
       document.getElementById('round-progress').style.width = `${(round / maxRounds) * 100}%`;
 
       const warnings = [];
-      if (village.food < village.population * (difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 1.8 : 1.5)) {
+      const consumptionRate = (difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 1.8 : 1.5) * (season === 'summer' ? 1.1 : 1);
+      if (village.food < village.population * consumptionRate) {
         warnings.push(difficulty === 'easy' ? "Stores wane—till the fields!" : "Famine looms—till the fields!");
       }
-      if (village.health < 50) {
+      if (village.health < criticalThresholds.health) {
         warnings.push(difficulty === 'hard' ? "Death stalks—tend the sick!" : "Sickness festers—tend the sick!");
       }
       if (village.population < criticalThresholds.population) {
@@ -278,6 +590,12 @@
       }
       if (village.health > 80 && village.food >= 30) {
         warnings.push("Hold a festival to draw souls!");
+      }
+      if (season === 'winter' && village.food >= 20) {
+        warnings.push("Winter aids fortification—build now!");
+      }
+      if (!village.upgrades.granary && village.food >= 50 && village.population >= 5) {
+        warnings.push(difficulty === 'easy' ? "Build a Granary for bounty!" : "A Granary strengthens thy stores!");
       }
       document.getElementById('warnings').innerHTML = warnings.length
         ? `<p class="warning">${warnings.join(' ')}</p>`
@@ -290,14 +608,37 @@
         checkGameOver();
         return;
       }
+      const actionMultiplier = difficulty === 'easy' ? 1.2 : difficulty === 'hard' ? 0.8 : 1;
       document.getElementById('actions').innerHTML = `
         <div class="flex justify-center gap-4 flex-wrap">
-          <button onclick="performAction('farm')" class="button bg-green-600 text-white p-3 rounded-lg font-semibold">Till the Fields</button>
-          <button onclick="performAction('heal')" class="button bg-blue-600 text-white p-3 rounded-lg font-semibold">Tend the Sick</button>
-          <button onclick="performAction('recruit')" class="button bg-purple-600 text-white p-3 rounded-lg font-semibold">Call Newcomers</button>
-          <button onclick="performAction('fortify')" class="button bg-gray-600 text-white p-3 rounded-lg font-semibold">Fortify Village</button>
-          <button onclick="performAction('trade')" class="button bg-yellow-600 text-white p-3 rounded-lg font-semibold" ${tradeUsed ? 'disabled' : ''}>Trade</button>
-          <button onclick="performAction('festival')" class="button bg-red-600 text-white p-3 rounded-lg font-semibold" ${village.health <= 80 || village.food < 30 ? 'disabled' : ''}>Hold Festival</button>
+          <div class="tooltip">
+            <button onclick="performAction('farm')" class="button bg-green-600 text-white p-3 rounded-lg font-semibold">Till the Fields</button>
+            <span class="tooltiptext">Gain ~${Math.floor(30 * actionMultiplier * (season === 'spring' ? 1.2 : 1))} Food</span>
+          </div>
+          <div class="tooltip">
+            <button onclick="performAction('heal')" class="button bg-blue-600 text-white p-3 rounded-lg font-semibold">Tend the Sick</button>
+            <span class="tooltiptext">Gain ~${Math.floor(12 * actionMultiplier * (season === 'summer' ? 1.2 : 1))} Health</span>
+          </div>
+          <div class="tooltip">
+            <button onclick="performAction('recruit')" class="button bg-purple-600 text-white p-3 rounded-lg font-semibold">Call Newcomers</button>
+            <span class="tooltiptext">Gain ~${Math.floor(10 * actionMultiplier * (season === 'spring' ? 0.8 : 1))} Population</span>
+          </div>
+          <div class="tooltip">
+            <button onclick="performAction('fortify')" class="button bg-gray-600 text-white p-3 rounded-lg font-semibold">Fortify Village</button>
+            <span class="tooltiptext">Spend ${season === 'winter' ? 16 : 20} Food to halve damage</span>
+          </div>
+          <div class="tooltip">
+            <button onclick="performAction('trade')" class="button bg-yellow-600 text-white p-3 rounded-lg font-semibold" ${tradeUsed ? 'disabled' : ''}>Trade</button>
+            <span class="tooltiptext">Swap Population/Food once</span>
+          </div>
+          <div class="tooltip">
+            <button onclick="performAction('festival')" class="button bg-red-600 text-white p-3 rounded-lg font-semibold" ${village.health <= 80 || village.food < 30 ? 'disabled' : ''}>Hold Festival</button>
+            <span class="tooltiptext">Spend 30 Food for ~${Math.floor(15 * actionMultiplier)} Population</span>
+          </div>
+          <div class="tooltip">
+            <button onclick="performAction('upgrade')" class="button bg-orange-600 text-white p-3 rounded-lg font-semibold">Upgrade Village</button>
+            <span class="tooltiptext">Build lasting boons</span>
+          </div>
         </div>
       `;
     }
