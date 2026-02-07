@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zen Balance</title>
 <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
     body {
         margin: 0;
         padding: 0;
@@ -17,7 +22,33 @@
         font-family: monospace;
         user-select: none;
         touch-action: manipulation;
+        position: relative;
+        overflow: hidden;
     }
+
+    /* Дождь */
+    .rain {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: -1;
+    }
+    .rain-drop {
+        position: absolute;
+        width: 4px;
+        height: 40px;
+        background: linear-gradient(transparent, rgba(120, 160, 260, 0.65));
+        border-radius: 2px;
+        opacity: 0.4;
+        animation: fall linear infinite;
+        transform: translateY(-50px);
+    }
+    @keyframes fall {
+        to {
+            transform: translateY(120vh);
+        }
+    }
+
     h1 {
         font-size: 1.6rem;
         margin: 0.6em 0 0.4em;
@@ -44,6 +75,7 @@
     }
     .grid-container {
         position: relative;
+        z-index: 1;
     }
     .grid {
         display: grid;
@@ -101,6 +133,8 @@
         cursor: pointer;
         transition: all 0.2s;
         display: none;
+        z-index: 2;
+        position: relative;
     }
     .restart-btn:hover {
         background: #444;
@@ -117,6 +151,7 @@
         text-align: center;
         max-width: 420px;
         opacity: 0.9;
+        z-index: 1;
     }
     .howto strong {
         color: #000;
@@ -139,6 +174,8 @@
 </head>
 <body>
 
+<div class="rain" id="rain"></div>
+
 <h1>Zen Balance</h1>
 <div class="status" id="status">Make every row and column sum to 0</div>
 
@@ -151,12 +188,12 @@
 
 <div class="howto">
     <strong>Goal:</strong> make every row and every column sum to 0<br><br>
-    
+   
     <strong>Symbols:</strong><br>
     <span class="symbols">▲</span> = –1 &nbsp;&nbsp;
     <span class="symbols">○</span> = 0 &nbsp;&nbsp;
     <span class="symbols">■</span> = +1<br><br>
-    
+   
     <strong>Controls:</strong><br>
     <strong>Left click</strong> on a cell → shift its row <strong>right</strong><br>
     <strong>Right click</strong> on a cell → shift its column <strong>up</strong>
@@ -167,6 +204,34 @@ const symbols = { '-1': '▲', '0': '○', '1': '■' };
 let board = [];
 let isGameOver = false;
 
+// Создаём дождь
+function createRain() {
+    const rainContainer = document.getElementById('rain');
+    for (let i = 0; i < 160; i++) { // количество капель
+        const drop = document.createElement('div');
+        drop.className = 'rain-drop';
+        
+        // случайная позиция слева
+        drop.style.left = Math.random() * 100 + 'vw';
+        
+        // случайная задержка начала падения
+        const delay = Math.random() * 8;
+        drop.style.animationDelay = delay + 's';
+        
+        // случайная длительность падения (медленные капли)
+        const duration = 6 + Math.random() * 8; // от 6 до 14 секунд
+        drop.style.animationDuration = duration + 's';
+        
+        // случайная длина и толщина капли
+        const length = 20 + Math.random() * 40;
+        drop.style.height = length + 'px';
+        drop.style.width = (1 + Math.random() * 1.5) + 'px';
+        
+        rainContainer.appendChild(drop);
+    }
+}
+
+// Инициализация игры
 function createSolved() {
     return [
         ['-1', '0', '1'],
@@ -178,10 +243,8 @@ function createSolved() {
 function init() {
     board = createSolved().map(r => r.slice());
     let attempts = 0;
-    const maxAttempts = 100; // защита от бесконечного цикла (маловероятно)
-
+    const maxAttempts = 100;
     do {
-        // перемешиваем
         for (let i = 0; i < 60; i++) {
             const isRow = Math.random() > 0.5;
             const idx = Math.floor(Math.random() * 3);
@@ -189,18 +252,15 @@ function init() {
             if (isRow) shiftRow(idx, dir);
             else shiftCol(idx, dir);
         }
-        
         attempts++;
-        // если после перемешивания уже победа — повторим
     } while (isSolved() && attempts < maxAttempts);
-    
+
     isGameOver = false;
     render();
     document.getElementById('restart').style.display = 'none';
     document.getElementById('grid').classList.remove('inactive');
 }
 
-// вспомогательная функция: проверяет, решена ли доска
 function isSolved() {
     for (let i = 0; i < 3; i++) {
         if (board[i].reduce((a,b) => a + Number(b), 0) !== 0) return false;
@@ -230,7 +290,6 @@ function render() {
     const grid = document.getElementById('grid');
     const cells = Array.from(grid.children);
     cells.forEach(c => c.classList.add('fade'));
-
     setTimeout(() => {
         grid.innerHTML = '';
         board.forEach(row => {
@@ -253,11 +312,9 @@ function checkWin() {
     for (let j = 0; j < 3; j++) {
         if (Number(board[0][j]) + Number(board[1][j]) + Number(board[2][j]) !== 0) won = false;
     }
-
     const status = document.getElementById('status');
     const restartBtn = document.getElementById('restart');
     const gridEl = document.getElementById('grid');
-
     if (won) {
         status.textContent = 'Zen achieved!';
         status.classList.add('win');
@@ -299,6 +356,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('restart').addEventListener('click', () => {
         init();
     });
+
+    // Запускаем дождь один раз
+    createRain();
 });
 
 init();
