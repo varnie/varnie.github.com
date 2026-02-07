@@ -177,17 +177,38 @@ function createSolved() {
 
 function init() {
     board = createSolved().map(r => r.slice());
-    for (let i = 0; i < 60; i++) {
-        const isRow = Math.random() > 0.5;
-        const idx = Math.floor(Math.random() * 3);
-        const dir = Math.random() > 0.5 ? 1 : -1;
-        if (isRow) shiftRow(idx, dir);
-        else shiftCol(idx, dir);
-    }
+    let attempts = 0;
+    const maxAttempts = 100; // защита от бесконечного цикла (маловероятно)
+
+    do {
+        // перемешиваем
+        for (let i = 0; i < 60; i++) {
+            const isRow = Math.random() > 0.5;
+            const idx = Math.floor(Math.random() * 3);
+            const dir = Math.random() > 0.5 ? 1 : -1;
+            if (isRow) shiftRow(idx, dir);
+            else shiftCol(idx, dir);
+        }
+        
+        attempts++;
+        // если после перемешивания уже победа — повторим
+    } while (isSolved() && attempts < maxAttempts);
+    
     isGameOver = false;
     render();
     document.getElementById('restart').style.display = 'none';
     document.getElementById('grid').classList.remove('inactive');
+}
+
+// вспомогательная функция: проверяет, решена ли доска
+function isSolved() {
+    for (let i = 0; i < 3; i++) {
+        if (board[i].reduce((a,b) => a + Number(b), 0) !== 0) return false;
+    }
+    for (let j = 0; j < 3; j++) {
+        if (Number(board[0][j]) + Number(board[1][j]) + Number(board[2][j]) !== 0) return false;
+    }
+    return true;
 }
 
 function shiftRow(rowIdx, dir) {
