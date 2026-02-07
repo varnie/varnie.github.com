@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zen Balance</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #f8f8f8;
+        font-family: monospace;
+        user-select: none;
+        touch-action: manipulation;
+    }
+    h1 {
+        font-size: 1.6rem;
+        margin: 0.6em 0 0.4em;
+        opacity: 0.6;
+        pointer-events: none;
+    }
+    .status {
+        font-size: 1.15rem;
+        margin: 0 0 1.2em;
+        min-height: 1.5em;
+        text-align: center;
+        opacity: 0.8;
+        pointer-events: none;
+    }
+    .win {
+        animation: pulse 2.8s infinite;
+        color: #000;
+        font-weight: bold;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.65; transform: scale(1.04); }
+    }
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 110px);
+        grid-template-rows: repeat(3, 110px);
+        gap: 10px;
+        padding: 30px;
+        border: 2px solid #333;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        cursor: default;
+    }
+    .cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4.2rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        transition: all 0.35s ease;
+        background: #fff;
+    }
+    .fade {
+        opacity: 0.3;
+        transform: scale(0.82);
+    }
+    .restart-btn {
+        margin-top: 1.8em;
+        padding: 12px 28px;
+        font-size: 1.1rem;
+        font-family: monospace;
+        background: #333;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: none;
+    }
+    .restart-btn:hover {
+        background: #555;
+        transform: scale(1.05);
+    }
+    .restart-btn:active {
+        transform: scale(0.97);
+    }
+    .howto {
+        margin-top: 2em;
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #444;
+        text-align: center;
+        max-width: 420px;
+        opacity: 0.9;
+    }
+    .howto strong {
+        color: #000;
+    }
+    .howto .symbols {
+        font-size: 1.4rem;
+        margin: 0 0.4em;
+    }
+    @media (max-width: 480px) {
+        .grid {
+            grid-template-columns: repeat(3, 84px);
+            grid-template-rows: repeat(3, 84px);
+            padding: 20px;
+            gap: 8px;
+        }
+        .cell { font-size: 3.2rem; }
+        .howto { font-size: 0.95rem; }
+    }
+</style>
+</head>
+<body>
+
+<h1>Zen Balance</h1>
+<div class="status" id="status">Make every row and column sum to 0</div>
+<div class="grid" id="grid"></div>
+
+<button class="restart-btn" id="restart">Start again</button>
+
+<div class="howto">
+    <strong>Goal:</strong> make every row and every column sum to 0<br><br>
+    
+    <strong>Symbols:</strong><br>
+    <span class="symbols">▲</span> = –1 &nbsp;&nbsp;
+    <span class="symbols">○</span> = 0 &nbsp;&nbsp;
+    <span class="symbols">■</span> = +1<br><br>
+    
+    <strong>Controls:</strong><br>
+    <strong>Left click</strong> on a cell → shift its row <strong>right</strong><br>
+    <strong>Right click</strong> on a cell → shift its column <strong>up</strong>
+</div>
+
+<script>
+const symbols = { '-1': '▲', '0': '○', '1': '■' };
+let board = [];
+
+function createSolved() {
+    return [
+        ['-1', '0', '1'],
+        ['0', '0', '0'],
+        ['1', '0', '-1']
+    ];
+}
+
+function init() {
+    board = createSolved().map(r => r.slice());
+    for (let i = 0; i < 60; i++) {
+        const isRow = Math.random() > 0.5;
+        const idx = Math.floor(Math.random() * 3);
+        const dir = Math.random() > 0.5 ? 1 : -1;
+        if (isRow) shiftRow(idx, dir);
+        else shiftCol(idx, dir);
+    }
+    render();
+    document.getElementById('restart').style.display = 'none';
+}
+
+function shiftRow(rowIdx, dir) {
+    const r = board[rowIdx];
+    if (dir > 0) board[rowIdx] = [r[2], r[0], r[1]];
+    else board[rowIdx] = [r[1], r[2], r[0]];
+}
+
+function shiftCol(colIdx, dir) {
+    let c = [board[0][colIdx], board[1][colIdx], board[2][colIdx]];
+    if (dir > 0) c = [c[2], c[0], c[1]];
+    else c = [c[1], c[2], c[0]];
+    board[0][colIdx] = c[0];
+    board[1][colIdx] = c[1];
+    board[2][colIdx] = c[2];
+}
+
+function render() {
+    const grid = document.getElementById('grid');
+    const cells = Array.from(grid.children);
+    cells.forEach(c => c.classList.add('fade'));
+
+    setTimeout(() => {
+        grid.innerHTML = '';
+        board.forEach(row => {
+            row.forEach(v => {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.textContent = symbols[v];
+                grid.appendChild(cell);
+            });
+        });
+        setTimeout(checkWin, 90);
+    }, 120);
+}
+
+function checkWin() {
+    let won = true;
+    for (let i = 0; i < 3; i++) {
+        if (board[i].reduce((a,b) => a + Number(b), 0) !== 0) won = false;
+    }
+    for (let j = 0; j < 3; j++) {
+        if (Number(board[0][j]) + Number(board[1][j]) + Number(board[2][j]) !== 0) won = false;
+    }
+
+    const status = document.getElementById('status');
+    const restartBtn = document.getElementById('restart');
+
+    if (won) {
+        status.textContent = 'Zen achieved!';
+        status.classList.add('win');
+        restartBtn.style.display = 'block';
+    } else {
+        status.classList.remove('win');
+        status.textContent = 'Make every row and column sum to 0';
+        restartBtn.style.display = 'none';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    const grid = document.getElementById('grid');
+
+    grid.addEventListener('click', e => {
+        if (e.button !== 0) return;
+        const rect = grid.getBoundingClientRect();
+        const y = e.clientY - rect.top;
+        const row = Math.floor(y / (rect.height / 3));
+        shiftRow(row, 1);
+        render();
+    });
+
+    grid.addEventListener('contextmenu', e => {
+        e.preventDefault();
+        const rect = grid.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const col = Math.floor(x / (rect.width / 3));
+        shiftCol(col, -1);
+        render();
+    });
+
+    document.getElementById('restart').addEventListener('click', () => {
+        init();
+    });
+});
+
+init();
+</script>
+</body>
+</html>
