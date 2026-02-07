@@ -33,13 +33,17 @@
         pointer-events: none;
     }
     .win {
-        animation: pulse 2.8s infinite;
-        color: #000;
+        font-size: 1.4rem;
         font-weight: bold;
+        color: #000;
+        animation: pulse 2.8s infinite;
     }
     @keyframes pulse {
         0%, 100% { opacity: 1; transform: scale(1); }
         50% { opacity: 0.65; transform: scale(1.04); }
+    }
+    .grid-container {
+        position: relative;
     }
     .grid {
         display: grid;
@@ -52,6 +56,24 @@
         border-radius: 12px;
         box-shadow: 0 8px 30px rgba(0,0,0,0.12);
         cursor: default;
+        transition: opacity 0.6s ease;
+    }
+    .grid.inactive {
+        opacity: 0.5;
+        pointer-events: none;
+        filter: grayscale(30%);
+    }
+    .grid-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.08);
+        border-radius: 12px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.6s ease;
+    }
+    .grid.inactive .grid-overlay {
+        opacity: 1;
     }
     .cell {
         display: flex;
@@ -69,10 +91,10 @@
     }
     .restart-btn {
         margin-top: 1.8em;
-        padding: 12px 28px;
-        font-size: 1.1rem;
+        padding: 12px 32px;
+        font-size: 1.15rem;
         font-family: monospace;
-        background: #333;
+        background: #222;
         color: white;
         border: none;
         border-radius: 8px;
@@ -81,7 +103,7 @@
         display: none;
     }
     .restart-btn:hover {
-        background: #555;
+        background: #444;
         transform: scale(1.05);
     }
     .restart-btn:active {
@@ -119,7 +141,11 @@
 
 <h1>Zen Balance</h1>
 <div class="status" id="status">Make every row and column sum to 0</div>
-<div class="grid" id="grid"></div>
+
+<div class="grid-container">
+    <div class="grid" id="grid"></div>
+    <div class="grid-overlay"></div>
+</div>
 
 <button class="restart-btn" id="restart">Start again</button>
 
@@ -139,6 +165,7 @@
 <script>
 const symbols = { '-1': '▲', '0': '○', '1': '■' };
 let board = [];
+let isGameOver = false;
 
 function createSolved() {
     return [
@@ -157,8 +184,10 @@ function init() {
         if (isRow) shiftRow(idx, dir);
         else shiftCol(idx, dir);
     }
+    isGameOver = false;
     render();
     document.getElementById('restart').style.display = 'none';
+    document.getElementById('grid').classList.remove('inactive');
 }
 
 function shiftRow(rowIdx, dir) {
@@ -206,15 +235,20 @@ function checkWin() {
 
     const status = document.getElementById('status');
     const restartBtn = document.getElementById('restart');
+    const gridEl = document.getElementById('grid');
 
     if (won) {
         status.textContent = 'Zen achieved!';
         status.classList.add('win');
         restartBtn.style.display = 'block';
+        gridEl.classList.add('inactive');
+        isGameOver = true;
     } else {
         status.classList.remove('win');
         status.textContent = 'Make every row and column sum to 0';
         restartBtn.style.display = 'none';
+        gridEl.classList.remove('inactive');
+        isGameOver = false;
     }
 }
 
@@ -223,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const grid = document.getElementById('grid');
 
     grid.addEventListener('click', e => {
-        if (e.button !== 0) return;
+        if (e.button !== 0 || isGameOver) return;
         const rect = grid.getBoundingClientRect();
         const y = e.clientY - rect.top;
         const row = Math.floor(y / (rect.height / 3));
@@ -232,6 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     grid.addEventListener('contextmenu', e => {
+        if (isGameOver) return;
         e.preventDefault();
         const rect = grid.getBoundingClientRect();
         const x = e.clientX - rect.left;
