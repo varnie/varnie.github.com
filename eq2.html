@@ -7,234 +7,357 @@
 
 <style>
 :root {
---cell-size: clamp(72px, 22vmin, 120px);
---gap: clamp(8px, 3vmin, 16px);
---font-size: clamp(36px, 10vmin, 56px);
+  --cell-size: clamp(72px, 22vmin, 120px);
+  --gap: clamp(8px, 3vmin, 16px);
+  --font-size: clamp(36px, 10vmin, 56px);
+  --bg: #0e0e0e;
+  --text: #eee;
+  --cell-bg: #1e1e1e;
+  --cell-hover: #2a2a2a;
+  --accent: #44ff44;
 }
 
-* {
-box-sizing: border-box;
+[data-theme="light"] {
+  --bg: #f8f9fa;
+  --text: #212529;
+  --cell-bg: #ffffff;
+  --cell-hover: #e9ecef;
+  --accent: #198754;
 }
+
+
 
 body {
-margin: 0;
-background: #0e0e0e;
-color: #eee;
-font-family: system-ui, sans-serif;
-min-height: 100vh;
-display: flex;
-justify-content: center;
-align-items: center;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.4s, color 0.4s;
 }
 
 .app {
-display: flex;
-flex-direction: column;
-align-items: center;
-gap: 16px;
-padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
 }
 
 h1 {
-font-weight: 300;
-margin: 0;
-opacity: 0.9;
+  font-weight: 300;
+  margin: 0;
+  opacity: 0.9;
 }
 
 #stats {
-display: flex;
-gap: 2em;
-font-size: 1.2em;
-font-weight: 400;
+  display: flex;
+  gap: 2em;
+  font-size: 1.2em;
 }
 
 #meter {
-width: min(300px, 80vw);
-height: 12px;
-background: #1a1a1a;
-border-radius: 6px;
-overflow: hidden;
+  width: min(300px, 80vw);
+  height: 12px;
+  background: #1a1a1a;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
+[data-theme="light"] #meter { background: #dee2e6; }
+
 #progress {
-height: 100%;
-background: linear-gradient(to right, #ff4444, #ffaa00, #44ff44);
-transition: width 0.3s ease;
-width: 0%;
+  height: 100%;
+  background: linear-gradient(to right, #ff4444, #ffaa00, var(--accent));
+  transition: width 0.3s ease;
+  width: 0%;
 }
 
 .grid {
-display: grid;
-grid-template-columns: repeat(3, var(--cell-size));
-gap: var(--gap);
-transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: grid;
+  grid-template-columns: repeat(3, var(--cell-size));
+  gap: var(--gap);
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .cell {
-width: var(--cell-size);
-height: var(--cell-size);
-background: #1e1e1e;
-border-radius: 20%;
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: var(--font-size);
-user-select: none;
-cursor: pointer;
-touch-action: manipulation;
-transition: all 0.15s ease;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  background: var(--cell-bg);
+  border-radius: 20%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  cursor: pointer;
 }
 
-@media (hover: hover) {
-.cell:hover {
-background: #2a2a2a;
-}
-}
+.cell:hover { background: var(--cell-hover); }
+.cell:active { transform: scale(0.95); }
 
-.cell:active {
-background: #333;
+.cell svg {
+  width: 60%;
+  height: 60%;
 }
 
 .buttons {
-display: flex;
-gap: 12px;
-flex-wrap: wrap;
-justify-content: center;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 button {
-background: #222;
-color: #eee;
-border: 1px solid #444;
-padding: 12px 20px;
-border-radius: 10px;
-font-size: 16px;
-cursor: pointer;
-transition: background 0.15s;
+  background: #222;
+  color: #eee;
+  border: 1px solid #444;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.15s;
 }
 
-button:active {
-background: #333;
+[data-theme="light"] button {
+  background: #e9ecef;
+  color: #212529;
+  border-color: #ced4da;
+}
+
+[data-theme="neon"] {
+  --bg: #0a0015;                    /* глубокий тёмно-фиолетовый */
+  --text: #00ffff;                  /* яркий cyan */
+  --cell-bg: #1a0033;               /* тёмно-фиолетовый фон ячеек */
+  --cell-hover: #330066;            /* более яркий при наведении */
+  --accent: #ff00ff;                /* magenta для акцентов */
+}
+
+[data-theme="neon"] .cell {
+  box-shadow: 0 0 15px #00ffff88, inset 0 0 10px #00ffff44;
+  transition: box-shadow 0.3s, transform 0.2s;
+}
+
+[data-theme="neon"] .cell:hover {
+  box-shadow: 0 0 25px #00ffffcc, inset 0 0 15px #00ffff88;
+}
+
+[data-theme="neon"] button {
+  background: transparent;
+  color: #00ffff;
+  border: 2px solid #00ffff;
+  box-shadow: 0 0 12px #00ffff88;
+  transition: all 0.25s;
+}
+
+[data-theme="neon"] button:hover {
+  background: #00ffff22;
+  box-shadow: 0 0 20px #00ffffcc;
+}
+
+[data-theme="neon"] button:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 30px #ff00ff;
+}
+
+[data-theme="neon"] #progress {
+  background: linear-gradient(to right, #ff00ff, #00ffff, #ff00ff);
+  box-shadow: 0 0 15px #00ffff;
+}
+
+[data-theme="neon"] #meter {
+  background: #1a0033;
+  box-shadow: inset 0 0 10px #00ffff44;
+}
+
+
+button:hover { opacity: 0.9; }
+button:active { transform: scale(0.97); }
+
+/* Confetti canvas */
+#confetti-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 100;
 }
 </style>
 </head>
 
-<body>
+<body data-theme="dark">
+
+<canvas id="confetti-canvas"></canvas>
+
 <div class="app">
-<h1>Равновесие</h1>
-<div id="stats">
-Уровень: <span id="level">1</span> | Ходы: <span id="moves">0</span>
-</div>
-<div id="meter"><div id="progress"></div></div>
-<div class="grid" id="grid"></div>
-<div class="buttons">
-<button onclick="undo()">↶ Undo</button>
-<button onclick="hint()">💡 Подсказка</button>
-<button onclick="newLevel()">🔄 Новый уровень</button>
-</div>
+  <h1>Равновесие</h1>
+  <div id="stats">
+    Уровень: <span id="level">1</span> | Ходы: <span id="moves">0</span>
+  </div>
+  <div id="meter"><div id="progress"></div></div>
+  <div class="grid" id="grid"></div>
+  <div class="buttons">
+    <button onclick="undo()">↶ Undo</button>
+    <button onclick="hint()">💡 Подсказка</button>
+    <button onclick="newLevel()">🔄 Новый</button>
+    <button onclick="setTheme('dark')">Тёмная</button>
+    <button onclick="setTheme('light')">Светлая</button>
+    <button onclick="setTheme('neon')">Неон</button>
+  </div>
 </div>
 
 <script>
-const SIZE = 3;
-const TYPES = ["⚪", "⬜", "🔺"];
-let grid = [];
-let currentLevel = 0;
-let moves = 0;
-let history = [];
+// === ТЕМЫ ===
+function setTheme(theme) {
+  document.body.dataset.theme = theme;
+  localStorage.setItem('theme', theme);
+}
 
-// === Аудио ===
+// Загрузка сохранённой темы
+const savedTheme = localStorage.getItem('theme') || 'dark';
+setTheme(savedTheme);
+
+// === SVG ИКОНКИ ===
+const SVGS = {
+  0: `<svg viewBox="0 0 100 100"><defs><radialGradient id="g0"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#d0d0d0"/></radialGradient></defs><circle cx="50" cy="50" r="45" fill="url(#g0)" stroke="#888" stroke-width="4"/></svg>`,
+  1: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f0f0f0"/><stop offset="100%" stop-color="#b0b0b0"/></linearGradient></defs><rect x="10" y="10" width="80" height="80" rx="12" fill="url(#g1)" stroke="#777" stroke-width="4"/></svg>`,
+  2: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffdddd"/><stop offset="100%" stop-color="#cc6666"/></linearGradient></defs><polygon points="50,10 90,80 10,80" fill="url(#g2)" stroke="#a00" stroke-width="4"/></svg>`
+};
+
+// === АУДИО (оставил как было, но можно отключить) ===
 let audioCtx = null;
 let isAudioUnlocked = false;
 
-function initAudio() {
-  if (audioCtx) return;
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-}
+function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
 
 function unlockAudio() {
   if (isAudioUnlocked || !audioCtx) return;
-
-  // Пустой буфер — хак для разблокировки на iOS/Safari
   const buffer = audioCtx.createBuffer(1, 1, 22050);
   const source = audioCtx.createBufferSource();
   source.buffer = buffer;
   source.connect(audioCtx.destination);
   source.start(0);
-
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-
+  if (audioCtx.state === 'suspended') audioCtx.resume();
   isAudioUnlocked = true;
   document.removeEventListener('touchend', unlockAudio);
   document.removeEventListener('click', unlockAudio);
 }
 
-function playSound(freq = 440, dur = 0.1, volume = 0.15) {
+function playSound(freq = 440, dur = 0.1, vol = 0.12) {
   if (!audioCtx || audioCtx.state !== 'running') return;
-
   try {
     const osc = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-
+    const gain = audioCtx.createGain();
     osc.type = 'sine';
     osc.frequency.value = freq;
-
-    // Плавное нарастание и затухание
-    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-    gainNode.gain.linearRampToValueAtTime(volume, audioCtx.currentTime + 0.01);
-    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + dur);
-
-    osc.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-
+    gain.gain.setValueAtTime(0, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.01);
+    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + dur);
+    osc.connect(gain).connect(audioCtx.destination);
     osc.start();
     osc.stop(audioCtx.currentTime + dur + 0.05);
-  } catch (e) {
-    console.warn('Sound play error:', e);
+  } catch(e){}
+}
+
+document.addEventListener('touchend', unlockAudio, {once:true});
+document.addEventListener('click', unlockAudio, {once:true});
+window.addEventListener('load', initAudio);
+
+// === КОНФЕТТИ ===
+const confettiCanvas = document.getElementById('confetti-canvas');
+const ctx = confettiCanvas.getContext('2d');
+let confettiParticles = [];
+
+function resizeConfetti() {
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+}
+
+window.addEventListener('resize', resizeConfetti);
+resizeConfetti();
+
+class Confetti {
+  constructor() {
+    this.x = Math.random() * confettiCanvas.width;
+    this.y = Math.random() * confettiCanvas.height * -0.5 - 50;
+    this.size = Math.random() * 8 + 4;
+    this.speedY = Math.random() * 5 + 3;
+    this.speedX = Math.random() * 4 - 2;
+    this.rotation = Math.random() * 360;
+    this.rotSpeed = Math.random() * 10 - 5;
+    this.color = ['#ff4d4d', '#4dff4d', '#4d4dff', '#ffff4d', '#ff4dff'][Math.floor(Math.random()*5)];
+  }
+  update() {
+    this.y += this.speedY;
+    this.x += this.speedX;
+    this.rotation += this.rotSpeed;
+    if (this.y > confettiCanvas.height + 50) this.y = -50;
+  }
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation * Math.PI / 180);
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = 0.9;
+    ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size * 0.4);
+    ctx.restore();
   }
 }
 
-// Слушатели для разблокировки аудио (работает на смартфонах)
-document.addEventListener('touchend', unlockAudio, { once: true });
-document.addEventListener('click', unlockAudio, { once: true });
-window.addEventListener('load', initAudio);
+function launchConfetti(count = 80) {
+  for (let i = 0; i < count; i++) {
+    confettiParticles.push(new Confetti());
+  }
+}
 
-// === Логика игры ===
+function animateConfetti() {
+  ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  confettiParticles = confettiParticles.filter(p => {
+    p.update();
+    p.draw();
+    return p.y < confettiCanvas.height + 100;
+  });
+  if (confettiParticles.length > 0) requestAnimationFrame(animateConfetti);
+}
+
+// === ИГРА ===
+
+const SIZE = 3;
+const TYPES = [0,1,2]; // 0-круг, 1-квадрат, 2-треугольник
+let grid = [];
+let currentLevel = 0;
+let moves = 0;
+let history = [];
 
 function neighbors(i) {
-  const x = i % SIZE;
-  const y = Math.floor(i / SIZE);
+  const x = i % SIZE, y = Math.floor(i / SIZE);
   const t = grid[i];
-  let dirs = [];
-  if (t === 0) dirs = [[1,0],[-1,0],[0,1],[0,-1]];
-  if (t === 1) dirs = [[1,0],[-1,0]];
-  if (t === 2) dirs = [[0,1],[0,-1]];
-  return dirs
-    .map(([dx,dy]) => [x+dx, y+dy])
-    .filter(([nx,ny]) => nx>=0 && ny>=0 && nx<SIZE && ny<SIZE)
-    .map(([nx,ny]) => ny*SIZE + nx);
+  let dirs = t === 0 ? [[1,0],[-1,0],[0,1],[0,-1]] :
+             t === 1 ? [[1,0],[-1,0]] :
+                       [[0,1],[0,-1]];
+  return dirs.map(([dx,dy]) => [x+dx, y+dy])
+             .filter(([nx,ny]) => nx>=0 && ny>=0 && nx<SIZE && ny<SIZE)
+             .map(([nx,ny]) => ny*SIZE + nx);
 }
 
 function applyMove(i) {
-  neighbors(i).forEach(n => {
-    grid[n] = (grid[n] + 1) % 3;
-  });
+  neighbors(i).forEach(n => grid[n] = (grid[n] + 1) % 3);
 }
 
-function isSolved() {
-  return grid.every(v => v === 0);
-}
+function isSolved() { return grid.every(v => v === 0); }
 
 function animateRipple(neigh) {
   neigh.forEach((n, idx) => {
     setTimeout(() => {
       const cell = document.querySelector(`[data-idx="${n}"]`);
       if (cell) {
-        cell.style.transform = 'scale(1.3)';
-        setTimeout(() => { cell.style.transform = ''; }, 150);
+        cell.style.transform = 'scale(1.25)';
+        setTimeout(() => cell.style.transform = '', 180);
       }
-    }, idx * 30);
+    }, idx * 35);
   });
 }
 
@@ -245,14 +368,16 @@ function clickCell(i) {
   animateRipple(neigh);
   applyMove(i);
   moves++;
-  playSound(600, 0.08, 0.12);  // тихий, короткий клик
+  playSound(600, 0.08, 0.12);
   render();
   if (isSolved()) {
     playSound(800, 0.25, 0.18);
     playSound(1000, 0.25, 0.18);
+    launchConfetti(100);
+    animateConfetti();
     setTimeout(() => {
-      alert(`✅ Равновесие на уровне ${currentLevel} за ${moves} ходов! 🧘`);
-    }, 100);
+      alert(`🎉 Равновесие достигнуто на уровне ${currentLevel} за ${moves} ходов!`);
+    }, 300);
   }
 }
 
@@ -286,7 +411,7 @@ function render() {
   grid.forEach((v, i) => {
     const d = document.createElement("div");
     d.className = "cell";
-    d.textContent = TYPES[v];
+    d.innerHTML = SVGS[v];
     d.dataset.idx = i;
     d.onclick = () => clickCell(i);
     g.appendChild(d);
