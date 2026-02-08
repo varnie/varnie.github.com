@@ -270,6 +270,7 @@ window.addEventListener('load', initAudio);
 const confettiCanvas = document.getElementById('confetti-canvas');
 const ctx = confettiCanvas.getContext('2d');
 let confettiParticles = [];
+let confettiAnimationId = null;
 
 function resizeConfetti() {
   confettiCanvas.width = window.innerWidth;
@@ -311,16 +312,31 @@ function launchConfetti(count = 80) {
   for (let i = 0; i < count; i++) {
     confettiParticles.push(new Confetti());
   }
+  if (!confettiAnimationId) animateConfetti();
+}
+
+function clearConfetti() {
+  confettiParticles = [];
+  if (confettiAnimationId) {
+    cancelAnimationFrame(confettiAnimationId);
+    confettiAnimationId = null;
+  }
+  ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
 }
 
 function animateConfetti() {
   ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-  confettiParticles = confettiParticles.filter(p => {
+  confettiParticles.forEach(p => {
     p.update();
     p.draw();
-    return p.y < confettiCanvas.height + 100;
   });
-  if (confettiParticles.length > 0) requestAnimationFrame(animateConfetti);
+  confettiParticles = confettiParticles.filter(p => p.y < confettiCanvas.height + 100);
+
+  if (confettiParticles.length > 0) {
+    confettiAnimationId = requestAnimationFrame(animateConfetti);
+  } else {
+    confettiAnimationId = null;
+  }
 }
 
 // === ИГРА ===
@@ -361,7 +377,11 @@ function animateRipple(neigh) {
   });
 }
 
+let gameWon = false;
+
 function clickCell(i) {
+  if (gameWon) return;
+
   history.push(grid.slice());
   if (history.length > 50) history.shift();
   const neigh = neighbors(i);
@@ -371,10 +391,10 @@ function clickCell(i) {
   playSound(600, 0.08, 0.12);
   render();
   if (isSolved()) {
+    gameWon = true;
     playSound(800, 0.25, 0.18);
     playSound(1000, 0.25, 0.18);
     launchConfetti(100);
-    animateConfetti();
     setTimeout(() => {
       alert(`🎉 Равновесие достигнуто на уровне ${currentLevel} за ${moves} ходов!`);
     }, 300);
@@ -396,7 +416,8 @@ function updateTilt() {
     const col = i % 3;
     torque += grid[i] * (col - 1);
   }
-  const deg = torque * -1.5;
+  const maxDeg = 12;
+  const deg = Math.max(-maxDeg, Math.min(maxDeg, torque * -1.5));
   document.getElementById('grid').style.transform = `rotate(${deg}deg)`;
 }
 
@@ -422,6 +443,10 @@ function render() {
 }
 
 function newLevel() {
+  // Важно: сбрасываем конфетти перед новым уровнем
+  clearConfetti();
+  gameWon = false;
+
   currentLevel++;
   grid = Array(SIZE * SIZE).fill(0);
   const scrambles = Math.min(15, 2 + currentLevel * 2);
