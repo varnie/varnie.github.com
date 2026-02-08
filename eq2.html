@@ -15,6 +15,7 @@
   --cell-bg: #1e1e1e;
   --cell-hover: #2a2a2a;
   --accent: #44ff44;
+  --meter-bg: #1a1a1a;
 }
 
 [data-theme="light"] {
@@ -23,9 +24,8 @@
   --cell-bg: #ffffff;
   --cell-hover: #e9ecef;
   --accent: #198754;
+  --meter-bg: #dee2e6;
 }
-
-
 
 body {
   margin: 0;
@@ -45,6 +45,9 @@ body {
   align-items: center;
   gap: 16px;
   padding: 16px;
+  position: relative;
+  width: 100%;
+  max-width: 500px;
 }
 
 h1 {
@@ -62,12 +65,10 @@ h1 {
 #meter {
   width: min(300px, 80vw);
   height: 12px;
-  background: #1a1a1a;
+  background: var(--meter-bg);
   border-radius: 6px;
   overflow: hidden;
 }
-
-[data-theme="light"] #meter { background: #dee2e6; }
 
 #progress {
   height: 100%;
@@ -128,54 +129,36 @@ button {
   border-color: #ced4da;
 }
 
-[data-theme="neon"] {
-  --bg: #0a0015;                    /* глубокий тёмно-фиолетовый */
-  --text: #00ffff;                  /* яркий cyan */
-  --cell-bg: #1a0033;               /* тёмно-фиолетовый фон ячеек */
-  --cell-hover: #330066;            /* более яркий при наведении */
-  --accent: #ff00ff;                /* magenta для акцентов */
-}
-
-[data-theme="neon"] .cell {
-  box-shadow: 0 0 15px #00ffff88, inset 0 0 10px #00ffff44;
-  transition: box-shadow 0.3s, transform 0.2s;
-}
-
-[data-theme="neon"] .cell:hover {
-  box-shadow: 0 0 25px #00ffffcc, inset 0 0 15px #00ffff88;
-}
-
-[data-theme="neon"] button {
-  background: transparent;
-  color: #00ffff;
-  border: 2px solid #00ffff;
-  box-shadow: 0 0 12px #00ffff88;
-  transition: all 0.25s;
-}
-
-[data-theme="neon"] button:hover {
-  background: #00ffff22;
-  box-shadow: 0 0 20px #00ffffcc;
-}
-
-[data-theme="neon"] button:active {
-  transform: scale(0.95);
-  box-shadow: 0 0 30px #ff00ff;
-}
-
-[data-theme="neon"] #progress {
-  background: linear-gradient(to right, #ff00ff, #00ffff, #ff00ff);
-  box-shadow: 0 0 15px #00ffff;
-}
-
-[data-theme="neon"] #meter {
-  background: #1a0033;
-  box-shadow: inset 0 0 10px #00ffff44;
-}
-
-
 button:hover { opacity: 0.9; }
 button:active { transform: scale(0.97); }
+
+/* Переключатель темы */
+.theme-toggle {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  background: rgba(100,100,100,0.15);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: all 0.3s;
+  backdrop-filter: blur(4px);
+}
+
+[data-theme="light"] .theme-toggle {
+  background: rgba(0,0,0,0.08);
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+  background: rgba(120,120,120,0.25);
+}
 
 /* Confetti canvas */
 #confetti-canvas {
@@ -193,19 +176,18 @@ button:active { transform: scale(0.97); }
 <canvas id="confetti-canvas"></canvas>
 
 <div class="app">
-  <h1>Равновесие</h1>
+  <button class="theme-toggle" id="themeToggle" title="Сменить тему">☀️</button>
+
+  <h1>Equilibrium</h1>
   <div id="stats">
-    Уровень: <span id="level">1</span> | Ходы: <span id="moves">0</span>
+    Level: <span id="level">1</span> | Moves: <span id="moves">0</span>
   </div>
   <div id="meter"><div id="progress"></div></div>
   <div class="grid" id="grid"></div>
   <div class="buttons">
     <button onclick="undo()">↶ Undo</button>
-    <button onclick="hint()">💡 Подсказка</button>
-    <button onclick="newLevel()">🔄 Новый</button>
-    <button onclick="setTheme('dark')">Тёмная</button>
-    <button onclick="setTheme('light')">Светлая</button>
-    <button onclick="setTheme('neon')">Неон</button>
+    <button onclick="hint()">💡 Hint</button>
+    <button onclick="newLevel()">🔄 New level</button>
   </div>
 </div>
 
@@ -214,11 +196,37 @@ button:active { transform: scale(0.97); }
 function setTheme(theme) {
   document.body.dataset.theme = theme;
   localStorage.setItem('theme', theme);
+  
+  // Обновляем иконку переключателя
+  const toggle = document.getElementById('themeToggle');
+  toggle.textContent = theme === 'light' ? '🌙' : '☀️';
+  toggle.title = theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode';
 }
 
-// Загрузка сохранённой темы
-const savedTheme = localStorage.getItem('theme') || 'dark';
-setTheme(savedTheme);
+function autoSetTheme() {
+  // Если пользователь уже выбирал тему вручную — не переопределяем
+  if (localStorage.getItem('theme')) return;
+  
+  const hour = new Date().getHours();
+  const isDay = hour >= 7 && hour < 20;
+  setTheme(isDay ? 'light' : 'dark');
+}
+
+// Инициализация темы
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) {
+  setTheme(savedTheme);
+} else {
+  autoSetTheme();
+}
+
+// Переключатель
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const current = document.body.dataset.theme;
+  setTheme(current === 'light' ? 'dark' : 'light');
+  // После ручного переключения сохраняем выбор навсегда
+  localStorage.setItem('theme', document.body.dataset.theme);
+});
 
 // === SVG ИКОНКИ ===
 const SVGS = {
@@ -227,11 +235,13 @@ const SVGS = {
   2: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffdddd"/><stop offset="100%" stop-color="#cc6666"/></linearGradient></defs><polygon points="50,10 90,80 10,80" fill="url(#g2)" stroke="#a00" stroke-width="4"/></svg>`
 };
 
-// === АУДИО (оставил как было, но можно отключить) ===
+// === АУДИО ===
 let audioCtx = null;
 let isAudioUnlocked = false;
 
-function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+function initAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
 
 function unlockAudio() {
   if (isAudioUnlocked || !audioCtx) return;
@@ -326,12 +336,8 @@ function clearConfetti() {
 
 function animateConfetti() {
   ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-  confettiParticles.forEach(p => {
-    p.update();
-    p.draw();
-  });
+  confettiParticles.forEach(p => { p.update(); p.draw(); });
   confettiParticles = confettiParticles.filter(p => p.y < confettiCanvas.height + 100);
-
   if (confettiParticles.length > 0) {
     confettiAnimationId = requestAnimationFrame(animateConfetti);
   } else {
@@ -340,9 +346,8 @@ function animateConfetti() {
 }
 
 // === ИГРА ===
-
 const SIZE = 3;
-const TYPES = [0,1,2]; // 0-круг, 1-квадрат, 2-треугольник
+const TYPES = [0,1,2];
 let grid = [];
 let currentLevel = 0;
 let moves = 0;
@@ -355,8 +360,8 @@ function neighbors(i) {
              t === 1 ? [[1,0],[-1,0]] :
                        [[0,1],[0,-1]];
   return dirs.map(([dx,dy]) => [x+dx, y+dy])
-             .filter(([nx,ny]) => nx>=0 && ny>=0 && nx<SIZE && ny<SIZE)
-             .map(([nx,ny]) => ny*SIZE + nx);
+    .filter(([nx,ny]) => nx>=0 && ny>=0 && nx<SIZE && ny<SIZE)
+    .map(([nx,ny]) => ny*SIZE + nx);
 }
 
 function applyMove(i) {
@@ -381,7 +386,6 @@ let gameWon = false;
 
 function clickCell(i) {
   if (gameWon) return;
-
   history.push(grid.slice());
   if (history.length > 50) history.shift();
   const neigh = neighbors(i);
@@ -396,7 +400,7 @@ function clickCell(i) {
     playSound(1000, 0.25, 0.18);
     launchConfetti(100);
     setTimeout(() => {
-      alert(`🎉 Равновесие достигнуто на уровне ${currentLevel} за ${moves} ходов!`);
+      alert(`🎉 Equilibrium achieved on level ${currentLevel} in ${moves} moves!`);
     }, 300);
   }
 }
@@ -443,10 +447,8 @@ function render() {
 }
 
 function newLevel() {
-  // Важно: сбрасываем конфетти перед новым уровнем
   clearConfetti();
   gameWon = false;
-
   currentLevel++;
   grid = Array(SIZE * SIZE).fill(0);
   const scrambles = Math.min(15, 2 + currentLevel * 2);
@@ -456,7 +458,7 @@ function newLevel() {
   history = [];
   moves = 0;
   render();
-  playSound(500, 0.12, 0.10); // звук нового уровня
+  playSound(500, 0.12, 0.10);
 }
 
 function undo() {
@@ -483,10 +485,9 @@ function getNextMove() {
       const x = i % 3;
       const y = Math.floor(i / 3);
       const t = state[i];
-      let dirs = [];
-      if (t === 0) dirs = [[1,0],[-1,0],[0,1],[0,-1]];
-      else if (t === 1) dirs = [[1,0],[-1,0]];
-      else if (t === 2) dirs = [[0,1],[0,-1]];
+      let dirs = t === 0 ? [[1,0],[-1,0],[0,1],[0,-1]] :
+                 t === 1 ? [[1,0],[-1,0]] :
+                           [[0,1],[0,-1]];
       const neigh = dirs
         .map(([dx, dy]) => {
           const nx = x + dx, ny = y + dy;
@@ -521,6 +522,7 @@ function hint() {
   }
 }
 
+// Старт игры
 newLevel();
 </script>
 </body>
