@@ -247,43 +247,39 @@ const SVGS = {
 
 // === АУДИО ===
 let audioCtx = null;
-let isAudioUnlocked = false;
 
 function initAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 }
 
-function unlockAudio() {
-  if (isAudioUnlocked || !audioCtx) return;
-  const buffer = audioCtx.createBuffer(1, 1, 22050);
-  const source = audioCtx.createBufferSource();
-  source.buffer = buffer;
-  source.connect(audioCtx.destination);
-  source.start(0);
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  isAudioUnlocked = true;
-  document.removeEventListener('touchend', unlockAudio);
-  document.removeEventListener('click', unlockAudio);
-}
 
 function playSound(freq = 440, dur = 0.1, vol = 0.12) {
-  if (!audioCtx || audioCtx.state !== 'running') return;
-  try {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0, audioCtx.currentTime);
-    gain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.01);
-    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + dur);
-    osc.connect(gain).connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + dur + 0.05);
-  } catch(e){}
+  if (!audioCtx) initAudio();
+
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume().then(() => {
+      playSound(freq, dur, vol);
+    });
+    return;
+  }
+
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = 'sine';
+  osc.frequency.value = freq;
+
+  gain.gain.setValueAtTime(0, audioCtx.currentTime);
+  gain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.01);
+  gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + dur);
+
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + dur + 0.05);
 }
 
-document.addEventListener('touchend', unlockAudio, {once:true});
-document.addEventListener('click', unlockAudio, {once:true});
+
+
 window.addEventListener('load', initAudio);
 
 // === КОНФЕТТИ ===
