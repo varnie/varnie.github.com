@@ -10,33 +10,43 @@
   --cell-size: clamp(72px, 22vmin, 120px);
   --gap: clamp(8px, 3vmin, 16px);
   --font-size: clamp(36px, 10vmin, 56px);
-  --bg: #0e0e0e;
-  --text: #eee;
-  --cell-bg: #1e1e1e;
-  --cell-hover: #2a2a2a;
-  --accent: #44ff44;
-  --meter-bg: #1a1a1a;
+  /* --- DARK THEME --- */
+  --bg: #12141a;
+  --text: #e0e0e0;
+  --cell-bg: #1e2128;
+  --cell-hover: #2a2e38;
+  --accent: #00ff9d;
+  --meter-bg: #1a1c22;
+  --border-color: rgba(255, 255, 255, 0.08);
 }
 
 [data-theme="light"] {
   --bg: #f8f9fa;
   --text: #212529;
-  --cell-bg: #ffffff;
-  --cell-hover: #e9ecef;
+  /* Фон карточек делаем чуть серее, чтобы белый блик был виден */
+  --cell-bg: #f0f2f5;
+  --cell-hover: #e2e4e8;
   --accent: #198754;
-  --meter-bg: #dee2e6;
+  --meter-bg: #e9ecef;
+  --border-color: rgba(0, 0, 0, 0.08);
 }
 
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   transition: background 0.4s, color 0.4s;
+}
+
+/* Градиент только для темной темы */
+body[data-theme="dark"] {
+  background-image: radial-gradient(circle at 50% 0%, #1e2230 0%, var(--bg) 60%);
+  background-attachment: fixed;
 }
 
 .app {
@@ -54,12 +64,16 @@ h1 {
   font-weight: 300;
   margin: 0;
   opacity: 0.9;
+  letter-spacing: 1px;
 }
 
 #stats {
   display: flex;
   gap: 2em;
   font-size: 1.2em;
+  font-weight: 500;
+  color: var(--text);
+  opacity: 0.8;
 }
 
 #meter {
@@ -68,13 +82,15 @@ h1 {
   background: var(--meter-bg);
   border-radius: 6px;
   overflow: hidden;
+  border: 1px solid var(--border-color);
 }
 
 #progress {
   height: 100%;
-  background: linear-gradient(to right, #ff4444, #ffaa00, var(--accent));
+  background: linear-gradient(to right, #ff4d4d, #ffb033, var(--accent));
   transition: width 0.3s ease;
   width: 0%;
+  box-shadow: 0 0 10px rgba(0, 255, 157, 0.4);
 }
 
 .grid {
@@ -82,7 +98,6 @@ h1 {
   grid-template-columns: repeat(3, var(--cell-size));
   gap: var(--gap);
   transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  
   animation: gentle-breeze 3s infinite ease-in-out;
 }
 
@@ -102,16 +117,55 @@ h1 {
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+
+  box-shadow:
+    0 4px 6px rgba(0,0,0,0.3),
+    0 10px 20px rgba(0,0,0,0.2),
+    inset 0 1px 0 rgba(255,255,255, 0.05);
+
+  border: 1px solid var(--border-color);
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
-.cell:hover { background: var(--cell-hover); }
-.cell:active { transform: scale(0.95); }
+/*
+   ЭФФЕКТ БЛЕСКА (ОДИНАКОВЫЙ ДЛЯ ОБОИХ ТЕМ)
+   Используем белый градиент. В темной теме он светится.
+   В светлой теме он светится на сером фоне карточки.
+*/
+.cell::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+  transform: skewX(-25deg);
+  transition: left 0.5s;
+  /* Улучшаем видимость в темной теме за счет отсутствия фильтров */
+}
+
+.cell:hover::before {
+  left: 150%;
+}
+
+.cell:hover {
+  background: var(--cell-hover);
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 12px rgba(0,0,0,0.4),
+    0 15px 30px rgba(0,0,0,0.3);
+}
+.cell:active {
+  transform: scale(0.95) translateY(0);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+}
 
 .cell svg {
   width: 60%;
   height: 60%;
+  position: relative;
+  z-index: 1;
 }
 
 .buttons {
@@ -122,14 +176,16 @@ h1 {
 }
 
 button {
-  background: #222;
-  color: #eee;
-  border: 1px solid #444;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 10px 18px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 15px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+  font-weight: 500;
 }
 
 [data-theme="light"] button {
@@ -138,10 +194,20 @@ button {
   border-color: #ced4da;
 }
 
-button:hover { opacity: 0.9; }
+button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(0, 255, 157, 0.2);
+}
+
+[data-theme="light"] button:hover {
+  background: #dee2e6;
+  border-color: #198754;
+  box-shadow: 0 0 10px rgba(25, 135, 84, 0.2);
+}
+
 button:active { transform: scale(0.97); }
 
-/* Переключатель темы */
 .theme-toggle {
   position: absolute;
   top: 16px;
@@ -150,7 +216,7 @@ button:active { transform: scale(0.97); }
   height: 48px;
   background: rgba(100,100,100,0.15);
   border-radius: 50%;
-  border: none;
+  border: 1px solid rgba(255,255,255,0.1);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -165,11 +231,10 @@ button:active { transform: scale(0.97); }
 }
 
 .theme-toggle:hover {
-  transform: scale(1.1);
+  transform: scale(1.1) rotate(15deg);
   background: rgba(120,120,120,0.25);
 }
 
-/* Confetti canvas */
 #confetti-canvas {
   position: fixed;
   top: 0; left: 0;
@@ -206,23 +271,19 @@ button:active { transform: scale(0.97); }
 function setTheme(theme) {
   document.body.dataset.theme = theme;
   localStorage.setItem('theme', theme);
-  
-  // Обновляем иконку переключателя
+
   const toggle = document.getElementById('themeToggle');
   toggle.textContent = theme === 'light' ? '🌙' : '☀️';
   toggle.title = theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode';
 }
 
 function autoSetTheme() {
-  // Если пользователь уже выбирал тему вручную — не переопределяем
   if (localStorage.getItem('theme')) return;
-  
   const hour = new Date().getHours();
   const isDay = hour >= 7 && hour < 20;
   setTheme(isDay ? 'light' : 'dark');
 }
 
-// Инициализация темы
 const savedTheme = localStorage.getItem('theme');
 if (savedTheme) {
   setTheme(savedTheme);
@@ -230,19 +291,17 @@ if (savedTheme) {
   autoSetTheme();
 }
 
-// Переключатель
 document.getElementById('themeToggle').addEventListener('click', () => {
   const current = document.body.dataset.theme;
   setTheme(current === 'light' ? 'dark' : 'light');
-  // После ручного переключения сохраняем выбор навсегда
   localStorage.setItem('theme', document.body.dataset.theme);
 });
 
 // === SVG ИКОНКИ ===
 const SVGS = {
-  0: `<svg viewBox="0 0 100 100"><defs><radialGradient id="g0"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#d0d0d0"/></radialGradient></defs><circle cx="50" cy="50" r="45" fill="url(#g0)" stroke="#888" stroke-width="4"/></svg>`,
-  1: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f0f0f0"/><stop offset="100%" stop-color="#b0b0b0"/></linearGradient></defs><rect x="10" y="10" width="80" height="80" rx="12" fill="url(#g1)" stroke="#777" stroke-width="4"/></svg>`,
-  2: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffdddd"/><stop offset="100%" stop-color="#cc6666"/></linearGradient></defs><polygon points="50,10 90,80 10,80" fill="url(#g2)" stroke="#a00" stroke-width="4"/></svg>`
+  0: `<svg viewBox="0 0 100 100"><defs><radialGradient id="g0"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#b0b0b0"/></radialGradient></defs><circle cx="50" cy="50" r="45" fill="url(#g0)" stroke="#999" stroke-width="4"/></svg>`,
+  1: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a0c4ff"/><stop offset="100%" stop-color="#4a90e2"/></linearGradient></defs><rect x="10" y="10" width="80" height="80" rx="12" fill="url(#g1)" stroke="#2d6cb5" stroke-width="4"/></svg>`,
+  2: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff9a9e"/><stop offset="100%" stop-color="#d63031"/></linearGradient></defs><polygon points="50,10 90,80 10,80" fill="url(#g2)" stroke="#a00" stroke-width="4"/></svg>`
 };
 
 // === АУДИО ===
@@ -252,33 +311,24 @@ function initAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 }
 
-
 function playSound(freq = 440, dur = 0.1, vol = 0.12) {
   if (!audioCtx) initAudio();
-
   if (audioCtx.state === 'suspended') {
-    audioCtx.resume().then(() => {
-      playSound(freq, dur, vol);
-    });
+    audioCtx.resume().then(() => playSound(freq, dur, vol));
     return;
   }
 
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
-
   osc.type = 'sine';
   osc.frequency.value = freq;
-
   gain.gain.setValueAtTime(0, audioCtx.currentTime);
   gain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.01);
   gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + dur);
-
   osc.connect(gain).connect(audioCtx.destination);
   osc.start();
   osc.stop(audioCtx.currentTime + dur + 0.05);
 }
-
-
 
 window.addEventListener('load', initAudio);
 
@@ -292,7 +342,6 @@ function resizeConfetti() {
   confettiCanvas.width = window.innerWidth;
   confettiCanvas.height = window.innerHeight;
 }
-
 window.addEventListener('resize', resizeConfetti);
 resizeConfetti();
 
@@ -325,9 +374,7 @@ class Confetti {
 }
 
 function launchConfetti(count = 80) {
-  for (let i = 0; i < count; i++) {
-    confettiParticles.push(new Confetti());
-  }
+  for (let i = 0; i < count; i++) confettiParticles.push(new Confetti());
   if (!confettiAnimationId) animateConfetti();
 }
 
@@ -518,7 +565,7 @@ function hint() {
   if (next >= 0) {
     const cell = document.querySelector(`[data-idx="${next}"]`);
     if (cell) {
-      cell.style.boxShadow = '0 0 30px #44ff44';
+      cell.style.boxShadow = '0 0 25px var(--accent), inset 0 0 10px var(--accent)';
       cell.style.transition = 'box-shadow 0.3s';
       playSound(700, 0.12, 0.15);
       setTimeout(() => { cell.style.boxShadow = ''; }, 2000);
