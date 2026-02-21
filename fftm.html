@@ -55,6 +55,32 @@
         .cloud:nth-child(2) { width: 400px; height: 250px; background: radial-gradient(ellipse, #7dd3fc, transparent); top: 40%; right: -15%; animation-delay: -5s; animation-duration: 30s; }
         .cloud:nth-child(3) { width: 450px; height: 280px; background: radial-gradient(ellipse, #c4b5fd, transparent); bottom: 5%; left: 10%; animation-delay: -12s; animation-duration: 28s; }
 
+        .stars-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            width: 3px; height: 3px;
+            background: #fff;
+            border-radius: 50%;
+            animation: star-twinkle var(--duration) infinite ease-in-out;
+            animation-delay: var(--delay);
+            box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.3);
+        }
+
+        .star.large { width: 4px; height: 4px; box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.5); }
+        .star.colored:nth-child(3n) { background: #ff9ed2; box-shadow: 0 0 8px 2px rgba(255, 158, 210, 0.5); }
+        .star.colored:nth-child(5n) { background: #9ed2ff; box-shadow: 0 0 8px 2px rgba(158, 210, 255, 0.5); }
+        .star.colored:nth-child(7n) { background: #d2ff9e; box-shadow: 0 0 8px 2px rgba(210, 255, 158, 0.5); }
+
+        @keyframes star-twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
         @keyframes float-cloud {
             0%, 100% { transform: translateX(0) translateY(0) scale(1) rotate(0deg); }
             25% { transform: translateX(60px) translateY(-40px) scale(1.15) rotate(2deg); }
@@ -66,7 +92,7 @@
             display: flex; flex-direction: column;
             height: 100vh;
             height: 100dvh;
-            position: relative; z-index: 1;
+            position: relative; z-index: 2;
             transition: transform 0.1s;
         }
 
@@ -233,11 +259,11 @@
 
         .bubble {
             position: fixed; background: linear-gradient(135deg, #fff, #f0f0f0);
-            color: #1a1625; padding: 8px 14px; border-radius: 18px;
-            font-size: 0.85rem; white-space: nowrap; z-index: 200;
+            color: #1a1625; padding: 10px 16px; border-radius: 18px;
+            font-size: 0.9rem; white-space: nowrap; z-index: 200;
             pointer-events: none; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             font-weight: 600; transform: translateX(-50%) scale(0); opacity: 0;
-            max-width: 180px; text-align: center;
+            max-width: 220px; text-align: center;
         }
         .bubble::after {
             content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
@@ -252,6 +278,17 @@
             100% { opacity: 0; transform: translateX(-50%) scale(0.9) translateY(-5px); }
         }
 
+        .bubble.description {
+            background: linear-gradient(135deg, #2a2440, #1e1830);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            max-width: 260px;
+            white-space: normal;
+            text-align: center;
+            line-height: 1.4;
+        }
+        .bubble.description::after { border-top-color: #1e1830; }
+
         .holding-item {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
             background: linear-gradient(135deg, rgba(30, 24, 48, 0.98), rgba(40, 32, 64, 0.98));
@@ -261,6 +298,18 @@
             box-shadow: 0 0 30px rgba(251, 191, 36, 0.4); backdrop-filter: blur(10px);
         }
         .holding-item .item-icon { font-size: 1.7rem; animation: item-float 0.8s infinite; }
+
+        .music-toggle {
+            position: fixed; top: 15px; right: 15px; z-index: 200;
+            background: var(--field); border-radius: 50%; width: 44px; height: 44px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            border: 1px solid var(--grid-border); cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            font-size: 1.4rem;
+        }
+        .music-toggle:active { transform: scale(0.9); }
+        .music-toggle.muted { opacity: 0.6; }
 
         .screens {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -348,335 +397,77 @@
             100% { opacity: 0; transform: scale(1.1) translateY(-25px) rotate(0deg); }
         }
 
-        /* ==================== MOBILE START SCREEN ==================== */
         @media (max-width: 500px) {
-            .screens {
-                align-items: flex-start;
-                overflow-y: auto;
-                padding: 15px;
-                padding-top: 20px;
-                padding-bottom: 30px;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .screen-content {
-                max-width: 100%;
-            }
-
-            .screen-content h1 {
-                font-size: 2.2rem;
-                margin-bottom: 8px;
-            }
-
-            .screen-content .subtitle {
-                font-size: 1rem;
-                margin-bottom: 20px;
-            }
-
-            .char-showcase {
-                margin: 20px 0;
-                gap: 12px;
-            }
-
-            .char-showcase .char .avatar {
-                width: 55px;
-                height: 55px;
-                font-size: 2rem;
-            }
-
-            .char-showcase .char:nth-child(1) .avatar {
-                font-size: 1.8rem;
-                border-radius: 14px;
-            }
-
-            .char-showcase .char:nth-child(2) .avatar,
-            .char-showcase .char:nth-child(3) .avatar,
-            .char-showcase .char:nth-child(4) .avatar {
-                font-size: 2.5rem;
-            }
-
-            .char-showcase .char:nth-child(3) .avatar::before {
-                width: 14px;
-                height: 9px;
-                top: 3px;
-                right: 7px;
-            }
-
-            .char-showcase .char:nth-child(3) .avatar::after {
-                width: 6px;
-                height: 6px;
-                top: 5px;
-                right: 10px;
-            }
-
-            .char-showcase .char span {
-                font-size: 0.85rem;
-            }
-
-            .instructions {
-                font-size: 0.9rem;
-                line-height: 1.6;
-                margin: 15px 0;
-            }
-
-            .instructions br {
-                display: none;
-            }
-
-            .instructions b {
-                display: inline-block;
-                margin: 0 2px;
-            }
-
-            .btn {
-                padding: 14px 35px;
-                font-size: 1.1rem;
-                margin-top: 15px;
-                border-radius: 22px;
-            }
-
-            .disclaimer {
-                font-size: 0.75rem;
-                margin-top: 15px;
-            }
+            .screens { align-items: flex-start; overflow-y: auto; padding: 15px; padding-top: 20px; padding-bottom: 30px; -webkit-overflow-scrolling: touch; }
+            .screen-content { max-width: 100%; }
+            .screen-content h1 { font-size: 2.2rem; margin-bottom: 8px; }
+            .screen-content .subtitle { font-size: 1rem; margin-bottom: 20px; }
+            .char-showcase { margin: 20px 0; gap: 12px; }
+            .char-showcase .char .avatar { width: 55px; height: 55px; font-size: 2rem; }
+            .char-showcase .char:nth-child(1) .avatar { font-size: 1.8rem; border-radius: 14px; }
+            .char-showcase .char:nth-child(2) .avatar, .char-showcase .char:nth-child(3) .avatar, .char-showcase .char:nth-child(4) .avatar { font-size: 2.5rem; }
+            .char-showcase .char:nth-child(3) .avatar::before { width: 14px; height: 9px; top: 3px; right: 7px; }
+            .char-showcase .char:nth-child(3) .avatar::after { width: 6px; height: 6px; top: 5px; right: 10px; }
+            .char-showcase .char span { font-size: 0.85rem; }
+            .instructions { font-size: 0.9rem; line-height: 1.6; margin: 15px 0; }
+            .instructions br { display: none; }
+            .instructions b { display: inline-block; margin: 0 2px; }
+            .btn { padding: 14px 35px; font-size: 1.1rem; margin-top: 15px; border-radius: 22px; }
+            .disclaimer { font-size: 0.75rem; margin-top: 15px; }
         }
 
-        /* Very small screens */
         @media (max-width: 360px) {
-            .screens {
-                padding: 10px;
-                padding-top: 15px;
-            }
-
-            .screen-content h1 {
-                font-size: 1.9rem;
-            }
-
-            .char-showcase .char .avatar {
-                width: 48px;
-                height: 48px;
-                font-size: 1.7rem;
-            }
-
-            .char-showcase .char:nth-child(1) .avatar {
-                font-size: 1.5rem;
-            }
-
-            .char-showcase .char:nth-child(2) .avatar,
-            .char-showcase .char:nth-child(3) .avatar,
-            .char-showcase .char:nth-child(4) .avatar {
-                font-size: 2.2rem;
-            }
-
-            .char-showcase .char span {
-                font-size: 0.75rem;
-            }
-
-            .instructions {
-                font-size: 0.8rem;
-            }
-
-            .btn {
-                padding: 12px 28px;
-                font-size: 1rem;
-            }
+            .screens { padding: 10px; padding-top: 15px; }
+            .screen-content h1 { font-size: 1.9rem; }
+            .char-showcase .char .avatar { width: 48px; height: 48px; font-size: 1.7rem; }
+            .char-showcase .char:nth-child(1) .avatar { font-size: 1.5rem; }
+            .char-showcase .char:nth-child(2) .avatar, .char-showcase .char:nth-child(3) .avatar, .char-showcase .char:nth-child(4) .avatar { font-size: 2.2rem; }
+            .char-showcase .char span { font-size: 0.75rem; }
+            .instructions { font-size: 0.8rem; }
+            .btn { padding: 12px 28px; font-size: 1rem; }
         }
 
-        /* ==================== MOBILE GAME FIELD ==================== */
         @media (max-width: 600px), (max-height: 500px) {
-            .game-wrapper {
-                height: 100vh;
-                height: 100dvh;
-            }
-
-            .hud {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                margin: 0;
-                padding: 8px 12px;
-                background: var(--field);
-                z-index: 60;
-                gap: 16px;
-                font-size: 0.95rem;
-                border-bottom: 1px solid var(--grid-border);
-                justify-content: flex-start;
-            }
-
-            .game-field {
-                position: fixed;
-                top: 42px;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                padding: 4px;
-                align-items: flex-start;
-                justify-content: center;
-            }
-
-            .grid {
-                width: 100vw;
-                height: calc(100vh - 42px);
-                height: calc(100dvh - 42px);
-                max-width: none;
-                max-height: none;
-                border-radius: 0;
-                gap: 2px;
-                box-shadow: none;
-                border: none;
-                animation: none;
-            }
-
-            .cell {
-                border-radius: 2px;
-            }
-
-            .entity {
-                font-size: 6.5vw !important;
-            }
-            .entity.player {
-                font-size: 7.5vw !important;
-            }
-            .entity.npc {
-                font-size: 7vw !important;
-            }
-            .entity.npc.vadim-char {
-                font-size: 6vw !important;
-            }
-            .entity.invader {
-                font-size: 6.8vw !important;
-            }
-            .entity.item {
-                font-size: 5.5vw !important;
-            }
-
-            .hp-bar-container {
-                width: 28px;
-                height: 4px;
-                top: -6px;
-            }
-
-            .entity.npc.karina-char::before {
-                width: 10px;
-                height: 7px;
-                top: -1px;
-                right: 12%;
-            }
-            .entity.npc.karina-char::after {
-                width: 4px;
-                height: 4px;
-                top: 0;
-                right: 14%;
-            }
-
-            .holding-item {
-                bottom: 8px;
-                padding: 10px 20px;
-                font-size: 1rem;
-                border-radius: 20px;
-                z-index: 70;
-            }
-            .holding-item .item-icon {
-                font-size: 1.4rem;
-            }
-
-            .controls-hint {
-                display: none;
-            }
-
-            .bubble {
-                font-size: 0.75rem;
-                padding: 6px 10px;
-                max-width: 140px;
-            }
-
-            .plus-effect {
-                font-size: 1.2rem;
-            }
-
-            .item-label {
-                font-size: 0.85rem;
-                padding: 4px 10px;
-            }
-
-            .hit-text {
-                font-size: 1rem;
-            }
+            .game-wrapper { height: 100vh; height: 100dvh; }
+            .hud { position: fixed; top: 0; left: 0; right: 0; margin: 0; padding: 8px 12px; background: var(--field); z-index: 60; gap: 16px; font-size: 0.95rem; border-bottom: 1px solid var(--grid-border); justify-content: flex-start; }
+            .game-field { position: fixed; top: 42px; left: 0; right: 0; bottom: 0; padding: 4px; align-items: flex-start; justify-content: center; }
+            .grid { width: 100vw; height: calc(100vh - 42px); height: calc(100dvh - 42px); max-width: none; max-height: none; border-radius: 0; gap: 2px; box-shadow: none; border: none; animation: none; }
+            .cell { border-radius: 2px; }
+            .entity { font-size: 6.5vw !important; }
+            .entity.player { font-size: 7.5vw !important; }
+            .entity.npc { font-size: 7vw !important; }
+            .entity.npc.vadim-char { font-size: 6vw !important; }
+            .entity.invader { font-size: 6.8vw !important; }
+            .entity.item { font-size: 5.5vw !important; }
+            .hp-bar-container { width: 28px; height: 4px; top: -6px; }
+            .entity.npc.karina-char::before { width: 10px; height: 7px; top: -1px; right: 12%; }
+            .entity.npc.karina-char::after { width: 4px; height: 4px; top: 0; right: 14%; }
+            .holding-item { bottom: 8px; padding: 10px 20px; font-size: 1rem; border-radius: 20px; z-index: 70; }
+            .holding-item .item-icon { font-size: 1.4rem; }
+            .controls-hint { display: none; }
+            .bubble { font-size: 0.75rem; padding: 6px 10px; max-width: 140px; }
+            .bubble.description { max-width: 180px; font-size: 0.7rem; }
+            .plus-effect { font-size: 1.2rem; }
+            .item-label { font-size: 0.85rem; padding: 4px 10px; }
+            .hit-text { font-size: 1rem; }
+            .music-toggle { top: 8px; right: 8px; width: 38px; height: 38px; font-size: 1.2rem; }
         }
 
-        /* Landscape mobile */
         @media (max-height: 500px) and (orientation: landscape) {
-            .game-field {
-                top: 0;
-                left: 80px;
-                right: 0;
-                bottom: 0;
-            }
-
-            .grid {
-                width: calc(100vh - 8px);
-                height: calc(100vh - 8px);
-                max-width: calc(100vw - 84px);
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            .hud {
-                position: fixed;
-                top: auto;
-                left: 0;
-                bottom: 0;
-                width: 80px;
-                height: 100vh;
-                flex-direction: column;
-                align-items: center;
-                justify-content: flex-start;
-                padding-top: 60px;
-                gap: 12px;
-                font-size: 0.85rem;
-                writing-mode: vertical-rl;
-                text-orientation: mixed;
-            }
-
-            .holding-item {
-                bottom: 8px;
-                right: 8px;
-                left: auto;
-                transform: none;
-                padding: 8px 14px;
-                font-size: 0.9rem;
-            }
+            .game-field { top: 0; left: 80px; right: 0; bottom: 0; }
+            .grid { width: calc(100vh - 8px); height: calc(100vh - 8px); max-width: calc(100vw - 84px); margin-left: auto; margin-right: auto; }
+            .hud { position: fixed; top: auto; left: 0; bottom: 0; width: 80px; height: 100vh; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 60px; gap: 12px; font-size: 0.85rem; writing-mode: vertical-rl; text-orientation: mixed; }
+            .holding-item { bottom: 8px; right: 8px; left: auto; transform: none; padding: 8px 14px; font-size: 0.9rem; }
         }
 
-        /* Small phones */
         @media (max-width: 360px) {
-            .hud {
-                gap: 10px;
-                font-size: 0.85rem;
-                padding: 6px 10px;
-            }
-
-            .entity {
-                font-size: 5.8vw !important;
-            }
-            .entity.player {
-                font-size: 6.8vw !important;
-            }
-            .entity.npc {
-                font-size: 6.3vw !important;
-            }
-            .entity.invader {
-                font-size: 6vw !important;
-            }
-            .entity.item {
-                font-size: 5vw !important;
-            }
-
-            .holding-item {
-                padding: 8px 14px;
-                font-size: 0.9rem;
-            }
+            .hud { gap: 10px; font-size: 0.85rem; padding: 6px 10px; }
+            .entity { font-size: 5.8vw !important; }
+            .entity.player { font-size: 6.8vw !important; }
+            .entity.npc { font-size: 6.3vw !important; }
+            .entity.invader { font-size: 6vw !important; }
+            .entity.item { font-size: 5vw !important; }
+            .holding-item { padding: 8px 14px; font-size: 0.9rem; }
         }
 
         @media (min-width: 601px) {
@@ -688,6 +479,10 @@
     <div class="bg-atmosphere">
         <div class="cloud"></div><div class="cloud"></div><div class="cloud"></div>
     </div>
+
+    <div class="stars-container" id="stars-container"></div>
+
+    <div class="music-toggle" id="music-toggle" title="Увімкнути/Вимкнути музику">🎵</div>
 
     <div class="game-wrapper" id="game-wrapper">
         <div class="hud">
@@ -761,6 +556,12 @@
 
         const CHARACTERS = { vadim: 'V', mikita: '🦝', karina: '👱‍♀️', katja: '👩🏻' };
 
+        const NPC_DESCRIPTIONS = {
+            vadim: 'Це пан Вадим, але лисий',
+            karina: 'Так це Карина, прекрасна госпожа!',
+            katja: 'Госпожа Катя — промінь світла там, де треба'
+        };
+
         const INVADER_TYPES = [
             { emoji: '🧟', name: 'Zombie', hp: 1 }, { emoji: '🧟‍♂️', name: 'Zombie', hp: 2 },
             { emoji: '👻', name: 'Ghost', hp: 1 }, { emoji: '💀', name: 'Skeleton', hp: 2 },
@@ -779,8 +580,8 @@
                 wrong: ['Ой, блін!', 'Не тому!', 'Йой!', 'Помилочка!'],
                 deliver: {
                     vadim: ['Ось, пане!', 'Тримайте, пане!'],
-                    karina: ['Будь ласка, пані!', 'Для вас, пані!'],
-                    katja: ['Будь ласка, пані!', 'Для вас, пані!']
+                    karina: ['Будь ласка, госпожо!', 'Для вас, госпожо!'],
+                    katja: ['Будь ласка, госпожо!', 'Для вас, госпожо!']
                 },
                 idle: ['Та ось же!', 'Чим би зайнятись...', 'Треба всім допомогти!', 'Де тут що...', 'Робота робота...', 'Несу-несу...', 'Ого!', 'Оп!'],
                 battle: ['Ядрана мати!', 'Сучі діти!', 'Отримуй!', 'На халяву!', 'Їжте на здоров\'я!', 'Не пройдеш!', 'Ах ти ж їжак!']
@@ -810,41 +611,178 @@
 
         let intervals = {};
         let audioCtx = null;
+        let musicPlaying = false;
+        let musicMuted = false;
+        let musicTimeout = null;
+        let masterGain = null;
 
-        function initAudio() { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} }
+        const musicToggle = document.getElementById('music-toggle');
+
+        function initStars() {
+            const container = document.getElementById('stars-container');
+            const starCount = 60;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                if (Math.random() < 0.3) star.classList.add('large');
+                if (Math.random() < 0.4) star.classList.add('colored');
+                
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.setProperty('--duration', (2 + Math.random() * 3) + 's');
+                star.style.setProperty('--delay', Math.random() * 3 + 's');
+                
+                container.appendChild(star);
+            }
+        }
+
+        function initAudio() { 
+            try { 
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+                masterGain = audioCtx.createGain();
+                masterGain.connect(audioCtx.destination);
+                masterGain.gain.value = 0.3;
+            } catch(e) {} 
+        }
+
+        function playNote(freq, startTime, duration, type = 'sine', volume = 0.15) {
+            if (!audioCtx || musicMuted) return;
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.connect(gain);
+            gain.connect(masterGain);
+            
+            osc.type = type;
+            osc.frequency.value = freq;
+            
+            gain.gain.setValueAtTime(0, startTime);
+            gain.gain.linearRampToValueAtTime(volume, startTime + 0.01);
+            gain.gain.setValueAtTime(volume, startTime + duration - 0.03);
+            gain.gain.linearRampToValueAtTime(0, startTime + duration);
+            
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+        }
+
+        function playRetroMusic() {
+            if (!audioCtx || musicMuted) return;
+            musicPlaying = true;
+
+            // Весёлая мажорная мелодия в стиле 8-bit
+            const melody = [
+                // Позитивный мотив
+                523, 587, 659, 698, 784, 698, 659, 587,
+                523, 659, 784, 880, 784, 659, 587, 523,
+                // Подъём
+                659, 784, 880, 988, 1047, 988, 880, 784,
+                659, 523, 587, 659, 784, 698, 659, 587,
+                // Радостный финал
+                523, 784, 1047, 784, 523, 659, 880, 659,
+                523, 587, 659, 698, 784, 880, 784, 698
+            ];
+
+            const noteDuration = 0.18; // Быстрее
+            let currentTime = audioCtx.currentTime;
+
+            function playSequence() {
+                if (musicMuted || !musicPlaying) return;
+
+                melody.forEach((note, i) => {
+                    playNote(note, currentTime + i * noteDuration, noteDuration * 0.85, 'square', 0.08);
+                });
+
+                const totalDuration = melody.length * noteDuration;
+                musicTimeout = setTimeout(() => {
+                    if (!musicMuted && musicPlaying) {
+                        currentTime = audioCtx.currentTime;
+                        playSequence();
+                    }
+                }, totalDuration * 1000);
+            }
+
+            playSequence();
+        }
+
+        function toggleMusic() {
+            musicMuted = !musicMuted;
+            
+            if (musicMuted) {
+                musicToggle.textContent = '🔇';
+                musicToggle.classList.add('muted');
+                if (musicTimeout) clearTimeout(musicTimeout);
+            } else {
+                musicToggle.textContent = '🎵';
+                musicToggle.classList.remove('muted');
+                if (state.isRunning && !state.gameOver) {
+                    playRetroMusic();
+                }
+            }
+        }
+
+        musicToggle.addEventListener('click', toggleMusic);
+
+        function stopMusic() {
+            musicPlaying = false;
+            if (musicTimeout) clearTimeout(musicTimeout);
+        }
 
         function playSound(type) {
             if (!audioCtx) return;
             try {
-                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-                osc.connect(gain); gain.connect(audioCtx.destination);
+                const osc = audioCtx.createOscillator(); 
+                const gain = audioCtx.createGain();
+                osc.connect(gain); 
+                gain.connect(audioCtx.destination);
                 const now = audioCtx.currentTime;
+                
                 if (type === 'kick') {
-                    osc.type = 'square'; osc.frequency.setValueAtTime(250, now);
+                    osc.type = 'square'; 
+                    osc.frequency.setValueAtTime(250, now);
                     osc.frequency.exponentialRampToValueAtTime(40, now + 0.18);
-                    gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
-                    osc.start(now); osc.stop(now + 0.18);
+                    gain.gain.setValueAtTime(0.15, now); 
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+                    osc.start(now); 
+                    osc.stop(now + 0.18);
                 } else if (type === 'deliver') {
-                    osc.frequency.setValueAtTime(420, now); osc.frequency.setValueAtTime(620, now + 0.1);
-                    osc.frequency.setValueAtTime(950, now + 0.2); gain.gain.setValueAtTime(0.08, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4); osc.start(now); osc.stop(now + 0.4);
+                    osc.frequency.setValueAtTime(420, now); 
+                    osc.frequency.setValueAtTime(620, now + 0.1);
+                    osc.frequency.setValueAtTime(950, now + 0.2); 
+                    gain.gain.setValueAtTime(0.06, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4); 
+                    osc.start(now); 
+                    osc.stop(now + 0.4);
                 } else if (type === 'pickup') {
-                    osc.frequency.setValueAtTime(520, now); osc.frequency.exponentialRampToValueAtTime(950, now + 0.1);
-                    gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                    osc.start(now); osc.stop(now + 0.15);
+                    osc.frequency.setValueAtTime(520, now); 
+                    osc.frequency.exponentialRampToValueAtTime(950, now + 0.1);
+                    gain.gain.setValueAtTime(0.06, now); 
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now); 
+                    osc.stop(now + 0.15);
                 } else if (type === 'wrong') {
-                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now);
+                    osc.type = 'sawtooth'; 
+                    osc.frequency.setValueAtTime(300, now);
                     osc.frequency.exponentialRampToValueAtTime(120, now + 0.25);
-                    gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-                    osc.start(now); osc.stop(now + 0.25);
+                    gain.gain.setValueAtTime(0.06, now); 
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now); 
+                    osc.stop(now + 0.25);
                 } else if (type === 'hurt') {
-                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(220, now);
+                    osc.type = 'sawtooth'; 
+                    osc.frequency.setValueAtTime(220, now);
                     osc.frequency.exponentialRampToValueAtTime(60, now + 0.3);
-                    gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                    osc.start(now); osc.stop(now + 0.3);
+                    gain.gain.setValueAtTime(0.08, now); 
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now); 
+                    osc.stop(now + 0.3);
                 } else if (type === 'step') {
-                    osc.frequency.setValueAtTime(180, now); gain.gain.setValueAtTime(0.02, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05); osc.start(now); osc.stop(now + 0.05);
+                    osc.frequency.setValueAtTime(180, now); 
+                    gain.gain.setValueAtTime(0.015, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05); 
+                    osc.start(now); 
+                    osc.stop(now + 0.05);
                 }
             } catch(e) {}
         }
@@ -960,6 +898,32 @@
             return [start];
         }
 
+        function showDescription(npcId) {
+            const text = NPC_DESCRIPTIONS[npcId];
+            if (!text) return;
+            
+            const npc = state.npcs[npcId];
+            if (!npc) return;
+            
+            const cell = getCell(npc.x, npc.y);
+            if (!cell) return;
+            
+            const rect = cell.getBoundingClientRect();
+            const el = document.createElement('div');
+            el.className = 'bubble description';
+            el.textContent = text;
+            el.style.left = rect.left + rect.width / 2 + 'px';
+            el.style.top = rect.top - 10 + 'px';
+            document.body.appendChild(el);
+            state.activeBubbles.push(el);
+            
+            requestAnimationFrame(() => el.classList.add('show'));
+            setTimeout(() => {
+                if (el.parentNode) el.remove();
+                state.activeBubbles = state.activeBubbles.filter(b => b !== el);
+            }, 2500);
+        }
+
         function handleCellClick(x, y, e) {
             if (!state.isRunning || state.gameOver) return;
             const target = getEntity(x, y);
@@ -970,13 +934,8 @@
             }
             if (target?.type === 'npc' && state.holding) { state.targetPos = { x, y }; state.moving = true; moveToTarget(true); return; }
             if (target?.type === 'npc' && !state.holding) {
-                const dirs = [[0,1], [0,-1], [1,0], [-1,0]];
-                for (const [dx, dy] of dirs) {
-                    const nx = x + dx; const ny = y + dy;
-                    if (nx >= 0 && nx < GRID && ny >= 0 && ny < GRID && !getEntity(nx, ny)) {
-                        state.targetPos = { x: nx, y: ny }; state.moving = true; moveToTarget(false); return;
-                    }
-                } return;
+                showDescription(target.id);
+                return;
             }
             if (!target) { state.targetPos = { x, y }; state.moving = true; moveToTarget(false); }
         }
@@ -1181,6 +1140,7 @@
 
         function endGame(deadChar) {
             state.isRunning = false; state.gameOver = true; state.moving = false;
+            stopMusic();
             Object.values(intervals).forEach(clearInterval);
             const names = { vadim: 'Вадим', karina: 'Карина', katja: 'Катя', mikita: 'Мікіта' };
             const feminine = ['karina', 'katja']; const verb = feminine.includes(deadChar) ? 'втратила' : 'втратив';
@@ -1194,7 +1154,7 @@
             state = {
                 player: { x: 6, y: 6 }, targetPos: null,
                 npcs: { vadim: { id: 'vadim', x: 1, y: 1 }, karina: { id: 'karina', x: 10, y: 1 }, katja: { id: 'katja', x: 1, y: 10 } },
-                items: [], invaders: [], energy: { vadim: 100, mikita: 100, karina: 100, katja: 100 },
+                items: [], invaders: [], energy: { vadim:100, mikita: 100, karina: 100, katja: 100 },
                 holding: null, score: 0, wave: 1, isRunning: true, gameOver: false, moving: false, lastDialogue: {}, activeBubbles: []
             };
             startScreen.classList.remove('show'); gameOverScreen.classList.remove('show');
@@ -1206,6 +1166,8 @@
             intervals.itemSpawn = setInterval(spawnItem, 2800); intervals.wave = setInterval(() => { state.wave++; render(); }, 40000);
             intervals.randomChat = setInterval(randomIdleDialogue, 2000);
             for (let i = 0; i < 3; i++) setTimeout(spawnItem, i * 300);
+            
+            if (!musicMuted) playRetroMusic();
         }
 
         const gridEl = document.getElementById('grid');
@@ -1234,6 +1196,7 @@
             checkDelivery(); render();
         });
 
+        initStars();
         startScreen.classList.add('show');
     </script>
 </body>
