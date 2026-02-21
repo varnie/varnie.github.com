@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Free4talk game</title>
+    <link href="fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        :root {
+            --bg: #0d0a12;
+            --bg-atmo: rgba(13, 10, 18, 0.98);
+            --field: #1a1528;
+            --field-alt: #221c35;
+            --grid-bg: linear-gradient(135deg, #2a2440, #1e1830);
+            --grid-border: rgba(255,255,255,0.08);
+            --text: #fff;
+            --text-muted: #9ca3af;
+            --cloud-opacity: 0.35;
+            --shadow-color: rgba(0,0,0,0.5);
+            --path-color: rgba(125, 211, 252, 0.08);
+            --path-shadow: inset 0 0 5px rgba(125, 211, 252, 0.1);
+        }
+
+        body.day-theme {
+            --bg: #f0f4f8;
+            --bg-atmo: rgba(240, 244, 248, 0.98);
+            --field: #e2e8f0;
+            --field-alt: #cbd5e1;
+            --grid-bg: linear-gradient(135deg, #ffffff, #f1f5f9);
+            --grid-border: rgba(0,0,0,0.1);
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --cloud-opacity: 0.6;
+            --shadow-color: rgba(0,0,0,0.1);
+            --path-color: rgba(56, 189, 248, 0.15);
+            --path-shadow: inset 0 0 8px rgba(56, 189, 248, 0.2);
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow: hidden;
+            touch-action: manipulation;
+            -webkit-touch-callout: none;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        .bg-atmosphere {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
+            transition: opacity 0.5s;
+        }
+
+        .cloud {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: var(--cloud-opacity);
+            animation: float-cloud 20s infinite ease-in-out;
+            transition: opacity 0.5s;
+        }
+
+        .cloud:nth-child(1) { width: 500px; height: 300px; background: radial-gradient(ellipse, #ff6b9d, transparent); top: -10%; left: -10%; animation-duration: 25s; }
+        .cloud:nth-child(2) { width: 400px; height: 250px; background: radial-gradient(ellipse, #7dd3fc, transparent); top: 40%; right: -15%; animation-delay: -5s; animation-duration: 30s; }
+        .cloud:nth-child(3) { width: 450px; height: 280px; background: radial-gradient(ellipse, #c4b5fd, transparent); bottom: 5%; left: 10%; animation-delay: -12s; animation-duration: 28s; }
+        
+        body.day-theme .cloud { filter: blur(80px); }
+        body.day-theme .cloud:nth-child(1) { background: radial-gradient(ellipse, #fde68a, transparent); }
+        body.day-theme .cloud:nth-child(2) { background: radial-gradient(ellipse, #93c5fd, transparent); }
+        body.day-theme .cloud:nth-child(3) { background: radial-gradient(ellipse, #f0abfc, transparent); }
+
+        @keyframes float-cloud {
+            0%, 100% { transform: translateX(0) translateY(0) scale(1) rotate(0deg); }
+            25% { transform: translateX(60px) translateY(-40px) scale(1.15) rotate(2deg); }
+            50% { transform: translateX(-40px) translateY(25px) scale(0.9) rotate(-1deg); }
+            75% { transform: translateX(35px) translateY(35px) scale(1.1) rotate(1deg); }
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed; top: 15px; right: 15px; z-index: 200;
+            background: var(--field); border-radius: 30px; padding: 4px;
+            display: flex; align-items: center; gap: 5px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            border: 1px solid var(--grid-border); cursor: pointer;
+            transition: background 0.3s;
+        }
+        .theme-toggle-icon {
+            font-size: 1.2rem; width: 30px; height: 30px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; transition: background 0.3s, color 0.3s;
+            color: var(--text-muted);
+        }
+        .theme-toggle-icon.active { background: var(--text); color: var(--bg); }
+
+        .game-wrapper {
+            display: flex; flex-direction: column;
+            height: 100vh; height: 100dvh;
+            position: relative; z-index: 1;
+            transition: transform 0.1s;
+        }
+
+        .shake-hard { animation: shake-anim 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        .shake-soft { animation: shake-anim 0.25s cubic-bezier(.36,.07,.19,.97) both; }
+
+        @keyframes shake-anim {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        .hud {
+            display: flex; justify-content: center; gap: 24px;
+            padding: 15px 16px; background: transparent;
+            font-size: 1.1rem; margin-top: 10px;
+        }
+        .hud span { font-weight: 700; color: var(--mikita); text-shadow: 0 0 10px rgba(125, 211, 252, 0.5); }
+        body.day-theme .hud span { text-shadow: none; color: #0284c7; }
+
+        .game-field {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            padding: 10px; overflow: hidden; min-height: 0; perspective: 1200px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: repeat(12, 1fr);
+            gap: 3px;
+            background: var(--grid-bg);
+            width: min(96vw, 80vh, 560px);
+            height: min(96vw, 80vh, 560px);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 0 60px rgba(125, 211, 252, 0.15), 0 0 120px rgba(196, 181, 253, 0.1), 0 25px 50px var(--shadow-color);
+            border: 2px solid var(--grid-border);
+            transform-style: preserve-3d;
+            
+            /* Повернуто анімацію */
+            animation: grid-sway 8s infinite ease-in-out;
+            
+            transition: background 0.5s, box-shadow 0.5s;
+        }
+        
+        body.day-theme .grid { box-shadow: 0 10px 30px var(--shadow-color); }
+
+        /* Анімація тільки для трансформації */
+        @keyframes grid-sway {
+            0%, 100% { transform: rotate(0deg) rotateX(0deg); }
+            25% { transform: rotate(0.3deg) rotateX(0.2deg); }
+            50% { transform: rotate(0deg) rotateX(0deg); }
+            75% { transform: rotate(-0.3deg) rotateX(-0.2deg); }
+        }
+
+        .cell {
+            background: var(--field);
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s; cursor: pointer;
+            border-radius: 3px; overflow: visible;
+        }
+        .cell:nth-child(even) { background: var(--field-alt); }
+
+        .cell.edge-glow { animation: soft-edge-pulse 6s infinite ease-in-out; }
+        body.day-theme .cell.edge-glow { animation: none; }
+
+        @keyframes soft-edge-pulse {
+            0%, 100% { background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.02); }
+            50% { background: rgba(255, 255, 255, 0.05); box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.05); }
+        }
+
+        .cell:active { background: rgba(255, 255, 255, 0.2) !important; transform: scale(0.95); }
+
+        .cell.path { background: var(--path-color) !important; box-shadow: var(--path-shadow); }
+        body.day-theme .cell.path { background: rgba(56, 189, 248, 0.1) !important; }
+
+        .cell.target { background: rgba(251, 191, 36, 0.2) !important; box-shadow: inset 0 0 10px rgba(251, 191, 36, 0.3); animation: target-glow 1s infinite; }
+        body.day-theme .cell.target { background: rgba(251, 191, 36, 0.3) !important; }
+
+        @keyframes target-glow {
+            0%, 100% { box-shadow: inset 0 0 10px rgba(251, 191, 36, 0.2); }
+            50% { box-shadow: inset 0 0 20px rgba(251, 191, 36, 0.4); }
+        }
+
+        .entity {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: min(5.5vw, 2.4rem);
+            transition: transform 0.15s, filter 0.15s;
+            pointer-events: none;
+        }
+
+        .entity.player {
+            filter: drop-shadow(0 0 15px var(--mikita)) drop-shadow(0 0 30px rgba(125, 211, 252, 0.6));
+            z-index: 15;
+            animation: player-float 1.2s infinite ease-in-out;
+            font-size: min(6.5vw, 2.8rem) !important;
+        }
+        body.day-theme .entity.player { filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); }
+
+        @keyframes player-float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-4px) scale(1.05); }
+        }
+
+        .entity.npc {
+            z-index: 10;
+            font-size: min(6vw, 2.6rem) !important;
+            animation: npc-idle 2s infinite ease-in-out;
+        }
+        body.day-theme .entity.npc { filter: none; }
+
+        @keyframes npc-idle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        /* Karina Bow */
+        .entity.npc.karina-char::before {
+            content: ''; position: absolute; top: 0px; right: 15%;
+            width: 14px; height: 10px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 50%; box-shadow: 0 0 6px rgba(239, 68, 68, 0.8); z-index: 20;
+        }
+        .entity.npc.karina-char::after {
+            content: ''; position: absolute; top: 2px; right: 18%;
+            width: 6px; height: 6px; background: #991b1b; border-radius: 50%; z-index: 21;
+        }
+
+        /* Vadim */
+        .entity.npc.vadim-char {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border-radius: 10px; width: 88% !important; height: 88% !important;
+            font-size: min(5.5vw, 2.5rem) !important; font-weight: 700; color: #fff;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.6), inset 0 2px 4px rgba(255,255,255,0.3);
+            display: flex; align-items: center; justify-content: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        body.day-theme .entity.npc.vadim-char { box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3); }
+
+        /* Invaders */
+        .entity.invader {
+            z-index: 12;
+            animation: invader-sway 0.6s infinite ease-in-out;
+            filter: drop-shadow(0 0 12px #22c55e) brightness(1.2);
+            font-size: min(5.8vw, 2.5rem) !important;
+        }
+        body.day-theme .entity.invader { filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); }
+
+        @keyframes invader-sway {
+            0%, 100% { transform: rotate(-8deg) scale(1); }
+            50% { transform: rotate(8deg) scale(1.1); }
+        }
+
+        /* HP Bars */
+        .hp-bar-container {
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 35px; height: 5px; background: rgba(0,0,0,0.7);
+            border-radius: 3px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.25); z-index: 25;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .hp-bar-fill { height: 100%; transition: width 0.3s; }
+        
+        .hp-bar-fill.invader-hp { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .hp-bar-fill.invader-hp.mid { background: linear-gradient(90deg, #f97316, #fb923c); }
+        .hp-bar-fill.invader-hp.high { background: linear-gradient(90deg, #22c55e, #4ade80); }
+
+        .hp-bar-fill.vadim-hp { background: linear-gradient(90deg, #22c55e, #4ade80); }
+        .hp-bar-fill.karina-hp { background: linear-gradient(90deg, #a855f7, #c4b5fd); }
+        .hp-bar-fill.katja-hp { background: linear-gradient(90deg, #ec4899, #f472b6); }
+
+        .entity.item {
+            animation: item-float 2s infinite ease-in-out;
+            opacity: 0.4; transition: all 0.3s;
+            font-size: min(4.8vw, 2rem) !important;
+        }
+        body.day-theme .entity.item { opacity: 0.6; filter: none; }
+
+        .entity.item.revealed {
+            opacity: 1;
+            filter: drop-shadow(0 0 15px var(--item));
+            animation: item-glow 1.5s infinite ease-in-out;
+        }
+        body.day-theme .entity.item.revealed { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+
+        @keyframes item-float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-3px) rotate(3deg); } }
+        @keyframes item-glow { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+        .entity.delivering { animation: deliver-burst 0.5s ease-out; }
+        @keyframes deliver-burst { 0% { transform: scale(1); } 40% { transform: scale(1.4); filter: brightness(1.5); } 100% { transform: scale(1); } }
+
+        .bubble {
+            position: fixed; background: linear-gradient(135deg, #fff, #f0f0f0);
+            color: #1a1625; padding: 8px 14px; border-radius: 18px;
+            font-size: 0.85rem; white-space: nowrap; z-index: 200;
+            pointer-events: none; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            font-weight: 600; transform: translateX(-50%) scale(0); opacity: 0;
+            max-width: 180px; text-align: center;
+        }
+        .bubble::after {
+            content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+            border: 6px solid transparent; border-top-color: #f0f0f0;
+        }
+        .bubble.show { animation: bubble-pop 2.5s forwards; }
+        @keyframes bubble-pop {
+            0% { opacity: 0; transform: translateX(-50%) scale(0) translateY(5px); }
+            15% { opacity: 1; transform: translateX(-50%) scale(1.1) translateY(0); }
+            25% { transform: translateX(-50%) scale(1) translateY(0); }
+            85% { opacity: 1; }
+            100% { opacity: 0; transform: translateX(-50%) scale(0.9) translateY(-5px); }
+        }
+
+        .holding-item {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(135deg, rgba(30, 24, 48, 0.98), rgba(40, 32, 64, 0.98));
+            padding: 14px 28px; border-radius: 25px; font-size: 1.15rem;
+            display: flex; align-items: center; gap: 14px; z-index: 50;
+            border: 2px solid var(--item);
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.4); backdrop-filter: blur(10px);
+            transition: background 0.3s;
+        }
+        body.day-theme .holding-item {
+            background: rgba(255, 255, 255, 0.9); color: #1e293b;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .holding-item .item-icon { font-size: 1.7rem; animation: item-float 0.8s infinite; }
+
+        .screens {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--bg-atmo); z-index: 1000; opacity: 0;
+            pointer-events: none; transition: opacity 0.4s; padding: 20px;
+            backdrop-filter: blur(20px);
+        }
+        .screens.show { opacity: 1; pointer-events: all; }
+
+        .screen-content { text-align: center; max-width: 440px; width: 100%; }
+        .screen-content h1 {
+            font-size: 3.2rem; margin-bottom: 12px;
+            background: linear-gradient(135deg, #38bdf8, #a78bfa, #f472b6);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .screen-content .subtitle { color: var(--text-muted); margin-bottom: 28px; font-size: 1.25rem; }
+        
+        .char-showcase { display: flex; justify-content: center; gap: 20px; margin: 35px 0; flex-wrap: wrap; }
+        .char-showcase .char { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .char-showcase .char .avatar {
+            width: 75px; height: 75px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 2.8rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4); position: relative;
+            transition: transform 0.3s; background: transparent;
+        }
+        .char-showcase .char span { font-size: 1.05rem; color: var(--text-muted); font-weight: 500; }
+
+        .char-showcase .char:nth-child(1) .avatar { background: linear-gradient(135deg, #22c55e, #16a34a); border-radius: 20px; font-size: 2.8rem; font-weight: 700; color: #fff; }
+        .char-showcase .char:nth-child(2) .avatar { font-size: 3.5rem; }
+        .char-showcase .char:nth-child(3) .avatar { font-size: 3.5rem; }
+        .char-showcase .char:nth-child(3) .avatar::before { content: ''; position: absolute; top: 4px; right: 10px; width: 18px; height: 12px; background: linear-gradient(135deg, #ef4444, #dc2626); border-radius: 50%; box-shadow: 0 0 6px rgba(239, 68, 68, 0.8); z-index: 20; }
+        .char-showcase .char:nth-child(3) .avatar::after { content: ''; position: absolute; top: 7px; right: 14px; width: 8px; height: 8px; background: #991b1b; border-radius: 50%; z-index: 21; }
+        .char-showcase .char:nth-child(4) .avatar { font-size: 3.5rem; }
+
+        .instructions { color: var(--text-muted); font-size: 1.05rem; line-height: 1.7; margin: 25px 0; }
+        .instructions b { color: var(--text); }
+        .disclaimer { font-size: 0.85rem; color: var(--text-muted); margin-top: 25px; font-style: italic; opacity: 0.7; }
+
+        .btn {
+            background: linear-gradient(135deg, #38bdf8, #0ea5e9); color: #fff;
+            border: none; padding: 18px 45px; font-size: 1.15rem;
+            font-family: 'Fredoka', sans-serif; font-weight: 700; border-radius: 28px;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 6px 25px rgba(56, 189, 248, 0.4); margin-top: 20px;
+        }
+        .btn:active { transform: scale(0.95); }
+
+        .game-over h1 { background: linear-gradient(135deg, #f472b6, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .final-stats { margin: 25px 0; font-size: 1.15rem; }
+        .final-stats div { margin: 10px 0; }
+        .final-stats span { color: #4ade80; font-weight: 700; }
+        body.day-theme .final-stats span { color: #059669; }
+
+        .controls-hint {
+            position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%);
+            background: var(--field); padding: 12px 20px; border-radius: 16px;
+            font-size: 0.85rem; color: var(--text-muted); z-index: 40;
+            text-align: center; border: 1px solid var(--grid-border);
+            line-height: 1.6; transition: background 0.3s, color 0.3s;
+        }
+
+        .plus-effect {
+            position: fixed; font-size: 1.4rem; font-weight: bold; color: #4ade80;
+            animation: plus-fly 1s forwards; pointer-events: none; z-index: 100;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        body.day-theme .plus-effect { color: #059669; text-shadow: none; }
+        @keyframes plus-fly { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-60px) scale(1.5); } }
+        
+        .item-label {
+            position: fixed; background: var(--bg); color: var(--text);
+            padding: 6px 14px; border-radius: 10px; font-size: 0.95rem; font-weight: 600;
+            pointer-events: none; z-index: 150; animation: label-fade 1.5s forwards;
+            border: 1px solid var(--grid-border); box-shadow: 0 4px 15px var(--shadow-color);
+        }
+        @keyframes label-fade { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-35px); } }
+
+        .hit-text {
+            position: fixed; font-weight: 900; color: #ef4444;
+            text-shadow: 2px 2px 0 #000;
+            animation: hit-pop 0.7s forwards; pointer-events: none; z-index: 200;
+        }
+        @keyframes hit-pop {
+            0% { opacity: 1; transform: scale(0.3) rotate(-15deg); }
+            40% { opacity: 1; transform: scale(1.5) rotate(8deg); }
+            100% { opacity: 0; transform: scale(1.1) translateY(-25px) rotate(0deg); }
+        }
+        .particle { position: fixed; border-radius: 50%; pointer-events: none; z-index: 150; }
+
+        @media (max-width: 400px) {
+            .grid { gap: 2px; }
+            .hud { font-size: 0.9rem; gap: 14px; }
+            .screen-content h1 { font-size: 2.4rem; }
+            .controls-hint { font-size: 0.8rem; padding: 10px 14px; }
+            .char-showcase .char .avatar { width: 60px; height: 60px; font-size: 2.5rem; }
+        }
+        @media (min-width: 600px) {
+            .grid { width: min(88vw, 72vh, 600px); height: min(88vw, 72vh, 600px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-atmosphere">
+        <div class="cloud"></div><div class="cloud"></div><div class="cloud"></div>
+    </div>
+
+    <div class="theme-toggle" id="theme-toggle" title="Змінити тему">
+        <div class="theme-toggle-icon" id="icon-sun">☀️</div>
+        <div class="theme-toggle-icon active" id="icon-moon">🌙</div>
+    </div>
+
+    <div class="game-wrapper" id="game-wrapper">
+        <div class="hud">
+            <div>Хвиля: <span id="wave">1</span></div>
+            <div>Рахунок: <span id="score">0</span></div>
+        </div>
+
+        <div class="game-field">
+            <div class="grid" id="grid"></div>
+        </div>
+
+        <div class="holding-item" id="holding" style="display:none">
+            Несу: <span class="item-icon" id="holding-icon"></span>
+        </div>
+
+        <div class="controls-hint">
+            Торкнись предмета або персонажа<br>Опосум сам дійде і віддасть
+        </div>
+    </div>
+
+    <div class="screens" id="start-screen">
+        <div class="screen-content">
+            <h1>Free4talk game</h1>
+            <p class="subtitle">Допоможи Мікіті подбати про друзів</p>
+            <div class="char-showcase">
+                <div class="char"><div class="avatar">V</div><span>Vadim</span></div>
+                <div class="char"><div class="avatar">🦝</div><span>Mikita</span></div>
+                <div class="char"><div class="avatar">👱‍♀️</div><span>Karina</span></div>
+                <div class="char"><div class="avatar">👩🏻</div><span>Katja</span></div>
+            </div>
+            <p class="instructions">
+                Ти — Мікіта-опосум<br><br>
+                <b>Vadim</b> хоче кепку і шампунь<br>
+                <b>Karina</b> вивчає німецьку — їй потрібні книга та ручка<br>
+                <b>Katja</b> мріє про квіти та квитки в кіно<br><br>
+                Захищай друзів від монстрів!<br>
+                Деяких треба вдарити кілька разів!
+            </p>
+            <button class="btn" id="start-btn">ГРАТИ</button>
+            <p class="disclaimer">Не основано на сюжетах Квентіна Тарантіно.</p>
+        </div>
+    </div>
+
+    <div class="screens" id="game-over-screen">
+        <div class="screen-content game-over">
+            <h1>КІНЕЦЬ ГРИ</h1>
+            <p class="subtitle" id="death-reason">Хтось втратив сили</p>
+            <div class="final-stats">
+                <div>Рахунок: <span id="final-score">0</span></div>
+                <div>Хвиля: <span id="final-wave">1</span></div>
+            </div>
+            <button class="btn" id="restart-btn">Ще раз</button>
+        </div>
+    </div>
+
+    <script>
+        const GRID = 12;
+        
+        const ITEMS = {
+            cap: { emoji: '🧢', target: 'vadim', name: 'Кепка', type: 'gift' },
+            shampoo: { emoji: '🧴', target: 'vadim', name: 'Шампунь', type: 'gift' },
+            book: { emoji: '📚', target: 'karina', name: 'Книга', type: 'gift' },
+            pen: { emoji: '🖊️', target: 'karina', name: 'Ручка', type: 'gift' },
+            flower: { emoji: '💐', target: 'katja', name: 'Квіти', type: 'gift' },
+            ticket: { emoji: '🎬', target: 'katja', name: 'Квиток', type: 'gift' },
+            boots: { emoji: '👢', target: 'self', name: 'Чоботи', type: 'powerup', effect: 'speed' },
+            star: { emoji: '⭐', target: 'self', name: 'Зірка', type: 'powerup', effect: 'score' }
+        };
+        
+        let powerups = { speedBoost: false, speedBoostEnd: 0 };
+
+        const CHARACTERS = { vadim: 'V', mikita: '🦝', karina: '👱‍♀️', katja: '👩🏻' };
+
+        const INVADER_TYPES = [
+            { emoji: '🧟', name: 'Zombie', hp: 1 }, { emoji: '🧟‍♂️', name: 'Zombie', hp: 2 },
+            { emoji: '👻', name: 'Ghost', hp: 1 }, { emoji: '💀', name: 'Skeleton', hp: 2 },
+            { emoji: '👽', name: 'Alien', hp: 3 }, { emoji: '🤖', name: 'Robot', hp: 4 }
+        ];
+
+        const DIALOGUES = {
+            vadim: {
+                happy: ['Охуенно!', 'Клас!', 'Нарешті!', 'Золото!', 'Да! Дякую!', 'Красава!', 'Оце сервіс!', 'Молоток!'],
+                sad: ['Де кепка...', 'Хочу шампунь...', 'Ну все...', 'Пиздець...', 'Без кепки я...', 'Мікіта, ти де?', 'Сил немає...'],
+                wrong: ['Не те!', 'Забери!', 'Нахера?!', 'Неа!', 'Це не мені!', 'Що за фігня?'],
+                idle: ['Нудно...', 'Що робити?', 'Їсти хочу...', 'Мікіта!', 'Ау!', 'Кепку б...', 'Шампунь б...', 'Ауч!', 'Рятуйте!', 'Хто тут?', 'Ей!']
+            },
+            mikita: {
+                pickup: ['Несемо!', 'Зараз принесу!', 'Зрозумів!', 'Взяв!', 'Та ось же!', 'О, знадобиться!'],
+                wrong: ['Ой, блін!', 'Не тому!', 'Йой!', 'Помилочка!'],
+                deliver: {
+                    vadim: ['Ось, пане!', 'Тримайте, пане!'],
+                    karina: ['Будь ласка, пані!', 'Для вас, пані!'],
+                    katja: ['Будь ласка, пані!', 'Для вас, пані!']
+                },
+                idle: ['Та ось же!', 'Чим би зайнятись...', 'Треба всім допомогти!', 'Де тут що...', 'Робота робота...', 'Несу-несу...', 'Ого!', 'Оп!'],
+                battle: ['Ядрана мати!', 'Сучі діти!', 'Отримуй!', 'На халяву!', 'Їжте на здоров\'я!', 'Не пройдеш!', 'Ах ти ж їжак!']
+            },
+            karina: {
+                happy: ['Wunderbar!', 'Danke!', 'Sehr gut!', 'Perfekt!', 'Toll!', 'Super!', 'Wunderbar schon!', 'Ausgezeichnet!'],
+                sad: ['Brauche Buch...', 'Ich brauche...', 'Oh je...', 'Hilfe...', 'Wo ist das Buch?', 'Ich verstehe nicht...', 'Ein Stift...'],
+                wrong: ['Nein!', 'Falsch!', 'Nicht fur mich!', 'Was ist das?', 'Das brauche ich nicht!'],
+                idle: ['Interessant...', 'Deutsch ist schwer...', 'Muss uben...', 'Wo ist Mikita?', 'Ein Buch ware gut...', 'Hm...', 'Schreibzeug...', 'Wie geht es?']
+            },
+            katja: {
+                happy: ['Дякую!', 'Як мило!', 'Квіти!', 'Дякую!', 'Найкращі!', 'Супер!', 'Гарно!', 'Чудово!', 'У кіно!'],
+                sad: ['Квіти...', 'Хочу квіти...', 'Будь ласка...', 'Мені сумно...', 'Де ж ти, Мікіта?', 'Так хочеться квітів...', 'У кіно б піти...'],
+                wrong: ['Не мені...', 'Не треба!', 'Не для мене!', 'Це не те!', 'Ой, ні...'],
+                idle: ['Нудно...', 'Квіти б...', 'Мікіта, ау!', 'Щось би зробити...', 'Гарний день...', 'Гм...', 'Фільм глянути б...', 'Ау!']
+            }
+        };
+
+        let state = {
+            player: { x: 6, y: 6 }, targetPos: null,
+            npcs: {}, items: [], invaders: [],
+            energy: { vadim: 100, mikita: 100, karina: 100, katja: 100 },
+            holding: null, score: 0, wave: 1,
+            isRunning: false, gameOver: false, moving: false,
+            lastDialogue: {}, activeBubbles: []
+        };
+
+        let intervals = {};
+        let audioCtx = null;
+
+        const themeToggle = document.getElementById('theme-toggle');
+        const iconSun = document.getElementById('icon-sun');
+        const iconMoon = document.getElementById('icon-moon');
+
+        function setTheme(isDay) {
+            if (isDay) {
+                document.body.classList.add('day-theme');
+                iconSun.classList.add('active');
+                iconMoon.classList.remove('active');
+            } else {
+                document.body.classList.remove('day-theme');
+                iconSun.classList.remove('active');
+                iconMoon.classList.add('active');
+            }
+        }
+
+        function initTheme() {
+            const hour = new Date().getHours();
+            const isDay = hour >= 7 && hour < 20;
+            setTheme(isDay);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const isDay = !document.body.classList.contains('day-theme');
+            setTheme(isDay);
+        });
+
+        function initAudio() { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+                if (type === 'kick') {
+                    osc.type = 'square'; osc.frequency.setValueAtTime(250, now);
+                    osc.frequency.exponentialRampToValueAtTime(40, now + 0.18);
+                    gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+                    osc.start(now); osc.stop(now + 0.18);
+                } else if (type === 'deliver') {
+                    osc.frequency.setValueAtTime(420, now); osc.frequency.setValueAtTime(620, now + 0.1);
+                    osc.frequency.setValueAtTime(950, now + 0.2); gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4); osc.start(now); osc.stop(now + 0.4);
+                } else if (type === 'pickup') {
+                    osc.frequency.setValueAtTime(520, now); osc.frequency.exponentialRampToValueAtTime(950, now + 0.1);
+                    gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.exponentialRampToValueAtTime(120, now + 0.25);
+                    gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now); osc.stop(now + 0.25);
+                } else if (type === 'hurt') {
+                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(60, now + 0.3);
+                    gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
+                } else if (type === 'step') {
+                    osc.frequency.setValueAtTime(180, now); gain.gain.setValueAtTime(0.02, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05); osc.start(now); osc.stop(now + 0.05);
+                }
+            } catch(e) {}
+        }
+
+        function shakeScreen(intense) {
+            const cls = intense ? 'shake-hard' : 'shake-soft';
+            wrapperEl.classList.add(cls);
+            setTimeout(() => wrapperEl.classList.remove(cls), intense ? 500 : 250);
+        }
+
+        function initGrid() {
+            gridEl.innerHTML = '';
+            for (let y = 0; y < GRID; y++) {
+                for (let x = 0; x < GRID; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.x = x; cell.dataset.y = y;
+                    if (x === 0 || x === GRID-1 || y === 0 || y === GRID-1) {
+                        if (Math.random() < 0.25) cell.classList.add('edge-glow');
+                    }
+                    cell.addEventListener('click', (e) => handleCellClick(x, y, e));
+                    gridEl.appendChild(cell);
+                }
+            }
+        }
+
+        function getCell(x, y) { if (x < 0 || x >= GRID || y < 0 || y >= GRID) return null; return gridEl.children[y * GRID + x]; }
+
+        function getEntity(x, y, excludePlayer = false) {
+            if (!excludePlayer && state.player.x === x && state.player.y === y) return { type: 'player', id: 'mikita' };
+            for (const [id, npc] of Object.entries(state.npcs)) { if (npc.x === x && npc.y === y) return { type: 'npc', id, ...npc }; }
+            for (const item of state.items) { if (item.x === x && item.y === y) return { type: 'item', ...item }; }
+            for (const inv of state.invaders) { if (inv.x === x && inv.y === y) return { type: 'invader', ...inv }; }
+            return null;
+        }
+
+        function render() {
+            document.querySelectorAll('.entity, .hp-bar-container').forEach(el => el.remove());
+
+            if (state.targetPos && state.moving) {
+                const path = findPath(state.player, state.targetPos);
+                path.forEach((pos, i) => {
+                    if (i > 0 && i < path.length - 1) {
+                        const cell = getCell(pos.x, pos.y);
+                        if (cell) cell.classList.add('path');
+                    }
+                });
+                const targetCell = getCell(state.targetPos.x, state.targetPos.y);
+                if (targetCell) targetCell.classList.add('target');
+            }
+
+            for (const inv of state.invaders) {
+                const cell = getCell(inv.x, inv.y);
+                if (cell) {
+                    const el = document.createElement('div'); el.className = 'entity invader';
+                    el.textContent = inv.emoji; cell.appendChild(el);
+                    const hpBar = document.createElement('div'); hpBar.className = 'hp-bar-container';
+                    const hpFill = document.createElement('div'); hpFill.className = 'hp-bar-fill invader-hp';
+                    const hpPercent = (inv.hp / inv.maxHp) * 100; hpFill.style.width = hpPercent + '%';
+                    if(hpPercent > 60) hpFill.classList.add('high'); else if(hpPercent > 30) hpFill.classList.add('mid');
+                    hpBar.appendChild(hpFill); cell.appendChild(hpBar);
+                }
+            }
+
+            for (const item of state.items) {
+                const cell = getCell(item.x, item.y);
+                if (cell) {
+                    const el = document.createElement('div'); el.className = 'entity item' + (item.revealed ? ' revealed' : '');
+                    el.textContent = item.emoji; cell.appendChild(el);
+                }
+            }
+
+            for (const [id, npc] of Object.entries(state.npcs)) {
+                const cell = getCell(npc.x, npc.y);
+                if (cell) {
+                    const el = document.createElement('div'); el.className = 'entity npc';
+                    if (id === 'karina') el.classList.add('karina-char');
+                    if (id === 'vadim') el.classList.add('vadim-char');
+                    el.textContent = CHARACTERS[id];
+                    if (state.holding && state.player.x === npc.x && state.player.y === npc.y) el.classList.add('delivering');
+                    cell.appendChild(el);
+
+                    const hpBar = document.createElement('div'); hpBar.className = 'hp-bar-container';
+                    const hpFill = document.createElement('div'); hpFill.className = `hp-bar-fill ${id}-hp`;
+                    hpFill.style.width = state.energy[id] + '%';
+                    hpBar.appendChild(hpFill); cell.appendChild(hpBar);
+                }
+            }
+
+            const playerCell = getCell(state.player.x, state.player.y);
+            if (playerCell) {
+                const el = document.createElement('div'); el.className = 'entity player';
+                el.textContent = CHARACTERS.mikita; playerCell.appendChild(el);
+            }
+            updateHUD();
+        }
+
+        function updateHUD() {
+            document.getElementById('score').textContent = state.score;
+            document.getElementById('wave').textContent = state.wave;
+            if (state.holding) {
+                holdingEl.style.display = 'flex';
+                document.getElementById('holding-icon').textContent = state.holding.emoji;
+            } else { holdingEl.style.display = 'none'; }
+        }
+
+        function findPath(start, end, canWalkToNPC = false) {
+            const queue = [[start]]; const visited = new Set(); visited.add(`${start.x},${start.y}`);
+            while (queue.length > 0) {
+                const path = queue.shift(); const current = path[path.length - 1];
+                if (current.x === end.x && current.y === end.y) return path;
+                const dirs = [[0,1], [0,-1], [1,0], [-1,0]];
+                for (const [dx, dy] of dirs) {
+                    const nx = current.x + dx; const ny = current.y + dy;
+                    if (nx >= 0 && nx < GRID && ny >= 0 && ny < GRID) {
+                        const key = `${nx},${ny}`;
+                        if (!visited.has(key)) {
+                            const entity = getEntity(nx, ny, true);
+                            if (!entity || entity.type === 'item') { visited.add(key); queue.push([...path, {x: nx, y: ny}]); }
+                            else if (canWalkToNPC && entity.type === 'npc') { if (nx === end.x && ny === end.y) { visited.add(key); queue.push([...path, {x: nx, y: ny}]); } }
+                        }
+                    }
+                }
+            }
+            return [start];
+        }
+
+        function handleCellClick(x, y, e) {
+            if (!state.isRunning || state.gameOver) return;
+            const target = getEntity(x, y);
+            if (target?.type === 'invader') { kickInvader(target); return; }
+            if (target?.type === 'item' && !state.holding) {
+                if (Math.random() > 0.35) showItemLabel(x, y, target.name);
+                state.targetPos = { x, y }; state.moving = true; moveToTarget(false); return;
+            }
+            if (target?.type === 'npc' && state.holding) { state.targetPos = { x, y }; state.moving = true; moveToTarget(true); return; }
+            if (target?.type === 'npc' && !state.holding) {
+                const dirs = [[0,1], [0,-1], [1,0], [-1,0]];
+                for (const [dx, dy] of dirs) {
+                    const nx = x + dx; const ny = y + dy;
+                    if (nx >= 0 && nx < GRID && ny >= 0 && ny < GRID && !getEntity(nx, ny)) {
+                        state.targetPos = { x: nx, y: ny }; state.moving = true; moveToTarget(false); return;
+                    }
+                } return;
+            }
+            if (!target) { state.targetPos = { x, y }; state.moving = true; moveToTarget(false); }
+        }
+
+        function showItemLabel(x, y, name) {
+            const cell = getCell(x, y); if (!cell) return; const rect = cell.getBoundingClientRect();
+            const label = document.createElement('div'); label.className = 'item-label'; label.textContent = name;
+            label.style.left = rect.left + rect.width/2 + 'px'; label.style.top = rect.top + 'px'; label.style.transform = 'translateX(-50%)';
+            document.body.appendChild(label); setTimeout(() => label.remove(), 1500);
+        }
+
+        function moveToTarget(canWalkToNPC = false) {
+            if (!state.moving || !state.targetPos) return;
+            const path = findPath(state.player, state.targetPos, canWalkToNPC);
+            if (path.length <= 1) { state.moving = false; state.targetPos = null; checkDelivery(); render(); return; }
+            const next = path[1];
+            const entity = getEntity(next.x, next.y, true);
+            if (entity?.type === 'npc' && !canWalkToNPC) { state.moving = false; state.targetPos = null; render(); return; }
+            if (entity?.type === 'invader') { state.moving = false; state.targetPos = null; render(); return; }
+            state.player.x = next.x; state.player.y = next.y; playSound('step');
+            const itemOnCell = state.items.find(i => i.x === next.x && i.y === next.y);
+            if (itemOnCell && !state.holding) { pickupItem(itemOnCell); state.moving = false; state.targetPos = null; render(); return; }
+            if (next.x === state.targetPos.x && next.y === state.targetPos.y) { state.moving = false; state.targetPos = null; checkDelivery(); }
+            const isSpeedBoost = powerups.speedBoost && Date.now() < powerups.speedBoostEnd;
+            render();
+            if (state.moving) setTimeout(() => moveToTarget(canWalkToNPC), isSpeedBoost ? 70 : 120);
+        }
+
+        function checkDelivery() {
+            if (!state.holding) return;
+            for (const [id, npc] of Object.entries(state.npcs)) {
+                if (npc.x === state.player.x && npc.y === state.player.y) { deliverItemTo(id); return; }
+            }
+        }
+
+        function pickupItem(item) {
+            const itemData = ITEMS[item.id];
+            if (itemData.type === 'powerup') {
+                applyPowerup(itemData.effect); state.items = state.items.filter(i => i !== item);
+                playSound('pickup'); showPlusEffect(itemData.effect === 'speed' ? 'ШВИДКІСТЬ!' : '+100'); return;
+            }
+            state.holding = item; state.items = state.items.filter(i => i !== item);
+            playSound('pickup'); showDialogue('mikita', 'pickup');
+        }
+
+        function applyPowerup(effect) {
+            if (effect === 'speed') { powerups.speedBoost = true; powerups.speedBoostEnd = Date.now() + 8000; }
+            else if (effect === 'score') { state.score += 100; }
+            render();
+        }
+
+        function deliverItemTo(npcId) {
+            if (!state.holding) return; const npc = state.npcs[npcId]; if (!npc) return;
+            const target = ITEMS[state.holding.id].target;
+            if (npcId === target) {
+                state.energy[npcId] = Math.min(100, state.energy[npcId] + 25); state.score += 50; playSound('deliver');
+                showDialogue('mikita', 'deliver', npcId, true); setTimeout(() => showDialogue(npcId, 'happy'), 150);
+                showPlusEffect('+25');
+            } else {
+                state.energy[npcId] = Math.max(0, state.energy[npcId] - 15); playSound('wrong'); showDialogue(npcId, 'wrong');
+            }
+            state.holding = null; checkGameOver(); render();
+        }
+
+        function showPlusEffect(text) {
+            const playerCell = getCell(state.player.x, state.player.y); if (!playerCell) return; const rect = playerCell.getBoundingClientRect();
+            const el = document.createElement('div'); el.className = 'plus-effect'; el.textContent = text;
+            el.style.left = rect.left + rect.width/2 + 'px'; el.style.top = rect.top + 'px';
+            document.body.appendChild(el); setTimeout(() => el.remove(), 1000);
+        }
+
+        function showDialogue(charId, type, subType = null, highPosition = false) {
+            let dialogues;
+            if (subType && type === 'deliver') dialogues = DIALOGUES[charId]?.[type]?.[subType];
+            else dialogues = DIALOGUES[charId]?.[type];
+            if (!dialogues || dialogues.length === 0) return;
+            const now = Date.now();
+            if (state.lastDialogue[charId] && now - state.lastDialogue[charId] < 1000) return;
+            state.lastDialogue[charId] = now;
+            const text = dialogues[Math.floor(Math.random() * dialogues.length)];
+            let coords = null;
+            if (charId === 'mikita') coords = { x: state.player.x, y: state.player.y };
+            else { const npc = state.npcs[charId]; if (!npc) return; coords = { x: npc.x, y: npc.y }; }
+            const cell = getCell(coords.x, coords.y); if (!cell) return; const rect = cell.getBoundingClientRect();
+            const el = document.createElement('div'); el.className = 'bubble'; el.textContent = text;
+            el.style.left = rect.left + rect.width / 2 + 'px'; el.style.top = rect.top - 8 + (highPosition ? -35 : 0) + 'px';
+            document.body.appendChild(el); state.activeBubbles.push(el);
+            requestAnimationFrame(() => el.classList.add('show'));
+            setTimeout(() => { if (el.parentNode) el.remove(); state.activeBubbles = state.activeBubbles.filter(b => b !== el); }, 2500);
+        }
+
+        function kickInvader(inv) {
+            const index = state.invaders.findIndex(i => i.id === inv.id); if (index === -1) return;
+            const monster = state.invaders[index]; monster.hp--;
+            createKickEffect(monster.x, monster.y, monster.hp <= 0);
+            if (Math.random() < 0.5) showDialogue('mikita', 'battle');
+            if (monster.hp <= 0) { state.invaders.splice(index, 1); state.score += 10 * monster.maxHp; shakeScreen(true); }
+            else { state.score += 2; shakeScreen(false); }
+            playSound('kick'); render();
+        }
+
+        function createKickEffect(x, y, isKill) {
+            const cell = getCell(x, y); if (!cell) return; const rect = cell.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2; const centerY = rect.top + rect.height / 2;
+            const texts = isKill ? ['БУМ!', 'ХРЯСЬ!', 'КАБАМ!'] : ['БАХ!', 'УДАР!', '-1 HP'];
+            const txt = document.createElement('div'); txt.className = 'hit-text';
+            txt.textContent = texts[Math.floor(Math.random() * texts.length)];
+            txt.style.left = centerX + 'px'; txt.style.top = centerY + 'px';
+            txt.style.fontSize = (1.2 + Math.random() * 0.6) + 'rem';
+            document.body.appendChild(txt); setTimeout(() => txt.remove(), 600);
+            const count = isKill ? 12 : 6;
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div'); p.textContent = ['💫', '✨', '💥'][Math.floor(Math.random()*3)];
+                p.style.cssText = `position: fixed; left: ${centerX}px; top: ${centerY}px; font-size: 1.2rem; pointer-events: none; z-index: 1000; transition: all 0.5s;`;
+                document.body.appendChild(p);
+                const angle = (Math.PI * 2 * i) / count; const distance = (isKill ? 60 : 30) + Math.random() * 30;
+                requestAnimationFrame(() => {
+                    p.style.left = centerX + Math.cos(angle) * distance + 'px'; p.style.top = centerY + Math.sin(angle) * distance + 'px'; p.style.opacity = '0';
+                });
+                setTimeout(() => p.remove(), 500);
+            }
+            cell.style.background = 'linear-gradient(135deg, #ff6b6b, #ffd93d)';
+            setTimeout(() => { cell.style.background = ''; }, 150);
+        }
+
+        function spawnItem() {
+            if (state.items.length >= 5) return;
+            const isPowerup = Math.random() < 0.15;
+            const itemTypes = isPowerup ? ['boots', 'star'] : ['cap', 'shampoo', 'book', 'pen', 'flower', 'ticket'];
+            const type = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+            let x, y, attempts = 0;
+            do { x = Math.floor(Math.random() * GRID); y = Math.floor(Math.random() * GRID); attempts++; } while (getEntity(x, y, true) && attempts < 50);
+            if (attempts >= 50) return;
+            state.items.push({ id: type, emoji: ITEMS[type].emoji, name: ITEMS[type].name, x, y, revealed: ITEMS[type].type === 'powerup' ? true : (Math.random() > 0.35) });
+            render();
+        }
+
+        function spawnInvader() {
+            const maxInvaders = 2 + state.wave;
+            if (state.invaders.length >= maxInvaders) return;
+            const edge = Math.floor(Math.random() * 4); let x, y;
+            if (edge === 0) { x = Math.floor(Math.random() * GRID); y = 0; }
+            else if (edge === 1) { x = GRID - 1; y = Math.floor(Math.random() * GRID); }
+            else if (edge === 2) { x = Math.floor(Math.random() * GRID); y = GRID - 1; }
+            else { x = 0; y = Math.floor(Math.random() * GRID); }
+            const type = INVADER_TYPES[Math.floor(Math.random() * INVADER_TYPES.length)];
+            const hpBonus = Math.floor(state.wave / 3);
+            state.invaders.push({ id: Date.now() + Math.random(), emoji: type.emoji, name: type.name, x, y, hp: type.hp + hpBonus, maxHp: type.hp + hpBonus });
+            render();
+        }
+
+        function moveNPCs() {
+            for (const [id, npc] of Object.entries(state.npcs)) {
+                if (Math.random() > 0.5) continue;
+                const dirs = [[0,1], [0,-1], [1,0], [-1,0]]; const dir = dirs[Math.floor(Math.random() * dirs.length)];
+                const nx = npc.x + dir[0]; const ny = npc.y + dir[1];
+                if (nx >= 0 && nx < GRID && ny >= 0 && ny < GRID) {
+                    if (nx === state.player.x && ny === state.player.y) continue;
+                    const occupied = Object.values(state.npcs).some(other => other.x === nx && other.y === ny);
+                    if (occupied) continue;
+                    const target = getEntity(nx, ny, true);
+                    if (!target || target.type === 'item') { npc.x = nx; npc.y = ny; }
+                }
+            } render();
+        }
+
+        function moveInvaders() {
+            for (const inv of state.invaders) {
+                const npcList = Object.values(state.npcs); if (npcList.length === 0) continue;
+                let nearest = null; let minDist = Infinity;
+                for (const npc of npcList) { const dist = Math.abs(inv.x - npc.x) + Math.abs(inv.y - npc.y); if (dist < minDist) { minDist = dist; nearest = npc; } }
+                if (!nearest) continue;
+                const dx = Math.sign(nearest.x - inv.x); const dy = Math.sign(nearest.y - inv.y);
+                const moves = []; if (dx !== 0) moves.push({x: dx, y: 0}); if (dy !== 0) moves.push({x: 0, y: dy});
+                if (moves.length === 0) continue;
+                const move = moves[Math.floor(Math.random() * moves.length)]; const nx = inv.x + move.x; const ny = inv.y + move.y;
+                if (nx >= 0 && nx < GRID && ny >= 0 && ny < GRID) {
+                    const target = getEntity(nx, ny);
+                    if (target?.type === 'npc') {
+                        state.energy[target.id] = Math.max(0, state.energy[target.id] - 12); playSound('hurt');
+                        showDialogue(target.id, 'sad'); shakeScreen(false); checkGameOver();
+                    } else if (!target) { inv.x = nx; inv.y = ny; }
+                }
+            } render();
+        }
+
+        function randomIdleDialogue() {
+            if (Math.random() < 0.4) { showDialogue('vadim', 'idle'); return; }
+            const chars = ['karina', 'katja', 'mikita']; const char = chars[Math.floor(Math.random() * chars.length)];
+            if (Math.random() < 0.6) showDialogue(char, 'idle');
+        }
+
+        function decayEnergy() {
+            for (const char of Object.keys(state.energy)) state.energy[char] = Math.max(0, state.energy[char] - 0.3);
+            for (const char of ['vadim', 'karina', 'katja']) {
+                if (state.energy[char] < 25 && state.energy[char] > 0 && Math.random() < 0.4) showDialogue(char, 'sad');
+            }
+            checkGameOver(); render();
+        }
+
+        function checkGameOver() { for (const [char, energy] of Object.entries(state.energy)) { if (energy <= 0) { endGame(char); return; } } }
+
+        function endGame(deadChar) {
+            state.isRunning = false; state.gameOver = true; state.moving = false;
+            Object.values(intervals).forEach(clearInterval);
+            const names = { vadim: 'Вадим', karina: 'Карина', katja: 'Катя', mikita: 'Мікіта' };
+            const feminine = ['karina', 'katja']; const verb = feminine.includes(deadChar) ? 'втратила' : 'втратив';
+            document.getElementById('death-reason').textContent = `${names[deadChar]} ${verb} всю енергію!`;
+            document.getElementById('final-score').textContent = state.score; document.getElementById('final-wave').textContent = state.wave;
+            setTimeout(() => gameOverScreen.classList.add('show'), 400);
+        }
+
+        function startGame() {
+            powerups = { speedBoost: false, speedBoostEnd: 0 };
+            state = {
+                player: { x: 6, y: 6 }, targetPos: null,
+                npcs: { vadim: { id: 'vadim', x: 1, y: 1 }, karina: { id: 'karina', x: 10, y: 1 }, katja: { id: 'katja', x: 1, y: 10 } },
+                items: [], invaders: [], energy: { vadim: 100, mikita: 100, karina: 100, katja: 100 },
+                holding: null, score: 0, wave: 1, isRunning: true, gameOver: false, moving: false, lastDialogue: {}, activeBubbles: []
+            };
+            startScreen.classList.remove('show'); gameOverScreen.classList.remove('show');
+            initGrid(); render();
+            clearInterval(intervals.decay); clearInterval(intervals.npcMove); clearInterval(intervals.invaderMove);
+            clearInterval(intervals.invaderSpawn); clearInterval(intervals.itemSpawn); clearInterval(intervals.wave); clearInterval(intervals.randomChat);
+            intervals.decay = setInterval(decayEnergy, 2200); intervals.npcMove = setInterval(moveNPCs, 2200);
+            intervals.invaderMove = setInterval(moveInvaders, 1400); intervals.invaderSpawn = setInterval(spawnInvader, 4500);
+            intervals.itemSpawn = setInterval(spawnItem, 2800); intervals.wave = setInterval(() => { state.wave++; render(); }, 40000);
+            intervals.randomChat = setInterval(randomIdleDialogue, 2000);
+            for (let i = 0; i < 3; i++) setTimeout(spawnItem, i * 300);
+        }
+
+        const gridEl = document.getElementById('grid');
+        const startScreen = document.getElementById('start-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const holdingEl = document.getElementById('holding');
+        const wrapperEl = document.getElementById('game-wrapper');
+
+        document.getElementById('start-btn').addEventListener('click', () => { initAudio(); startGame(); });
+        document.getElementById('restart-btn').addEventListener('click', () => { initAudio(); startGame(); });
+
+        document.addEventListener('keydown', (e) => {
+            if (!state.isRunning || state.gameOver) return;
+            const key = e.key.toLowerCase(); let dx = 0, dy = 0;
+            if (key === 'w' || key === 'arrowup') dy = -1; else if (key === 's' || key === 'arrowdown') dy = 1;
+            else if (key === 'a' || key === 'arrowleft') dx = -1; else if (key === 'd' || key === 'arrowright') dx = 1; else return;
+            if (state.moving) return;
+            const nx = state.player.x + dx; const ny = state.player.y + dy;
+            if (nx < 0 || nx >= GRID || ny < 0 || ny >= GRID) return;
+            const target = getEntity(nx, ny);
+            if (target?.type === 'invader') { kickInvader(target); return; }
+            if (target?.type === 'npc' && !state.holding) return;
+            state.player.x = nx; state.player.y = ny; playSound('step');
+            const itemOnCell = state.items.find(i => i.x === nx && i.y === ny);
+            if (itemOnCell && !state.holding) pickupItem(itemOnCell);
+            checkDelivery(); render();
+        });
+
+        initTheme();
+        startScreen.classList.add('show');
+    </script>
+</body>
+</html>
