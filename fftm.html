@@ -25,23 +25,6 @@
             --text-muted: #9ca3af;
             --cloud-opacity: 0.35;
             --shadow-color: rgba(0,0,0,0.5);
-            --path-color: rgba(125, 211, 252, 0.08);
-            --path-shadow: inset 0 0 5px rgba(125, 211, 252, 0.1);
-        }
-
-        body.day-theme {
-            --bg: #f0f4f8;
-            --bg-atmo: rgba(240, 244, 248, 0.98);
-            --field: #e2e8f0;
-            --field-alt: #cbd5e1;
-            --grid-bg: linear-gradient(135deg, #ffffff, #f1f5f9);
-            --grid-border: rgba(0,0,0,0.1);
-            --text: #1e293b;
-            --text-muted: #64748b;
-            --cloud-opacity: 0.6;
-            --shadow-color: rgba(0,0,0,0.1);
-            --path-color: rgba(56, 189, 248, 0.15);
-            --path-shadow: inset 0 0 8px rgba(56, 189, 248, 0.2);
         }
 
         body {
@@ -52,14 +35,12 @@
             overflow: hidden;
             touch-action: manipulation;
             -webkit-touch-callout: none;
-            transition: background 0.5s ease, color 0.5s ease;
         }
 
         .bg-atmosphere {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 0; overflow: hidden;
-            transition: opacity 0.5s;
         }
 
         .cloud {
@@ -68,17 +49,11 @@
             filter: blur(60px);
             opacity: var(--cloud-opacity);
             animation: float-cloud 20s infinite ease-in-out;
-            transition: opacity 0.5s;
         }
 
         .cloud:nth-child(1) { width: 500px; height: 300px; background: radial-gradient(ellipse, #ff6b9d, transparent); top: -10%; left: -10%; animation-duration: 25s; }
         .cloud:nth-child(2) { width: 400px; height: 250px; background: radial-gradient(ellipse, #7dd3fc, transparent); top: 40%; right: -15%; animation-delay: -5s; animation-duration: 30s; }
         .cloud:nth-child(3) { width: 450px; height: 280px; background: radial-gradient(ellipse, #c4b5fd, transparent); bottom: 5%; left: 10%; animation-delay: -12s; animation-duration: 28s; }
-        
-        body.day-theme .cloud { filter: blur(80px); }
-        body.day-theme .cloud:nth-child(1) { background: radial-gradient(ellipse, #fde68a, transparent); }
-        body.day-theme .cloud:nth-child(2) { background: radial-gradient(ellipse, #93c5fd, transparent); }
-        body.day-theme .cloud:nth-child(3) { background: radial-gradient(ellipse, #f0abfc, transparent); }
 
         @keyframes float-cloud {
             0%, 100% { transform: translateX(0) translateY(0) scale(1) rotate(0deg); }
@@ -87,25 +62,10 @@
             75% { transform: translateX(35px) translateY(35px) scale(1.1) rotate(1deg); }
         }
 
-        .theme-toggle {
-            position: fixed; top: 15px; right: 15px; z-index: 200;
-            background: var(--field); border-radius: 30px; padding: 4px;
-            display: flex; align-items: center; gap: 5px;
-            box-shadow: 0 4px 15px var(--shadow-color);
-            border: 1px solid var(--grid-border); cursor: pointer;
-            transition: background 0.3s;
-        }
-        .theme-toggle-icon {
-            font-size: 1.2rem; width: 30px; height: 30px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; transition: background 0.3s, color 0.3s;
-            color: var(--text-muted);
-        }
-        .theme-toggle-icon.active { background: var(--text); color: var(--bg); }
-
         .game-wrapper {
             display: flex; flex-direction: column;
-            height: 100vh; height: 100dvh;
+            height: 100vh;
+            height: 100dvh;
             position: relative; z-index: 1;
             transition: transform 0.1s;
         }
@@ -126,7 +86,6 @@
             font-size: 1.1rem; margin-top: 10px;
         }
         .hud span { font-weight: 700; color: #7dd3fc; text-shadow: 0 0 10px rgba(125, 211, 252, 0.5); }
-        body.day-theme .hud span { text-shadow: none; color: #0284c7; }
 
         .game-field {
             flex: 1; display: flex; align-items: center; justify-content: center;
@@ -147,10 +106,7 @@
             border: 2px solid var(--grid-border);
             transform-style: preserve-3d;
             animation: grid-sway 8s infinite ease-in-out;
-            transition: background 0.5s, box-shadow 0.5s;
         }
-        
-        body.day-theme .grid { box-shadow: 0 10px 30px var(--shadow-color); }
 
         @keyframes grid-sway {
             0%, 100% { transform: rotate(0deg) rotateX(0deg); }
@@ -169,7 +125,6 @@
         .cell:nth-child(even) { background: var(--field-alt); }
 
         .cell.edge-glow { animation: soft-edge-pulse 6s infinite ease-in-out; }
-        body.day-theme .cell.edge-glow { animation: none; }
 
         @keyframes soft-edge-pulse {
             0%, 100% { background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.02); }
@@ -177,17 +132,6 @@
         }
 
         .cell:active { background: rgba(255, 255, 255, 0.2) !important; transform: scale(0.95); }
-
-        .cell.path { background: var(--path-color) !important; box-shadow: var(--path-shadow); }
-        body.day-theme .cell.path { background: rgba(56, 189, 248, 0.1) !important; }
-
-        .cell.target { background: rgba(251, 191, 36, 0.2) !important; box-shadow: inset 0 0 10px rgba(251, 191, 36, 0.3); animation: target-glow 1s infinite; }
-        body.day-theme .cell.target { background: rgba(251, 191, 36, 0.3) !important; }
-
-        @keyframes target-glow {
-            0%, 100% { box-shadow: inset 0 0 10px rgba(251, 191, 36, 0.2); }
-            50% { box-shadow: inset 0 0 20px rgba(251, 191, 36, 0.4); }
-        }
 
         .entity {
             position: absolute; width: 100%; height: 100%;
@@ -203,7 +147,6 @@
             animation: player-float 1.2s infinite ease-in-out;
             font-size: min(6.5vw, 2.8rem) !important;
         }
-        body.day-theme .entity.player { filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); }
 
         @keyframes player-float {
             0%, 100% { transform: translateY(0) scale(1); }
@@ -215,7 +158,6 @@
             font-size: min(6vw, 2.6rem) !important;
             animation: npc-idle 2s infinite ease-in-out;
         }
-        body.day-theme .entity.npc { filter: none; }
 
         @keyframes npc-idle {
             0%, 100% { transform: scale(1); }
@@ -241,7 +183,6 @@
             display: flex; align-items: center; justify-content: center;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
-        body.day-theme .entity.npc.vadim-char { box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3); }
 
         .entity.invader {
             z-index: 12;
@@ -249,7 +190,6 @@
             filter: drop-shadow(0 0 12px #22c55e) brightness(1.2);
             font-size: min(5.8vw, 2.5rem) !important;
         }
-        body.day-theme .entity.invader { filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); }
 
         @keyframes invader-sway {
             0%, 100% { transform: rotate(-8deg) scale(1); }
@@ -278,14 +218,12 @@
             opacity: 0.4; transition: all 0.3s;
             font-size: min(4.8vw, 2rem) !important;
         }
-        body.day-theme .entity.item { opacity: 0.6; filter: none; }
 
         .entity.item.revealed {
             opacity: 1;
             filter: drop-shadow(0 0 15px #fbbf24);
             animation: item-glow 1.5s infinite ease-in-out;
         }
-        body.day-theme .entity.item.revealed { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
 
         @keyframes item-float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-3px) rotate(3deg); } }
         @keyframes item-glow { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
@@ -321,11 +259,6 @@
             display: flex; align-items: center; gap: 14px; z-index: 50;
             border: 2px solid #fbbf24;
             box-shadow: 0 0 30px rgba(251, 191, 36, 0.4); backdrop-filter: blur(10px);
-            transition: background 0.3s;
-        }
-        body.day-theme .holding-item {
-            background: rgba(255, 255, 255, 0.9); color: #1e293b;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
         .holding-item .item-icon { font-size: 1.7rem; animation: item-float 0.8s infinite; }
 
@@ -380,14 +313,13 @@
         .final-stats { margin: 25px 0; font-size: 1.15rem; }
         .final-stats div { margin: 10px 0; }
         .final-stats span { color: #4ade80; font-weight: 700; }
-        body.day-theme .final-stats span { color: #059669; }
 
         .controls-hint {
             position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%);
             background: var(--field); padding: 12px 20px; border-radius: 16px;
             font-size: 0.85rem; color: var(--text-muted); z-index: 40;
             text-align: center; border: 1px solid var(--grid-border);
-            line-height: 1.6; transition: background 0.3s, color 0.3s;
+            line-height: 1.6;
         }
 
         .plus-effect {
@@ -395,7 +327,6 @@
             animation: plus-fly 1s forwards; pointer-events: none; z-index: 100;
             text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
-        body.day-theme .plus-effect { color: #059669; text-shadow: none; }
         @keyframes plus-fly { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-60px) scale(1.5); } }
         
         .item-label {
@@ -416,7 +347,6 @@
             40% { opacity: 1; transform: scale(1.5) rotate(8deg); }
             100% { opacity: 0; transform: scale(1.1) translateY(-25px) rotate(0deg); }
         }
-        .particle { position: fixed; border-radius: 50%; pointer-events: none; z-index: 150; }
 
         /* ==================== MOBILE START SCREEN ==================== */
         @media (max-width: 500px) {
@@ -573,21 +503,6 @@
                 border-bottom: 1px solid var(--grid-border);
                 justify-content: flex-start;
             }
-            body.day-theme .hud {
-                background: rgba(255, 255, 255, 0.95);
-                backdrop-filter: blur(10px);
-            }
-
-            .theme-toggle {
-                top: 8px;
-                right: 8px;
-                padding: 3px;
-            }
-            .theme-toggle-icon {
-                width: 26px;
-                height: 26px;
-                font-size: 1rem;
-            }
 
             .game-field {
                 position: fixed;
@@ -724,12 +639,6 @@
                 text-orientation: mixed;
             }
 
-            .theme-toggle {
-                top: 10px;
-                left: 10px;
-                right: auto;
-            }
-
             .holding-item {
                 bottom: 8px;
                 right: 8px;
@@ -770,24 +679,6 @@
             }
         }
 
-        /* Very short screens (notch phones) */
-        @media (max-height: 700px) and (min-width: 601px) {
-            .hud {
-                padding: 10px 16px;
-                font-size: 1rem;
-                margin-top: 5px;
-            }
-
-            .game-field {
-                padding: 5px;
-            }
-
-            .grid {
-                width: min(94vw, 75vh, 500px);
-                height: min(94vw, 75vh, 500px);
-            }
-        }
-
         @media (min-width: 601px) {
             .grid { width: min(88vw, 72vh, 600px); height: min(88vw, 72vh, 600px); }
         }
@@ -796,11 +687,6 @@
 <body>
     <div class="bg-atmosphere">
         <div class="cloud"></div><div class="cloud"></div><div class="cloud"></div>
-    </div>
-
-    <div class="theme-toggle" id="theme-toggle" title="Змінити тему">
-        <div class="theme-toggle-icon" id="icon-sun">☀️</div>
-        <div class="theme-toggle-icon active" id="icon-moon">🌙</div>
     </div>
 
     <div class="game-wrapper" id="game-wrapper">
@@ -901,7 +787,7 @@
             },
             karina: {
                 happy: ['Wunderbar!', 'Danke!', 'Sehr gut!', 'Perfekt!', 'Toll!', 'Super!', 'Wunderbar schon!', 'Ausgezeichnet!'],
-                sad: ['Brauche Buch...', 'Ich brauche...', 'Oh je...', 'Hilfe...', 'Wo ist das Book?', 'Ich verstehe nicht...', 'Ein Stift...'],
+                sad: ['Brauche Buch...', 'Ich brauche...', 'Oh je...', 'Hilfe...', 'Wo ist das Buch?', 'Ich verstehe nicht...', 'Ein Stift...'],
                 wrong: ['Nein!', 'Falsch!', 'Nicht fur mich!', 'Was ist das?', 'Das brauche ich nicht!'],
                 idle: ['Interessant...', 'Deutsch ist schwer...', 'Muss uben...', 'Wo ist Mikita?', 'Ein Buch ware gut...', 'Hm...', 'Schreibzeug...', 'Wie geht es?']
             },
@@ -924,33 +810,6 @@
 
         let intervals = {};
         let audioCtx = null;
-
-        const themeToggle = document.getElementById('theme-toggle');
-        const iconSun = document.getElementById('icon-sun');
-        const iconMoon = document.getElementById('icon-moon');
-
-        function setTheme(isDay) {
-            if (isDay) {
-                document.body.classList.add('day-theme');
-                iconSun.classList.add('active');
-                iconMoon.classList.remove('active');
-            } else {
-                document.body.classList.remove('day-theme');
-                iconSun.classList.remove('active');
-                iconMoon.classList.add('active');
-            }
-        }
-
-        function initTheme() {
-            const hour = new Date().getHours();
-            const isDay = hour >= 7 && hour < 20;
-            setTheme(isDay);
-        }
-
-        themeToggle.addEventListener('click', () => {
-            const isDay = !document.body.classList.contains('day-theme');
-            setTheme(isDay);
-        });
 
         function initAudio() { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} }
 
@@ -1024,18 +883,6 @@
 
         function render() {
             document.querySelectorAll('.entity, .hp-bar-container').forEach(el => el.remove());
-
-            if (state.targetPos && state.moving) {
-                const path = findPath(state.player, state.targetPos);
-                path.forEach((pos, i) => {
-                    if (i > 0 && i < path.length - 1) {
-                        const cell = getCell(pos.x, pos.y);
-                        if (cell) cell.classList.add('path');
-                    }
-                });
-                const targetCell = getCell(state.targetPos.x, state.targetPos.y);
-                if (targetCell) targetCell.classList.add('target');
-            }
 
             for (const inv of state.invaders) {
                 const cell = getCell(inv.x, inv.y);
@@ -1387,7 +1234,6 @@
             checkDelivery(); render();
         });
 
-        initTheme();
         startScreen.classList.add('show');
     </script>
 </body>
