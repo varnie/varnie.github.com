@@ -7,7 +7,9 @@
     <link href="fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
-            margin: 0; padding: 0; box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
@@ -47,27 +49,31 @@
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
-            min-height: 100dvh; /* Динамічна висота для мобільних */
             overflow: hidden;
             touch-action: manipulation;
             -webkit-touch-callout: none;
             transition: background 0.5s ease, color 0.5s ease;
-            display: flex;
-            flex-direction: column;
         }
 
         .bg-atmosphere {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 0; overflow: hidden; transition: opacity 0.5s;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
+            transition: opacity 0.5s;
         }
 
         .cloud {
-            position: absolute; border-radius: 50%; filter: blur(60px);
-            opacity: var(--cloud-opacity); animation: float-cloud 20s infinite ease-in-out;
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: var(--cloud-opacity);
+            animation: float-cloud 20s infinite ease-in-out;
+            transition: opacity 0.5s;
         }
-        .cloud:nth-child(1) { width: 500px; height: 300px; background: radial-gradient(ellipse, #ff6b9d, transparent); top: -10%; left: -10%; }
-        .cloud:nth-child(2) { width: 400px; height: 250px; background: radial-gradient(ellipse, #7dd3fc, transparent); top: 40%; right: -15%; animation-delay: -5s; }
-        .cloud:nth-child(3) { width: 450px; height: 280px; background: radial-gradient(ellipse, #c4b5fd, transparent); bottom: 5%; left: 10%; animation-delay: -12s; }
+
+        .cloud:nth-child(1) { width: 500px; height: 300px; background: radial-gradient(ellipse, #ff6b9d, transparent); top: -10%; left: -10%; animation-duration: 25s; }
+        .cloud:nth-child(2) { width: 400px; height: 250px; background: radial-gradient(ellipse, #7dd3fc, transparent); top: 40%; right: -15%; animation-delay: -5s; animation-duration: 30s; }
+        .cloud:nth-child(3) { width: 450px; height: 280px; background: radial-gradient(ellipse, #c4b5fd, transparent); bottom: 5%; left: 10%; animation-delay: -12s; animation-duration: 28s; }
         
         body.day-theme .cloud { filter: blur(80px); }
         body.day-theme .cloud:nth-child(1) { background: radial-gradient(ellipse, #fde68a, transparent); }
@@ -76,21 +82,25 @@
 
         @keyframes float-cloud {
             0%, 100% { transform: translateX(0) translateY(0) scale(1) rotate(0deg); }
-            50% { transform: translateX(30px) translateY(-20px) scale(1.1) rotate(1deg); }
+            25% { transform: translateX(60px) translateY(-40px) scale(1.15) rotate(2deg); }
+            50% { transform: translateX(-40px) translateY(25px) scale(0.9) rotate(-1deg); }
+            75% { transform: translateX(35px) translateY(35px) scale(1.1) rotate(1deg); }
         }
 
         /* Theme Toggle */
         .theme-toggle {
-            position: fixed; top: 10px; right: 10px; z-index: 200;
+            position: fixed; top: 15px; right: 15px; z-index: 200;
             background: var(--field); border-radius: 30px; padding: 4px;
-            display: flex; align-items: center; gap: 4px;
-            box-shadow: 0 4px 10px var(--shadow-color);
+            display: flex; align-items: center; gap: 5px;
+            box-shadow: 0 4px 15px var(--shadow-color);
             border: 1px solid var(--grid-border); cursor: pointer;
+            transition: background 0.3s;
         }
         .theme-toggle-icon {
-            font-size: 1.1rem; width: 28px; height: 28px;
+            font-size: 1.2rem; width: 30px; height: 30px;
             display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; transition: background 0.3s; color: var(--text-muted);
+            border-radius: 50%; transition: background 0.3s, color 0.3s;
+            color: var(--text-muted);
         }
         .theme-toggle-icon.active { background: var(--text); color: var(--bg); }
 
@@ -98,6 +108,7 @@
             display: flex; flex-direction: column;
             height: 100vh; height: 100dvh;
             position: relative; z-index: 1;
+            transition: transform 0.1s;
         }
 
         .shake-hard { animation: shake-anim 0.5s cubic-bezier(.36,.07,.19,.97) both; }
@@ -105,55 +116,51 @@
 
         @keyframes shake-anim {
             10%, 90% { transform: translate3d(-2px, 0, 0); }
-            30%, 70% { transform: translate3d(-4px, 0, 0); }
-            50% { transform: translate3d(4px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
         }
 
         .hud {
-            display: flex; justify-content: center; gap: 20px;
-            padding: 10px 16px; background: transparent;
-            font-size: 1rem; margin-top: 5px;
-            flex-shrink: 0; /* Забороняємо стискати */
+            display: flex; justify-content: center; gap: 24px;
+            padding: 15px 16px; background: transparent;
+            font-size: 1.1rem; margin-top: 10px;
         }
         .hud span { font-weight: 700; color: var(--mikita); text-shadow: 0 0 10px rgba(125, 211, 252, 0.5); }
         body.day-theme .hud span { text-shadow: none; color: #0284c7; }
 
         .game-field {
-            flex: 1; /* Займає весь вільний простір */
-            display: flex; align-items: center; justify-content: center;
-            padding: 5px; overflow: hidden;
-            perspective: 1200px;
-            min-height: 0; /* Важливо для флексу */
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            padding: 10px; overflow: hidden; min-height: 0; perspective: 1200px;
         }
 
         .grid {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
             grid-template-rows: repeat(12, 1fr);
-            gap: 2px; /* Тонші проміжки */
-            
-            /* Логіка розміру: Максимальна ширина 98% OR Максимальна висота (висота екрану - 60px на HUD) */
-            /* Але не ширше 800px для великих екранів */
-            width: min(98vw, calc(100vh - 70px), 800px);
-            height: min(98vw, calc(100vh - 70px), 800px);
-            
-            aspect-ratio: 1 / 1; /* Залишаємо квадратним */
-            
+            gap: 3px;
             background: var(--grid-bg);
-            border-radius: 12px;
+            width: min(96vw, 80vh, 560px);
+            height: min(96vw, 80vh, 560px);
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 0 40px rgba(125, 211, 252, 0.1), 0 15px 30px var(--shadow-color);
+            box-shadow: 0 0 60px rgba(125, 211, 252, 0.15), 0 0 120px rgba(196, 181, 253, 0.1), 0 25px 50px var(--shadow-color);
             border: 2px solid var(--grid-border);
             transform-style: preserve-3d;
+            
+            /* Повернуто анімацію */
             animation: grid-sway 8s infinite ease-in-out;
+            
             transition: background 0.5s, box-shadow 0.5s;
         }
         
-        body.day-theme .grid { box-shadow: 0 5px 20px var(--shadow-color); }
+        body.day-theme .grid { box-shadow: 0 10px 30px var(--shadow-color); }
 
+        /* Анімація тільки для трансформації */
         @keyframes grid-sway {
             0%, 100% { transform: rotate(0deg) rotateX(0deg); }
             25% { transform: rotate(0.3deg) rotateX(0.2deg); }
+            50% { transform: rotate(0deg) rotateX(0deg); }
             75% { transform: rotate(-0.3deg) rotateX(-0.2deg); }
         }
 
@@ -161,7 +168,8 @@
             background: var(--field);
             position: relative;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; border-radius: 2px; overflow: visible;
+            transition: background 0.2s; cursor: pointer;
+            border-radius: 3px; overflow: visible;
         }
         .cell:nth-child(even) { background: var(--field-alt); }
 
@@ -169,73 +177,100 @@
         body.day-theme .cell.edge-glow { animation: none; }
 
         @keyframes soft-edge-pulse {
-            0%, 100% { background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.02); }
-            50% { background: rgba(255, 255, 255, 0.05); box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05); }
+            0%, 100% { background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.02); }
+            50% { background: rgba(255, 255, 255, 0.05); box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.05); }
         }
 
-        .cell:active { background: rgba(255, 255, 255, 0.2) !important; transform: scale(0.9); }
+        .cell:active { background: rgba(255, 255, 255, 0.2) !important; transform: scale(0.95); }
 
         .cell.path { background: var(--path-color) !important; box-shadow: var(--path-shadow); }
         body.day-theme .cell.path { background: rgba(56, 189, 248, 0.1) !important; }
 
-        .cell.target { background: rgba(251, 191, 36, 0.2) !important; box-shadow: inset 0 0 8px rgba(251, 191, 36, 0.3); animation: target-glow 1s infinite; }
-        @keyframes target-glow { 0%, 100% { box-shadow: inset 0 0 8px rgba(251, 191, 36, 0.2); } 50% { box-shadow: inset 0 0 15px rgba(251, 191, 36, 0.4); } }
+        .cell.target { background: rgba(251, 191, 36, 0.2) !important; box-shadow: inset 0 0 10px rgba(251, 191, 36, 0.3); animation: target-glow 1s infinite; }
+        body.day-theme .cell.target { background: rgba(251, 191, 36, 0.3) !important; }
+
+        @keyframes target-glow {
+            0%, 100% { box-shadow: inset 0 0 10px rgba(251, 191, 36, 0.2); }
+            50% { box-shadow: inset 0 0 20px rgba(251, 191, 36, 0.4); }
+        }
 
         .entity {
             position: absolute; width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
-            font-size: min(5vw, 2.2rem); /* Адаптивний розмір шрифту */
-            transition: transform 0.15s; pointer-events: none;
+            font-size: min(5.5vw, 2.4rem);
+            transition: transform 0.15s, filter 0.15s;
+            pointer-events: none;
         }
 
         .entity.player {
-            filter: drop-shadow(0 0 10px var(--mikita));
-            z-index: 15; animation: player-float 1.2s infinite ease-in-out;
-            font-size: min(6vw, 2.6rem) !important;
+            filter: drop-shadow(0 0 15px var(--mikita)) drop-shadow(0 0 30px rgba(125, 211, 252, 0.6));
+            z-index: 15;
+            animation: player-float 1.2s infinite ease-in-out;
+            font-size: min(6.5vw, 2.8rem) !important;
         }
-        body.day-theme .entity.player { filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2)); }
+        body.day-theme .entity.player { filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); }
 
-        @keyframes player-float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-2px) scale(1.02); } }
+        @keyframes player-float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-4px) scale(1.05); }
+        }
 
-        .entity.npc { z-index: 10; animation: npc-idle 2s infinite ease-in-out; }
+        .entity.npc {
+            z-index: 10;
+            font-size: min(6vw, 2.6rem) !important;
+            animation: npc-idle 2s infinite ease-in-out;
+        }
         body.day-theme .entity.npc { filter: none; }
-        @keyframes npc-idle { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+
+        @keyframes npc-idle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
 
         /* Karina Bow */
         .entity.npc.karina-char::before {
-            content: ''; position: absolute; top: 0px; right: 12%;
-            width: 10px; height: 7px;
+            content: ''; position: absolute; top: 0px; right: 15%;
+            width: 14px; height: 10px;
             background: linear-gradient(135deg, #ef4444, #dc2626);
-            border-radius: 50%; box-shadow: 0 0 4px rgba(239, 68, 68, 0.8); z-index: 20;
+            border-radius: 50%; box-shadow: 0 0 6px rgba(239, 68, 68, 0.8); z-index: 20;
         }
         .entity.npc.karina-char::after {
-            content: ''; position: absolute; top: 1px; right: 15%;
-            width: 4px; height: 4px; background: #991b1b; border-radius: 50%; z-index: 21;
+            content: ''; position: absolute; top: 2px; right: 18%;
+            width: 6px; height: 6px; background: #991b1b; border-radius: 50%; z-index: 21;
         }
 
         /* Vadim */
         .entity.npc.vadim-char {
             background: linear-gradient(135deg, #22c55e, #16a34a);
-            border-radius: 6px; width: 85% !important; height: 85% !important;
-            font-size: min(5vw, 2.2rem) !important; font-weight: 700; color: #fff;
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+            border-radius: 10px; width: 88% !important; height: 88% !important;
+            font-size: min(5.5vw, 2.5rem) !important; font-weight: 700; color: #fff;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.6), inset 0 2px 4px rgba(255,255,255,0.3);
             display: flex; align-items: center; justify-content: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
+        body.day-theme .entity.npc.vadim-char { box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3); }
 
         /* Invaders */
         .entity.invader {
-            z-index: 12; animation: invader-sway 0.6s infinite ease-in-out;
-            filter: drop-shadow(0 0 8px #22c55e) brightness(1.2);
+            z-index: 12;
+            animation: invader-sway 0.6s infinite ease-in-out;
+            filter: drop-shadow(0 0 12px #22c55e) brightness(1.2);
+            font-size: min(5.8vw, 2.5rem) !important;
         }
-        body.day-theme .entity.invader { filter: none; }
-        @keyframes invader-sway { 0%, 100% { transform: rotate(-5deg) scale(1); } 50% { transform: rotate(5deg) scale(1.05); } }
+        body.day-theme .entity.invader { filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); }
+
+        @keyframes invader-sway {
+            0%, 100% { transform: rotate(-8deg) scale(1); }
+            50% { transform: rotate(8deg) scale(1.1); }
+        }
 
         /* HP Bars */
         .hp-bar-container {
-            position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
-            width: 24px; height: 4px; background: rgba(0,0,0,0.6);
-            border-radius: 2px; overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.2); z-index: 25;
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 35px; height: 5px; background: rgba(0,0,0,0.7);
+            border-radius: 3px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.25); z-index: 25;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
         .hp-bar-fill { height: 100%; transition: width 0.3s; }
         
@@ -247,132 +282,160 @@
         .hp-bar-fill.karina-hp { background: linear-gradient(90deg, #a855f7, #c4b5fd); }
         .hp-bar-fill.katja-hp { background: linear-gradient(90deg, #ec4899, #f472b6); }
 
-        .entity.item { animation: item-float 2s infinite ease-in-out; opacity: 0.4; }
+        .entity.item {
+            animation: item-float 2s infinite ease-in-out;
+            opacity: 0.4; transition: all 0.3s;
+            font-size: min(4.8vw, 2rem) !important;
+        }
         body.day-theme .entity.item { opacity: 0.6; filter: none; }
 
-        .entity.item.revealed { opacity: 1; filter: drop-shadow(0 0 10px var(--item)); }
-        body.day-theme .entity.item.revealed { filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2)); }
+        .entity.item.revealed {
+            opacity: 1;
+            filter: drop-shadow(0 0 15px var(--item));
+            animation: item-glow 1.5s infinite ease-in-out;
+        }
+        body.day-theme .entity.item.revealed { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
 
-        @keyframes item-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+        @keyframes item-float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-3px) rotate(3deg); } }
+        @keyframes item-glow { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
-        .entity.delivering { animation: deliver-burst 0.4s ease-out; }
-        @keyframes deliver-burst { 0% { transform: scale(1); } 40% { transform: scale(1.3); filter: brightness(1.5); } 100% { transform: scale(1); } }
+        .entity.delivering { animation: deliver-burst 0.5s ease-out; }
+        @keyframes deliver-burst { 0% { transform: scale(1); } 40% { transform: scale(1.4); filter: brightness(1.5); } 100% { transform: scale(1); } }
 
         .bubble {
             position: fixed; background: linear-gradient(135deg, #fff, #f0f0f0);
-            color: #1a1625; padding: 6px 12px; border-radius: 14px;
-            font-size: 0.8rem; white-space: nowrap; z-index: 200;
-            pointer-events: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            color: #1a1625; padding: 8px 14px; border-radius: 18px;
+            font-size: 0.85rem; white-space: nowrap; z-index: 200;
+            pointer-events: none; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             font-weight: 600; transform: translateX(-50%) scale(0); opacity: 0;
+            max-width: 180px; text-align: center;
         }
-        .bubble::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: #f0f0f0; }
-        .bubble.show { animation: bubble-pop 2s forwards; }
+        .bubble::after {
+            content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+            border: 6px solid transparent; border-top-color: #f0f0f0;
+        }
+        .bubble.show { animation: bubble-pop 2.5s forwards; }
         @keyframes bubble-pop {
             0% { opacity: 0; transform: translateX(-50%) scale(0) translateY(5px); }
-            15% { opacity: 1; transform: translateX(-50%) scale(1.05) translateY(0); }
+            15% { opacity: 1; transform: translateX(-50%) scale(1.1) translateY(0); }
+            25% { transform: translateX(-50%) scale(1) translateY(0); }
             85% { opacity: 1; }
             100% { opacity: 0; transform: translateX(-50%) scale(0.9) translateY(-5px); }
         }
 
         .holding-item {
-            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
-            background: rgba(30, 24, 48, 0.95);
-            padding: 10px 20px; border-radius: 20px; font-size: 1rem;
-            display: flex; align-items: center; gap: 10px; z-index: 50;
-            border: 2px solid var(--item); box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(135deg, rgba(30, 24, 48, 0.98), rgba(40, 32, 64, 0.98));
+            padding: 14px 28px; border-radius: 25px; font-size: 1.15rem;
+            display: flex; align-items: center; gap: 14px; z-index: 50;
+            border: 2px solid var(--item);
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.4); backdrop-filter: blur(10px);
+            transition: background 0.3s;
         }
-        body.day-theme .holding-item { background: rgba(255, 255, 255, 0.95); color: #1e293b; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .holding-item .item-icon { font-size: 1.4rem; animation: item-float 0.8s infinite; }
+        body.day-theme .holding-item {
+            background: rgba(255, 255, 255, 0.9); color: #1e293b;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .holding-item .item-icon { font-size: 1.7rem; animation: item-float 0.8s infinite; }
 
         .screens {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             display: flex; align-items: center; justify-content: center;
             background: var(--bg-atmo); z-index: 1000; opacity: 0;
             pointer-events: none; transition: opacity 0.4s; padding: 20px;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
         }
         .screens.show { opacity: 1; pointer-events: all; }
 
-        .screen-content { text-align: center; max-width: 400px; width: 100%; }
+        .screen-content { text-align: center; max-width: 440px; width: 100%; }
         .screen-content h1 {
-            font-size: 2.8rem; margin-bottom: 10px;
+            font-size: 3.2rem; margin-bottom: 12px;
             background: linear-gradient(135deg, #38bdf8, #a78bfa, #f472b6);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
-        .screen-content .subtitle { color: var(--text-muted); margin-bottom: 20px; font-size: 1.1rem; }
+        .screen-content .subtitle { color: var(--text-muted); margin-bottom: 28px; font-size: 1.25rem; }
         
-        .char-showcase { display: flex; justify-content: center; gap: 15px; margin: 25px 0; flex-wrap: wrap; }
-        .char-showcase .char { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .char-showcase { display: flex; justify-content: center; gap: 20px; margin: 35px 0; flex-wrap: wrap; }
+        .char-showcase .char { display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .char-showcase .char .avatar {
-            width: 60px; height: 60px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 2.2rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); position: relative; background: transparent;
+            width: 75px; height: 75px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 2.8rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4); position: relative;
+            transition: transform 0.3s; background: transparent;
         }
-        .char-showcase .char span { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
+        .char-showcase .char span { font-size: 1.05rem; color: var(--text-muted); font-weight: 500; }
 
-        .char-showcase .char:nth-child(1) .avatar { background: linear-gradient(135deg, #22c55e, #16a34a); border-radius: 15px; font-weight: 700; color: #fff; }
-        .char-showcase .char:nth-child(2) .avatar { font-size: 3rem; }
-        .char-showcase .char:nth-child(3) .avatar { font-size: 3rem; }
-        .char-showcase .char:nth-child(3) .avatar::before { content: ''; position: absolute; top: 2px; right: 8px; width: 14px; height: 10px; background: #ef4444; border-radius: 50%; z-index: 20; }
-        .char-showcase .char:nth-child(4) .avatar { font-size: 3rem; }
+        .char-showcase .char:nth-child(1) .avatar { background: linear-gradient(135deg, #22c55e, #16a34a); border-radius: 20px; font-size: 2.8rem; font-weight: 700; color: #fff; }
+        .char-showcase .char:nth-child(2) .avatar { font-size: 3.5rem; }
+        .char-showcase .char:nth-child(3) .avatar { font-size: 3.5rem; }
+        .char-showcase .char:nth-child(3) .avatar::before { content: ''; position: absolute; top: 4px; right: 10px; width: 18px; height: 12px; background: linear-gradient(135deg, #ef4444, #dc2626); border-radius: 50%; box-shadow: 0 0 6px rgba(239, 68, 68, 0.8); z-index: 20; }
+        .char-showcase .char:nth-child(3) .avatar::after { content: ''; position: absolute; top: 7px; right: 14px; width: 8px; height: 8px; background: #991b1b; border-radius: 50%; z-index: 21; }
+        .char-showcase .char:nth-child(4) .avatar { font-size: 3.5rem; }
 
-        .instructions { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin: 20px 0; }
+        .instructions { color: var(--text-muted); font-size: 1.05rem; line-height: 1.7; margin: 25px 0; }
         .instructions b { color: var(--text); }
-        .disclaimer { font-size: 0.75rem; color: var(--text-muted); margin-top: 20px; font-style: italic; opacity: 0.7; }
+        .disclaimer { font-size: 0.85rem; color: var(--text-muted); margin-top: 25px; font-style: italic; opacity: 0.7; }
 
         .btn {
             background: linear-gradient(135deg, #38bdf8, #0ea5e9); color: #fff;
-            border: none; padding: 14px 35px; font-size: 1.1rem;
-            font-family: 'Fredoka', sans-serif; font-weight: 700; border-radius: 25px;
-            cursor: pointer; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3); margin-top: 15px;
+            border: none; padding: 18px 45px; font-size: 1.15rem;
+            font-family: 'Fredoka', sans-serif; font-weight: 700; border-radius: 28px;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 6px 25px rgba(56, 189, 248, 0.4); margin-top: 20px;
         }
         .btn:active { transform: scale(0.95); }
 
         .game-over h1 { background: linear-gradient(135deg, #f472b6, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .final-stats { margin: 20px 0; font-size: 1rem; }
-        .final-stats div { margin: 8px 0; }
+        .final-stats { margin: 25px 0; font-size: 1.15rem; }
+        .final-stats div { margin: 10px 0; }
         .final-stats span { color: #4ade80; font-weight: 700; }
         body.day-theme .final-stats span { color: #059669; }
 
         .controls-hint {
-            position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%);
-            background: var(--field); padding: 8px 16px; border-radius: 12px;
-            font-size: 0.75rem; color: var(--text-muted); z-index: 40;
+            position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%);
+            background: var(--field); padding: 12px 20px; border-radius: 16px;
+            font-size: 0.85rem; color: var(--text-muted); z-index: 40;
             text-align: center; border: 1px solid var(--grid-border);
+            line-height: 1.6; transition: background 0.3s, color 0.3s;
         }
 
         .plus-effect {
-            position: fixed; font-size: 1.2rem; font-weight: bold; color: #4ade80;
+            position: fixed; font-size: 1.4rem; font-weight: bold; color: #4ade80;
             animation: plus-fly 1s forwards; pointer-events: none; z-index: 100;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
         body.day-theme .plus-effect { color: #059669; text-shadow: none; }
-        @keyframes plus-fly { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-40px) scale(1.5); } }
+        @keyframes plus-fly { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-60px) scale(1.5); } }
         
         .item-label {
             position: fixed; background: var(--bg); color: var(--text);
-            padding: 4px 10px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+            padding: 6px 14px; border-radius: 10px; font-size: 0.95rem; font-weight: 600;
             pointer-events: none; z-index: 150; animation: label-fade 1.5s forwards;
-            border: 1px solid var(--grid-border);
+            border: 1px solid var(--grid-border); box-shadow: 0 4px 15px var(--shadow-color);
         }
-        @keyframes label-fade { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-20px); } }
+        @keyframes label-fade { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-35px); } }
 
         .hit-text {
             position: fixed; font-weight: 900; color: #ef4444;
-            text-shadow: 1px 1px 0 #000;
-            animation: hit-pop 0.6s forwards; pointer-events: none; z-index: 200;
+            text-shadow: 2px 2px 0 #000;
+            animation: hit-pop 0.7s forwards; pointer-events: none; z-index: 200;
         }
         @keyframes hit-pop {
-            0% { opacity: 1; transform: scale(0.3) rotate(-10deg); }
-            40% { opacity: 1; transform: scale(1.3) rotate(5deg); }
-            100% { opacity: 0; transform: scale(1) translateY(-15px) rotate(0deg); }
+            0% { opacity: 1; transform: scale(0.3) rotate(-15deg); }
+            40% { opacity: 1; transform: scale(1.5) rotate(8deg); }
+            100% { opacity: 0; transform: scale(1.1) translateY(-25px) rotate(0deg); }
         }
         .particle { position: fixed; border-radius: 50%; pointer-events: none; z-index: 150; }
 
-        /* Адаптивність для дуже малих екранів */
-        @media (max-width: 350px) {
-            .hud { font-size: 0.9rem; gap: 10px; }
-            .grid { width: 98vw; height: 98vw; }
+        @media (max-width: 400px) {
+            .grid { gap: 2px; }
+            .hud { font-size: 0.9rem; gap: 14px; }
+            .screen-content h1 { font-size: 2.4rem; }
+            .controls-hint { font-size: 0.8rem; padding: 10px 14px; }
+            .char-showcase .char .avatar { width: 60px; height: 60px; font-size: 2.5rem; }
+        }
+        @media (min-width: 600px) {
+            .grid { width: min(88vw, 72vh, 600px); height: min(88vw, 72vh, 600px); }
         }
     </style>
 </head>
@@ -401,7 +464,7 @@
         </div>
 
         <div class="controls-hint">
-            Торкнись предмета або персонажа
+            Торкнись предмета або персонажа<br>Опосум сам дійде і віддасть
         </div>
     </div>
 
@@ -420,7 +483,8 @@
                 <b>Vadim</b> хоче кепку і шампунь<br>
                 <b>Karina</b> вивчає німецьку — їй потрібні книга та ручка<br>
                 <b>Katja</b> мріє про квіти та квитки в кіно<br><br>
-                Захищай друзів від монстрів!
+                Захищай друзів від монстрів!<br>
+                Деяких треба вдарити кілька разів!
             </p>
             <button class="btn" id="start-btn">ГРАТИ</button>
             <p class="disclaimer">Не основано на сюжетах Квентіна Тарантіно.</p>
@@ -465,33 +529,33 @@
 
         const DIALOGUES = {
             vadim: {
-                happy: ['Охуенно!', 'Клас!', 'Нарешті!', 'Золото!', 'Да! Дякую!', 'Красава!'],
-                sad: ['Де кепка...', 'Хочу шампунь...', 'Ну все...', 'Пиздець...'],
-                wrong: ['Не те!', 'Забери!', 'Нахера?!', 'Неа!'],
-                idle: ['Нудно...', 'Що робити?', 'Мікіта!', 'Ау!', 'Кепку б...']
+                happy: ['Охуенно!', 'Клас!', 'Нарешті!', 'Золото!', 'Да! Дякую!', 'Красава!', 'Оце сервіс!', 'Молоток!'],
+                sad: ['Де кепка...', 'Хочу шампунь...', 'Ну все...', 'Пиздець...', 'Без кепки я...', 'Мікіта, ти де?', 'Сил немає...'],
+                wrong: ['Не те!', 'Забери!', 'Нахера?!', 'Неа!', 'Це не мені!', 'Що за фігня?'],
+                idle: ['Нудно...', 'Що робити?', 'Їсти хочу...', 'Мікіта!', 'Ау!', 'Кепку б...', 'Шампунь б...', 'Ауч!', 'Рятуйте!', 'Хто тут?', 'Ей!']
             },
             mikita: {
-                pickup: ['Несемо!', 'Зараз принесу!', 'Зрозумів!', 'Взяв!'],
-                wrong: ['Ой, блін!', 'Не тому!'],
+                pickup: ['Несемо!', 'Зараз принесу!', 'Зрозумів!', 'Взяв!', 'Та ось же!', 'О, знадобиться!'],
+                wrong: ['Ой, блін!', 'Не тому!', 'Йой!', 'Помилочка!'],
                 deliver: {
-                    vadim: ['Ось, пане!', 'Тримайте!'],
-                    karina: ['Будь ласка!', 'Для вас!'],
-                    katja: ['Будь ласка!', 'Для вас!']
+                    vadim: ['Ось, пане!', 'Тримайте, пане!'],
+                    karina: ['Будь ласка, пані!', 'Для вас, пані!'],
+                    katja: ['Будь ласка, пані!', 'Для вас, пані!']
                 },
-                idle: ['Та ось же!', 'Чим би зайнятись...', 'Де тут що...'],
-                battle: ['Ядрана мати!', 'Сучі діти!', 'Отримуй!', 'На халяву!']
+                idle: ['Та ось же!', 'Чим би зайнятись...', 'Треба всім допомогти!', 'Де тут що...', 'Робота робота...', 'Несу-несу...', 'Ого!', 'Оп!'],
+                battle: ['Ядрана мати!', 'Сучі діти!', 'Отримуй!', 'На халяву!', 'Їжте на здоров\'я!', 'Не пройдеш!', 'Ах ти ж їжак!']
             },
             karina: {
-                happy: ['Wunderbar!', 'Danke!', 'Sehr gut!', 'Perfekt!', 'Toll!'],
-                sad: ['Brauche Buch...', 'Oh je...', 'Hilfe...'],
-                wrong: ['Nein!', 'Falsch!'],
-                idle: ['Interessant...', 'Muss uben...', 'Wo ist Mikita?']
+                happy: ['Wunderbar!', 'Danke!', 'Sehr gut!', 'Perfekt!', 'Toll!', 'Super!', 'Wunderbar schon!', 'Ausgezeichnet!'],
+                sad: ['Brauche Buch...', 'Ich brauche...', 'Oh je...', 'Hilfe...', 'Wo ist das Buch?', 'Ich verstehe nicht...', 'Ein Stift...'],
+                wrong: ['Nein!', 'Falsch!', 'Nicht fur mich!', 'Was ist das?', 'Das brauche ich nicht!'],
+                idle: ['Interessant...', 'Deutsch ist schwer...', 'Muss uben...', 'Wo ist Mikita?', 'Ein Buch ware gut...', 'Hm...', 'Schreibzeug...', 'Wie geht es?']
             },
             katja: {
-                happy: ['Дякую!', 'Як мило!', 'Квіти!', 'Супер!', 'Гарно!'],
-                sad: ['Квіти...', 'Будь ласка...', 'Мені сумно...'],
-                wrong: ['Не мені...', 'Не треба!'],
-                idle: ['Нудно...', 'Квіти б...', 'Мікіта, ау!']
+                happy: ['Дякую!', 'Як мило!', 'Квіти!', 'Дякую!', 'Найкращі!', 'Супер!', 'Гарно!', 'Чудово!', 'У кіно!'],
+                sad: ['Квіти...', 'Хочу квіти...', 'Будь ласка...', 'Мені сумно...', 'Де ж ти, Мікіта?', 'Так хочеться квітів...', 'У кіно б піти...'],
+                wrong: ['Не мені...', 'Не треба!', 'Не для мене!', 'Це не те!', 'Ой, ні...'],
+                idle: ['Нудно...', 'Квіти б...', 'Мікіта, ау!', 'Щось би зробити...', 'Гарний день...', 'Гм...', 'Фільм глянути б...', 'Ау!']
             }
         };
 
@@ -543,28 +607,39 @@
                 osc.connect(gain); gain.connect(audioCtx.destination);
                 const now = audioCtx.currentTime;
                 if (type === 'kick') {
-                    osc.type = 'square'; osc.frequency.setValueAtTime(200, now); osc.frequency.exponentialRampToValueAtTime(50, now + 0.15);
-                    gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                    osc.start(now); osc.stop(now + 0.15);
+                    osc.type = 'square'; osc.frequency.setValueAtTime(250, now);
+                    osc.frequency.exponentialRampToValueAtTime(40, now + 0.18);
+                    gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+                    osc.start(now); osc.stop(now + 0.18);
                 } else if (type === 'deliver') {
-                    osc.frequency.setValueAtTime(400, now); osc.frequency.setValueAtTime(600, now + 0.1); osc.frequency.setValueAtTime(900, now + 0.2);
-                    gain.gain.setValueAtTime(0.06, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                    osc.start(now); osc.stop(now + 0.3);
+                    osc.frequency.setValueAtTime(420, now); osc.frequency.setValueAtTime(620, now + 0.1);
+                    osc.frequency.setValueAtTime(950, now + 0.2); gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4); osc.start(now); osc.stop(now + 0.4);
                 } else if (type === 'pickup') {
-                    osc.frequency.setValueAtTime(500, now); osc.frequency.exponentialRampToValueAtTime(900, now + 0.1);
-                    gain.gain.setValueAtTime(0.06, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                    osc.start(now); osc.stop(now + 0.1);
+                    osc.frequency.setValueAtTime(520, now); osc.frequency.exponentialRampToValueAtTime(950, now + 0.1);
+                    gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.exponentialRampToValueAtTime(120, now + 0.25);
+                    gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now); osc.stop(now + 0.25);
                 } else if (type === 'hurt') {
-                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now); osc.frequency.exponentialRampToValueAtTime(50, now + 0.2);
-                    gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-                    osc.start(now); osc.stop(now + 0.2);
+                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(60, now + 0.3);
+                    gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
+                } else if (type === 'step') {
+                    osc.frequency.setValueAtTime(180, now); gain.gain.setValueAtTime(0.02, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05); osc.start(now); osc.stop(now + 0.05);
                 }
             } catch(e) {}
         }
 
         function shakeScreen(intense) {
-            wrapperEl.classList.add(intense ? 'shake-hard' : 'shake-soft');
-            setTimeout(() => wrapperEl.classList.remove('shake-hard', 'shake-soft'), 300);
+            const cls = intense ? 'shake-hard' : 'shake-soft';
+            wrapperEl.classList.add(cls);
+            setTimeout(() => wrapperEl.classList.remove(cls), intense ? 500 : 250);
         }
 
         function initGrid() {
@@ -573,22 +648,23 @@
                 for (let x = 0; x < GRID; x++) {
                     const cell = document.createElement('div');
                     cell.className = 'cell';
+                    cell.dataset.x = x; cell.dataset.y = y;
                     if (x === 0 || x === GRID-1 || y === 0 || y === GRID-1) {
-                        if (Math.random() < 0.3) cell.classList.add('edge-glow');
+                        if (Math.random() < 0.25) cell.classList.add('edge-glow');
                     }
-                    cell.addEventListener('click', () => handleCellClick(x, y));
+                    cell.addEventListener('click', (e) => handleCellClick(x, y, e));
                     gridEl.appendChild(cell);
                 }
             }
         }
 
-        function getCell(x, y) { return (x < 0 || x >= GRID || y < 0 || y >= GRID) ? null : gridEl.children[y * GRID + x]; }
+        function getCell(x, y) { if (x < 0 || x >= GRID || y < 0 || y >= GRID) return null; return gridEl.children[y * GRID + x]; }
 
-        function getEntity(x, y, exclPlayer = false) {
-            if (!exclPlayer && state.player.x === x && state.player.y === y) return { type: 'player', id: 'mikita' };
-            for (const [id, npc] of Object.entries(state.npcs)) if (npc.x === x && npc.y === y) return { type: 'npc', id, ...npc };
-            for (const item of state.items) if (item.x === x && item.y === y) return { type: 'item', ...item };
-            for (const inv of state.invaders) if (inv.x === x && inv.y === y) return { type: 'invader', ...inv };
+        function getEntity(x, y, excludePlayer = false) {
+            if (!excludePlayer && state.player.x === x && state.player.y === y) return { type: 'player', id: 'mikita' };
+            for (const [id, npc] of Object.entries(state.npcs)) { if (npc.x === x && npc.y === y) return { type: 'npc', id, ...npc }; }
+            for (const item of state.items) { if (item.x === x && item.y === y) return { type: 'item', ...item }; }
+            for (const inv of state.invaders) { if (inv.x === x && inv.y === y) return { type: 'invader', ...inv }; }
             return null;
         }
 
@@ -597,282 +673,338 @@
 
             if (state.targetPos && state.moving) {
                 const path = findPath(state.player, state.targetPos);
-                path.forEach((pos, i) => { if(i > 0 && i < path.length-1) getCell(pos.x, pos.y)?.classList.add('path'); });
-                getCell(state.targetPos.x, state.targetPos.y)?.classList.add('target');
+                path.forEach((pos, i) => {
+                    if (i > 0 && i < path.length - 1) {
+                        const cell = getCell(pos.x, pos.y);
+                        if (cell) cell.classList.add('path');
+                    }
+                });
+                const targetCell = getCell(state.targetPos.x, state.targetPos.y);
+                if (targetCell) targetCell.classList.add('target');
             }
 
-            // Render Invaders
             for (const inv of state.invaders) {
                 const cell = getCell(inv.x, inv.y);
                 if (cell) {
-                    cell.innerHTML += `<div class="entity invader">${inv.emoji}</div>`;
-                    const hpP = (inv.hp / inv.maxHp) * 100;
-                    let hpClass = hpP > 60 ? 'high' : (hpP > 30 ? 'mid' : '');
-                    cell.innerHTML += `<div class="hp-bar-container"><div class="hp-bar-fill invader-hp ${hpClass}" style="width:${hpP}%"></div></div>`;
+                    const el = document.createElement('div'); el.className = 'entity invader';
+                    el.textContent = inv.emoji; cell.appendChild(el);
+                    const hpBar = document.createElement('div'); hpBar.className = 'hp-bar-container';
+                    const hpFill = document.createElement('div'); hpFill.className = 'hp-bar-fill invader-hp';
+                    const hpPercent = (inv.hp / inv.maxHp) * 100; hpFill.style.width = hpPercent + '%';
+                    if(hpPercent > 60) hpFill.classList.add('high'); else if(hpPercent > 30) hpFill.classList.add('mid');
+                    hpBar.appendChild(hpFill); cell.appendChild(hpBar);
                 }
             }
 
-            // Render Items
             for (const item of state.items) {
                 const cell = getCell(item.x, item.y);
-                if(cell) cell.innerHTML += `<div class="entity item ${item.revealed ? 'revealed' : ''}">${item.emoji}</div>`;
+                if (cell) {
+                    const el = document.createElement('div'); el.className = 'entity item' + (item.revealed ? ' revealed' : '');
+                    el.textContent = item.emoji; cell.appendChild(el);
+                }
             }
 
-            // Render NPCs
             for (const [id, npc] of Object.entries(state.npcs)) {
                 const cell = getCell(npc.x, npc.y);
                 if (cell) {
-                    let cls = 'entity npc';
-                    if (id === 'karina') cls += ' karina-char';
-                    if (id === 'vadim') cls += ' vadim-char';
-                    if (state.holding && state.player.x === npc.x && state.player.y === npc.y) cls += ' delivering';
-                    cell.innerHTML += `<div class="${cls}">${CHARACTERS[id]}</div>`;
-                    cell.innerHTML += `<div class="hp-bar-container"><div class="hp-bar-fill ${id}-hp" style="width:${state.energy[id]}%"></div></div>`;
+                    const el = document.createElement('div'); el.className = 'entity npc';
+                    if (id === 'karina') el.classList.add('karina-char');
+                    if (id === 'vadim') el.classList.add('vadim-char');
+                    el.textContent = CHARACTERS[id];
+                    if (state.holding && state.player.x === npc.x && state.player.y === npc.y) el.classList.add('delivering');
+                    cell.appendChild(el);
+
+                    const hpBar = document.createElement('div'); hpBar.className = 'hp-bar-container';
+                    const hpFill = document.createElement('div'); hpFill.className = `hp-bar-fill ${id}-hp`;
+                    hpFill.style.width = state.energy[id] + '%';
+                    hpBar.appendChild(hpFill); cell.appendChild(hpBar);
                 }
             }
 
-            // Render Player
-            const pCell = getCell(state.player.x, state.player.y);
-            if(pCell) pCell.innerHTML += `<div class="entity player">${CHARACTERS.mikita}</div>`;
-
+            const playerCell = getCell(state.player.x, state.player.y);
+            if (playerCell) {
+                const el = document.createElement('div'); el.className = 'entity player';
+                el.textContent = CHARACTERS.mikita; playerCell.appendChild(el);
+            }
             updateHUD();
         }
 
         function updateHUD() {
             document.getElementById('score').textContent = state.score;
             document.getElementById('wave').textContent = state.wave;
-            holdingEl.style.display = state.holding ? 'flex' : 'none';
-            if(state.holding) document.getElementById('holding-icon').textContent = state.holding.emoji;
+            if (state.holding) {
+                holdingEl.style.display = 'flex';
+                document.getElementById('holding-icon').textContent = state.holding.emoji;
+            } else { holdingEl.style.display = 'none'; }
         }
 
-        function findPath(start, end, npcWalk = false) {
-            const q = [[start]]; const vis = new Set([`${start.x},${start.y}`]);
-            while(q.length) {
-                const p = q.shift(); const c = p[p.length-1];
-                if (c.x === end.x && c.y === end.y) return p;
-                for (const [dx, dy] of [[0,1],[0,-1],[1,0],[-1,0]]) {
-                    const n = {x: c.x+dx, y: c.y+dy};
-                    if (n.x>=0 && n.x<GRID && n.y>=0 && n.y<GRID && !vis.has(`${n.x},${n.y}`)) {
-                        const ent = getEntity(n.x, n.y, true);
-                        if (!ent || ent.type === 'item') { vis.add(`${n.x},${n.y}`); q.push([...p, n]); }
-                        else if (npcWalk && ent.type === 'npc' && n.x===end.x && n.y===end.y) return [...p, n];
+        function findPath(start, end, canWalkToNPC = false) {
+            const queue = [[start]]; const visited = new Set(); visited.add(`${start.x},${start.y}`);
+            while (queue.length > 0) {
+                const path = queue.shift(); const current = path[path.length - 1];
+                if (current.x === end.x && current.y === end.y) return path;
+                const dirs = [[0,1], [0,-1], [1,0], [-1,0]];
+                for (const [dx, dy] of dirs) {
+                    const nx = current.x + dx; const ny = current.y + dy;
+                    if (nx >= 0 && nx < GRID && ny >= 0 && ny < GRID) {
+                        const key = `${nx},${ny}`;
+                        if (!visited.has(key)) {
+                            const entity = getEntity(nx, ny, true);
+                            if (!entity || entity.type === 'item') { visited.add(key); queue.push([...path, {x: nx, y: ny}]); }
+                            else if (canWalkToNPC && entity.type === 'npc') { if (nx === end.x && ny === end.y) { visited.add(key); queue.push([...path, {x: nx, y: ny}]); } }
+                        }
                     }
                 }
-            } return [start];
+            }
+            return [start];
         }
 
-        function handleCellClick(x, y) {
+        function handleCellClick(x, y, e) {
             if (!state.isRunning || state.gameOver) return;
-            const t = getEntity(x, y);
-            if (t?.type === 'invader') { kickInvader(t); return; }
-            if (t?.type === 'item' && !state.holding) { state.targetPos = {x,y}; state.moving = true; moveToTarget(false); return; }
-            if (t?.type === 'npc' && state.holding) { state.targetPos = {x,y}; state.moving = true; moveToTarget(true); return; }
-            if (!t) { state.targetPos = {x,y}; state.moving = true; moveToTarget(false); }
+            const target = getEntity(x, y);
+            if (target?.type === 'invader') { kickInvader(target); return; }
+            if (target?.type === 'item' && !state.holding) {
+                if (Math.random() > 0.35) showItemLabel(x, y, target.name);
+                state.targetPos = { x, y }; state.moving = true; moveToTarget(false); return;
+            }
+            if (target?.type === 'npc' && state.holding) { state.targetPos = { x, y }; state.moving = true; moveToTarget(true); return; }
+            if (target?.type === 'npc' && !state.holding) {
+                const dirs = [[0,1], [0,-1], [1,0], [-1,0]];
+                for (const [dx, dy] of dirs) {
+                    const nx = x + dx; const ny = y + dy;
+                    if (nx >= 0 && nx < GRID && ny >= 0 && ny < GRID && !getEntity(nx, ny)) {
+                        state.targetPos = { x: nx, y: ny }; state.moving = true; moveToTarget(false); return;
+                    }
+                } return;
+            }
+            if (!target) { state.targetPos = { x, y }; state.moving = true; moveToTarget(false); }
         }
 
-        function moveToTarget(npcWalk = false) {
+        function showItemLabel(x, y, name) {
+            const cell = getCell(x, y); if (!cell) return; const rect = cell.getBoundingClientRect();
+            const label = document.createElement('div'); label.className = 'item-label'; label.textContent = name;
+            label.style.left = rect.left + rect.width/2 + 'px'; label.style.top = rect.top + 'px'; label.style.transform = 'translateX(-50%)';
+            document.body.appendChild(label); setTimeout(() => label.remove(), 1500);
+        }
+
+        function moveToTarget(canWalkToNPC = false) {
             if (!state.moving || !state.targetPos) return;
-            const path = findPath(state.player, state.targetPos, npcWalk);
+            const path = findPath(state.player, state.targetPos, canWalkToNPC);
             if (path.length <= 1) { state.moving = false; state.targetPos = null; checkDelivery(); render(); return; }
-            
             const next = path[1];
-            const ent = getEntity(next.x, next.y, true);
-            if (ent?.type === 'npc' && !npcWalk) { state.moving = false; state.targetPos = null; render(); return; }
-            if (ent?.type === 'invader') { state.moving = false; state.targetPos = null; render(); return; }
-
-            state.player.x = next.x; state.player.y = next.y;
-            
-            const item = state.items.find(i => i.x === next.x && i.y === next.y);
-            if (item && !state.holding) { pickupItem(item); state.moving = false; state.targetPos = null; render(); return; }
-
+            const entity = getEntity(next.x, next.y, true);
+            if (entity?.type === 'npc' && !canWalkToNPC) { state.moving = false; state.targetPos = null; render(); return; }
+            if (entity?.type === 'invader') { state.moving = false; state.targetPos = null; render(); return; }
+            state.player.x = next.x; state.player.y = next.y; playSound('step');
+            const itemOnCell = state.items.find(i => i.x === next.x && i.y === next.y);
+            if (itemOnCell && !state.holding) { pickupItem(itemOnCell); state.moving = false; state.targetPos = null; render(); return; }
             if (next.x === state.targetPos.x && next.y === state.targetPos.y) { state.moving = false; state.targetPos = null; checkDelivery(); }
-            
+            const isSpeedBoost = powerups.speedBoost && Date.now() < powerups.speedBoostEnd;
             render();
-            if (state.moving) setTimeout(() => moveToTarget(npcWalk), powerups.speedBoost && Date.now() < powerups.speedBoostEnd ? 70 : 110);
+            if (state.moving) setTimeout(() => moveToTarget(canWalkToNPC), isSpeedBoost ? 70 : 120);
         }
 
         function checkDelivery() {
             if (!state.holding) return;
-            for (const [id, npc] of Object.entries(state.npcs))
+            for (const [id, npc] of Object.entries(state.npcs)) {
                 if (npc.x === state.player.x && npc.y === state.player.y) { deliverItemTo(id); return; }
+            }
         }
 
         function pickupItem(item) {
-            if (ITEMS[item.id].type === 'powerup') {
-                if (ITEMS[item.id].effect === 'speed') { powerups.speedBoost = true; powerups.speedBoostEnd = Date.now() + 8000; }
-                else state.score += 100;
-                state.items = state.items.filter(i => i !== item);
-                showPlusEffect(ITEMS[item.id].effect === 'speed' ? 'ШВИДКІСТЬ!' : '+100');
-            } else {
-                state.holding = item; state.items = state.items.filter(i => i !== item);
-                showDialogue('mikita', 'pickup');
+            const itemData = ITEMS[item.id];
+            if (itemData.type === 'powerup') {
+                applyPowerup(itemData.effect); state.items = state.items.filter(i => i !== item);
+                playSound('pickup'); showPlusEffect(itemData.effect === 'speed' ? 'ШВИДКІСТЬ!' : '+100'); return;
             }
+            state.holding = item; state.items = state.items.filter(i => i !== item);
+            playSound('pickup'); showDialogue('mikita', 'pickup');
+        }
+
+        function applyPowerup(effect) {
+            if (effect === 'speed') { powerups.speedBoost = true; powerups.speedBoostEnd = Date.now() + 8000; }
+            else if (effect === 'score') { state.score += 100; }
             render();
         }
 
         function deliverItemTo(npcId) {
-            if (!state.holding) return;
+            if (!state.holding) return; const npc = state.npcs[npcId]; if (!npc) return;
             const target = ITEMS[state.holding.id].target;
             if (npcId === target) {
-                state.energy[npcId] = Math.min(100, state.energy[npcId] + 25); state.score += 50;
-                showDialogue('mikita', 'deliver', npcId, true); setTimeout(() => showDialogue(npcId, 'happy'), 100);
+                state.energy[npcId] = Math.min(100, state.energy[npcId] + 25); state.score += 50; playSound('deliver');
+                showDialogue('mikita', 'deliver', npcId, true); setTimeout(() => showDialogue(npcId, 'happy'), 150);
                 showPlusEffect('+25');
             } else {
-                state.energy[npcId] = Math.max(0, state.energy[npcId] - 15);
-                showDialogue(npcId, 'wrong');
+                state.energy[npcId] = Math.max(0, state.energy[npcId] - 15); playSound('wrong'); showDialogue(npcId, 'wrong');
             }
             state.holding = null; checkGameOver(); render();
         }
 
         function showPlusEffect(text) {
-            const pCell = getCell(state.player.x, state.player.y); if(!pCell) return;
-            const rect = pCell.getBoundingClientRect();
+            const playerCell = getCell(state.player.x, state.player.y); if (!playerCell) return; const rect = playerCell.getBoundingClientRect();
             const el = document.createElement('div'); el.className = 'plus-effect'; el.textContent = text;
             el.style.left = rect.left + rect.width/2 + 'px'; el.style.top = rect.top + 'px';
             document.body.appendChild(el); setTimeout(() => el.remove(), 1000);
         }
 
-        function showDialogue(charId, type, sub = null, high = false) {
-            const dials = sub ? DIALOGUES[charId]?.[type]?.[sub] : DIALOGUES[charId]?.[type];
-            if (!dials) return;
+        function showDialogue(charId, type, subType = null, highPosition = false) {
+            let dialogues;
+            if (subType && type === 'deliver') dialogues = DIALOGUES[charId]?.[type]?.[subType];
+            else dialogues = DIALOGUES[charId]?.[type];
+            if (!dialogues || dialogues.length === 0) return;
             const now = Date.now();
-            if (state.lastDialogue[charId] && now - state.lastDialogue[charId] < 800) return;
+            if (state.lastDialogue[charId] && now - state.lastDialogue[charId] < 1000) return;
             state.lastDialogue[charId] = now;
-            const txt = dials[Math.floor(Math.random() * dials.length)];
-            const coords = charId === 'mikita' ? state.player : state.npcs[charId];
-            if(!coords) return;
-            const cell = getCell(coords.x, coords.y); if(!cell) return;
-            const rect = cell.getBoundingClientRect();
-            const el = document.createElement('div'); el.className = 'bubble'; el.textContent = txt;
-            el.style.left = rect.left + rect.width/2 + 'px'; el.style.top = rect.top - 5 + (high ? -30 : 0) + 'px';
-            document.body.appendChild(el);
+            const text = dialogues[Math.floor(Math.random() * dialogues.length)];
+            let coords = null;
+            if (charId === 'mikita') coords = { x: state.player.x, y: state.player.y };
+            else { const npc = state.npcs[charId]; if (!npc) return; coords = { x: npc.x, y: npc.y }; }
+            const cell = getCell(coords.x, coords.y); if (!cell) return; const rect = cell.getBoundingClientRect();
+            const el = document.createElement('div'); el.className = 'bubble'; el.textContent = text;
+            el.style.left = rect.left + rect.width / 2 + 'px'; el.style.top = rect.top - 8 + (highPosition ? -35 : 0) + 'px';
+            document.body.appendChild(el); state.activeBubbles.push(el);
             requestAnimationFrame(() => el.classList.add('show'));
-            setTimeout(() => el.remove(), 2000);
+            setTimeout(() => { if (el.parentNode) el.remove(); state.activeBubbles = state.activeBubbles.filter(b => b !== el); }, 2500);
         }
 
         function kickInvader(inv) {
-            const idx = state.invaders.findIndex(i => i.id === inv.id); if(idx===-1) return;
-            const m = state.invaders[idx]; m.hp--;
-            createKickEffect(m.x, m.y, m.hp <= 0);
+            const index = state.invaders.findIndex(i => i.id === inv.id); if (index === -1) return;
+            const monster = state.invaders[index]; monster.hp--;
+            createKickEffect(monster.x, monster.y, monster.hp <= 0);
             if (Math.random() < 0.5) showDialogue('mikita', 'battle');
-            if (m.hp <= 0) { state.invaders.splice(idx, 1); state.score += 10 * m.maxHp; shakeScreen(true); }
+            if (monster.hp <= 0) { state.invaders.splice(index, 1); state.score += 10 * monster.maxHp; shakeScreen(true); }
             else { state.score += 2; shakeScreen(false); }
-            render();
+            playSound('kick'); render();
         }
 
-        function createKickEffect(x, y, kill) {
-            const cell = getCell(x,y); if(!cell) return;
-            const rect = cell.getBoundingClientRect();
-            const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+        function createKickEffect(x, y, isKill) {
+            const cell = getCell(x, y); if (!cell) return; const rect = cell.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2; const centerY = rect.top + rect.height / 2;
+            const texts = isKill ? ['БУМ!', 'ХРЯСЬ!', 'КАБАМ!'] : ['БАХ!', 'УДАР!', '-1 HP'];
             const txt = document.createElement('div'); txt.className = 'hit-text';
-            txt.textContent = kill ? 'БУМ!' : 'БАХ!';
-            txt.style.left = cx + 'px'; txt.style.top = cy + 'px';
-            document.body.appendChild(txt); setTimeout(() => txt.remove(), 500);
-            cell.style.background = 'radial-gradient(#ff6b6b, #ffd93d)';
-            setTimeout(() => cell.style.background = '', 100);
+            txt.textContent = texts[Math.floor(Math.random() * texts.length)];
+            txt.style.left = centerX + 'px'; txt.style.top = centerY + 'px';
+            txt.style.fontSize = (1.2 + Math.random() * 0.6) + 'rem';
+            document.body.appendChild(txt); setTimeout(() => txt.remove(), 600);
+            const count = isKill ? 12 : 6;
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div'); p.textContent = ['💫', '✨', '💥'][Math.floor(Math.random()*3)];
+                p.style.cssText = `position: fixed; left: ${centerX}px; top: ${centerY}px; font-size: 1.2rem; pointer-events: none; z-index: 1000; transition: all 0.5s;`;
+                document.body.appendChild(p);
+                const angle = (Math.PI * 2 * i) / count; const distance = (isKill ? 60 : 30) + Math.random() * 30;
+                requestAnimationFrame(() => {
+                    p.style.left = centerX + Math.cos(angle) * distance + 'px'; p.style.top = centerY + Math.sin(angle) * distance + 'px'; p.style.opacity = '0';
+                });
+                setTimeout(() => p.remove(), 500);
+            }
+            cell.style.background = 'linear-gradient(135deg, #ff6b6b, #ffd93d)';
+            setTimeout(() => { cell.style.background = ''; }, 150);
         }
 
         function spawnItem() {
-            if (state.items.length >= 4) return;
-            const isP = Math.random() < 0.1;
-            const types = isP ? ['boots', 'star'] : ['cap', 'shampoo', 'book', 'pen', 'flower', 'ticket'];
-            const type = types[Math.floor(Math.random() * types.length)];
-            let x, y, att = 0;
-            do { x = Math.floor(Math.random()*GRID); y = Math.floor(Math.random()*GRID); att++; } while (getEntity(x,y,true) && att < 30);
-            if (att < 30) state.items.push({ id: type, emoji: ITEMS[type].emoji, name: ITEMS[type].name, x, y, revealed: isP || Math.random() > 0.4 });
+            if (state.items.length >= 5) return;
+            const isPowerup = Math.random() < 0.15;
+            const itemTypes = isPowerup ? ['boots', 'star'] : ['cap', 'shampoo', 'book', 'pen', 'flower', 'ticket'];
+            const type = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+            let x, y, attempts = 0;
+            do { x = Math.floor(Math.random() * GRID); y = Math.floor(Math.random() * GRID); attempts++; } while (getEntity(x, y, true) && attempts < 50);
+            if (attempts >= 50) return;
+            state.items.push({ id: type, emoji: ITEMS[type].emoji, name: ITEMS[type].name, x, y, revealed: ITEMS[type].type === 'powerup' ? true : (Math.random() > 0.35) });
             render();
         }
 
         function spawnInvader() {
-            if (state.invaders.length >= 2 + state.wave) return;
-            const side = Math.floor(Math.random() * 4);
-            let x, y;
-            if (side===0) { x = Math.floor(Math.random()*GRID); y = 0; }
-            else if (side===1) { x = GRID-1; y = Math.floor(Math.random()*GRID); }
-            else if (side===2) { x = Math.floor(Math.random()*GRID); y = GRID-1; }
-            else { x = 0; y = Math.floor(Math.random()*GRID); }
-            const t = INVADER_TYPES[Math.floor(Math.random()*INVADER_TYPES.length)];
-            state.invaders.push({ id: Date.now()+Math.random(), emoji: t.emoji, x, y, hp: t.hp, maxHp: t.hp });
+            const maxInvaders = 2 + state.wave;
+            if (state.invaders.length >= maxInvaders) return;
+            const edge = Math.floor(Math.random() * 4); let x, y;
+            if (edge === 0) { x = Math.floor(Math.random() * GRID); y = 0; }
+            else if (edge === 1) { x = GRID - 1; y = Math.floor(Math.random() * GRID); }
+            else if (edge === 2) { x = Math.floor(Math.random() * GRID); y = GRID - 1; }
+            else { x = 0; y = Math.floor(Math.random() * GRID); }
+            const type = INVADER_TYPES[Math.floor(Math.random() * INVADER_TYPES.length)];
+            const hpBonus = Math.floor(state.wave / 3);
+            state.invaders.push({ id: Date.now() + Math.random(), emoji: type.emoji, name: type.name, x, y, hp: type.hp + hpBonus, maxHp: type.hp + hpBonus });
             render();
         }
 
         function moveNPCs() {
             for (const [id, npc] of Object.entries(state.npcs)) {
-                if (Math.random() > 0.4) continue;
-                const d = [[0,1],[0,-1],[1,0],[-1,0]][Math.floor(Math.random()*4)];
-                const nx = npc.x+d[0], ny = npc.y+d[1];
-                if (nx>=0 && nx<GRID && ny>=0 && ny<GRID && !getEntity(nx,ny,true)) { npc.x=nx; npc.y=ny; }
+                if (Math.random() > 0.5) continue;
+                const dirs = [[0,1], [0,-1], [1,0], [-1,0]]; const dir = dirs[Math.floor(Math.random() * dirs.length)];
+                const nx = npc.x + dir[0]; const ny = npc.y + dir[1];
+                if (nx >= 0 && nx < GRID && ny >= 0 && ny < GRID) {
+                    if (nx === state.player.x && ny === state.player.y) continue;
+                    const occupied = Object.values(state.npcs).some(other => other.x === nx && other.y === ny);
+                    if (occupied) continue;
+                    const target = getEntity(nx, ny, true);
+                    if (!target || target.type === 'item') { npc.x = nx; npc.y = ny; }
+                }
             } render();
         }
 
         function moveInvaders() {
             for (const inv of state.invaders) {
-                const npcs = Object.values(state.npcs);
-                if (!npcs.length) continue;
-                let near = npcs[0], minD = 99;
-                npcs.forEach(n => { const d = Math.abs(n.x-inv.x)+Math.abs(n.y-inv.y); if(d<minD){minD=d; near=n;} });
-                const dx = Math.sign(near.x - inv.x), dy = Math.sign(near.y - inv.y);
-                const moves = []; if(dx!==0) moves.push({x:dx,y:0}); if(dy!==0) moves.push({x:0,y:dy});
-                if(!moves.length) continue;
-                const mv = moves[Math.floor(Math.random()*moves.length)];
-                const nx = inv.x+mv.x, ny = inv.y+mv.y;
-                if (nx>=0 && nx<GRID && ny>=0 && ny<GRID) {
-                    const t = getEntity(nx,ny);
-                    if (t?.type === 'npc') {
-                        state.energy[t.id] = Math.max(0, state.energy[t.id] - 12);
-                        showDialogue(t.id, 'sad'); shakeScreen(false);
-                        if(state.energy[t.id] <= 0) endGame(t.id);
-                    } else if (!t) { inv.x=nx; inv.y=ny; }
+                const npcList = Object.values(state.npcs); if (npcList.length === 0) continue;
+                let nearest = null; let minDist = Infinity;
+                for (const npc of npcList) { const dist = Math.abs(inv.x - npc.x) + Math.abs(inv.y - npc.y); if (dist < minDist) { minDist = dist; nearest = npc; } }
+                if (!nearest) continue;
+                const dx = Math.sign(nearest.x - inv.x); const dy = Math.sign(nearest.y - inv.y);
+                const moves = []; if (dx !== 0) moves.push({x: dx, y: 0}); if (dy !== 0) moves.push({x: 0, y: dy});
+                if (moves.length === 0) continue;
+                const move = moves[Math.floor(Math.random() * moves.length)]; const nx = inv.x + move.x; const ny = inv.y + move.y;
+                if (nx >= 0 && nx < GRID && ny >= 0 && ny < GRID) {
+                    const target = getEntity(nx, ny);
+                    if (target?.type === 'npc') {
+                        state.energy[target.id] = Math.max(0, state.energy[target.id] - 12); playSound('hurt');
+                        showDialogue(target.id, 'sad'); shakeScreen(false); checkGameOver();
+                    } else if (!target) { inv.x = nx; inv.y = ny; }
                 }
             } render();
         }
 
         function randomIdleDialogue() {
-            if (Math.random() < 0.3) showDialogue('vadim', 'idle');
-            else if (Math.random() < 0.3) showDialogue(['karina','katja','mikita'][Math.floor(Math.random()*3)], 'idle');
+            if (Math.random() < 0.4) { showDialogue('vadim', 'idle'); return; }
+            const chars = ['karina', 'katja', 'mikita']; const char = chars[Math.floor(Math.random() * chars.length)];
+            if (Math.random() < 0.6) showDialogue(char, 'idle');
         }
 
         function decayEnergy() {
-            for (const c of Object.keys(state.energy)) state.energy[c] = Math.max(0, state.energy[c] - 0.4);
+            for (const char of Object.keys(state.energy)) state.energy[char] = Math.max(0, state.energy[char] - 0.3);
+            for (const char of ['vadim', 'karina', 'katja']) {
+                if (state.energy[char] < 25 && state.energy[char] > 0 && Math.random() < 0.4) showDialogue(char, 'sad');
+            }
             checkGameOver(); render();
         }
 
-        function checkGameOver() { for (const [c, e] of Object.entries(state.energy)) if (e <= 0) endGame(c); }
+        function checkGameOver() { for (const [char, energy] of Object.entries(state.energy)) { if (energy <= 0) { endGame(char); return; } } }
 
-        function endGame(dead) {
-            state.isRunning = false; state.gameOver = true;
+        function endGame(deadChar) {
+            state.isRunning = false; state.gameOver = true; state.moving = false;
             Object.values(intervals).forEach(clearInterval);
-            const names = { vadim: 'Вадим', karina: 'Карина', katja: 'Катя' };
-            const verb = ['karina','katja'].includes(dead) ? 'втратила' : 'втратив';
-            document.getElementById('death-reason').textContent = `${names[dead]} ${verb} енергію!`;
-            document.getElementById('final-score').textContent = state.score;
-            document.getElementById('final-wave').textContent = state.wave;
-            setTimeout(() => gameOverScreen.classList.add('show'), 300);
+            const names = { vadim: 'Вадим', karina: 'Карина', katja: 'Катя', mikita: 'Мікіта' };
+            const feminine = ['karina', 'katja']; const verb = feminine.includes(deadChar) ? 'втратила' : 'втратив';
+            document.getElementById('death-reason').textContent = `${names[deadChar]} ${verb} всю енергію!`;
+            document.getElementById('final-score').textContent = state.score; document.getElementById('final-wave').textContent = state.wave;
+            setTimeout(() => gameOverScreen.classList.add('show'), 400);
         }
 
         function startGame() {
-            powerups = {};
+            powerups = { speedBoost: false, speedBoostEnd: 0 };
             state = {
-                player: {x:6,y:6}, targetPos: null,
-                npcs: { vadim:{id:'vadim',x:1,y:1}, karina:{id:'karina',x:10,y:1}, katja:{id:'katja',x:1,y:10} },
-                items: [], invaders: [],
-                energy: { vadim:100, mikita:100, karina:100, katja:100 },
-                holding: null, score: 0, wave: 1, isRunning: true, gameOver: false, moving: false, lastDialogue: {}
+                player: { x: 6, y: 6 }, targetPos: null,
+                npcs: { vadim: { id: 'vadim', x: 1, y: 1 }, karina: { id: 'karina', x: 10, y: 1 }, katja: { id: 'katja', x: 1, y: 10 } },
+                items: [], invaders: [], energy: { vadim: 100, mikita: 100, karina: 100, katja: 100 },
+                holding: null, score: 0, wave: 1, isRunning: true, gameOver: false, moving: false, lastDialogue: {}, activeBubbles: []
             };
             startScreen.classList.remove('show'); gameOverScreen.classList.remove('show');
             initGrid(); render();
-            
-            clearInterval(intervals.decay); clearInterval(intervals.npc); clearInterval(intervals.inv);
-            clearInterval(intervals.spI); clearInterval(intervals.spV); clearInterval(intervals.idle);
-            
-            intervals.decay = setInterval(decayEnergy, 2000);
-            intervals.npc = setInterval(moveNPCs, 2500);
-            intervals.inv = setInterval(moveInvaders, 1200);
-            intervals.spI = setInterval(spawnItem, 4000);
-            intervals.spV = setInterval(spawnInvader, 5000);
-            intervals.idle = setInterval(randomIdleDialogue, 3000);
-            
-            spawnItem(); spawnItem();
+            clearInterval(intervals.decay); clearInterval(intervals.npcMove); clearInterval(intervals.invaderMove);
+            clearInterval(intervals.invaderSpawn); clearInterval(intervals.itemSpawn); clearInterval(intervals.wave); clearInterval(intervals.randomChat);
+            intervals.decay = setInterval(decayEnergy, 2200); intervals.npcMove = setInterval(moveNPCs, 2200);
+            intervals.invaderMove = setInterval(moveInvaders, 1400); intervals.invaderSpawn = setInterval(spawnInvader, 4500);
+            intervals.itemSpawn = setInterval(spawnItem, 2800); intervals.wave = setInterval(() => { state.wave++; render(); }, 40000);
+            intervals.randomChat = setInterval(randomIdleDialogue, 2000);
+            for (let i = 0; i < 3; i++) setTimeout(spawnItem, i * 300);
         }
 
         const gridEl = document.getElementById('grid');
@@ -883,6 +1015,23 @@
 
         document.getElementById('start-btn').addEventListener('click', () => { initAudio(); startGame(); });
         document.getElementById('restart-btn').addEventListener('click', () => { initAudio(); startGame(); });
+
+        document.addEventListener('keydown', (e) => {
+            if (!state.isRunning || state.gameOver) return;
+            const key = e.key.toLowerCase(); let dx = 0, dy = 0;
+            if (key === 'w' || key === 'arrowup') dy = -1; else if (key === 's' || key === 'arrowdown') dy = 1;
+            else if (key === 'a' || key === 'arrowleft') dx = -1; else if (key === 'd' || key === 'arrowright') dx = 1; else return;
+            if (state.moving) return;
+            const nx = state.player.x + dx; const ny = state.player.y + dy;
+            if (nx < 0 || nx >= GRID || ny < 0 || ny >= GRID) return;
+            const target = getEntity(nx, ny);
+            if (target?.type === 'invader') { kickInvader(target); return; }
+            if (target?.type === 'npc' && !state.holding) return;
+            state.player.x = nx; state.player.y = ny; playSound('step');
+            const itemOnCell = state.items.find(i => i.x === nx && i.y === ny);
+            if (itemOnCell && !state.holding) pickupItem(itemOnCell);
+            checkDelivery(); render();
+        });
 
         initTheme();
         startScreen.classList.add('show');
