@@ -418,7 +418,141 @@
         }
         .particle { position: fixed; border-radius: 50%; pointer-events: none; z-index: 150; }
 
-        /* ==================== MOBILE OPTIMIZATION ==================== */
+        /* ==================== MOBILE START SCREEN ==================== */
+        @media (max-width: 500px) {
+            .screens {
+                align-items: flex-start;
+                overflow-y: auto;
+                padding: 15px;
+                padding-top: 20px;
+                padding-bottom: 30px;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .screen-content {
+                max-width: 100%;
+            }
+
+            .screen-content h1 {
+                font-size: 2.2rem;
+                margin-bottom: 8px;
+            }
+
+            .screen-content .subtitle {
+                font-size: 1rem;
+                margin-bottom: 20px;
+            }
+
+            .char-showcase {
+                margin: 20px 0;
+                gap: 12px;
+            }
+
+            .char-showcase .char .avatar {
+                width: 55px;
+                height: 55px;
+                font-size: 2rem;
+            }
+
+            .char-showcase .char:nth-child(1) .avatar {
+                font-size: 1.8rem;
+                border-radius: 14px;
+            }
+
+            .char-showcase .char:nth-child(2) .avatar,
+            .char-showcase .char:nth-child(3) .avatar,
+            .char-showcase .char:nth-child(4) .avatar {
+                font-size: 2.5rem;
+            }
+
+            .char-showcase .char:nth-child(3) .avatar::before {
+                width: 14px;
+                height: 9px;
+                top: 3px;
+                right: 7px;
+            }
+
+            .char-showcase .char:nth-child(3) .avatar::after {
+                width: 6px;
+                height: 6px;
+                top: 5px;
+                right: 10px;
+            }
+
+            .char-showcase .char span {
+                font-size: 0.85rem;
+            }
+
+            .instructions {
+                font-size: 0.9rem;
+                line-height: 1.6;
+                margin: 15px 0;
+            }
+
+            .instructions br {
+                display: none;
+            }
+
+            .instructions b {
+                display: inline-block;
+                margin: 0 2px;
+            }
+
+            .btn {
+                padding: 14px 35px;
+                font-size: 1.1rem;
+                margin-top: 15px;
+                border-radius: 22px;
+            }
+
+            .disclaimer {
+                font-size: 0.75rem;
+                margin-top: 15px;
+            }
+        }
+
+        /* Very small screens */
+        @media (max-width: 360px) {
+            .screens {
+                padding: 10px;
+                padding-top: 15px;
+            }
+
+            .screen-content h1 {
+                font-size: 1.9rem;
+            }
+
+            .char-showcase .char .avatar {
+                width: 48px;
+                height: 48px;
+                font-size: 1.7rem;
+            }
+
+            .char-showcase .char:nth-child(1) .avatar {
+                font-size: 1.5rem;
+            }
+
+            .char-showcase .char:nth-child(2) .avatar,
+            .char-showcase .char:nth-child(3) .avatar,
+            .char-showcase .char:nth-child(4) .avatar {
+                font-size: 2.2rem;
+            }
+
+            .char-showcase .char span {
+                font-size: 0.75rem;
+            }
+
+            .instructions {
+                font-size: 0.8rem;
+            }
+
+            .btn {
+                padding: 12px 28px;
+                font-size: 1rem;
+            }
+        }
+
+        /* ==================== MOBILE GAME FIELD ==================== */
         @media (max-width: 600px), (max-height: 500px) {
             .game-wrapper {
                 height: 100vh;
@@ -767,7 +901,7 @@
             },
             karina: {
                 happy: ['Wunderbar!', 'Danke!', 'Sehr gut!', 'Perfekt!', 'Toll!', 'Super!', 'Wunderbar schon!', 'Ausgezeichnet!'],
-                sad: ['Brauche Buch...', 'Ich brauche...', 'Oh je...', 'Hilfe...', 'Wo ist das Buch?', 'Ich verstehe nicht...', 'Ein Stift...'],
+                sad: ['Brauche Buch...', 'Ich brauche...', 'Oh je...', 'Hilfe...', 'Wo ist das Book?', 'Ich verstehe nicht...', 'Ein Stift...'],
                 wrong: ['Nein!', 'Falsch!', 'Nicht fur mich!', 'Was ist das?', 'Das brauche ich nicht!'],
                 idle: ['Interessant...', 'Deutsch ist schwer...', 'Muss uben...', 'Wo ist Mikita?', 'Ein Buch ware gut...', 'Hm...', 'Schreibzeug...', 'Wie geht es?']
             },
