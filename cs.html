@@ -1,0 +1,3077 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Interview Cheat Sheet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg: #0f1115;
+            --bg-secondary: #181b21;
+            --fg: #e4e4e7;
+            --fg-muted: #a1a1aa;
+            --accent: #38bdf8;
+            --accent-dim: #0ea5e9;
+            --card: #1e2228;
+            --card-hover: #24282f;
+            --border: rgba(255, 255, 255, 0.06);
+            --code-bg: #1a1d23;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --error: #f87171;
+            --glow: rgba(56, 189, 248, 0.15);
+        }
+
+        [data-theme="light"] {
+            --bg: #f4f7fa;
+            --bg-secondary: #ffffff;
+            --fg: #18181b;
+            --fg-muted: #71717a;
+            --accent: #0ea5e9;
+            --accent-dim: #0284c7;
+            --card: #ffffff;
+            --card-hover: #f8fafc;
+            --border: #e5e7eb;
+            --code-bg: #f8fafc;
+            --success: #16a34a;
+            --warning: #d97706;
+            --error: #dc2626;
+            --glow: rgba(14, 165, 233, 0.1);
+        }
+
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.7;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Background pattern - subtle */
+        .bg-pattern {
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(14, 165, 233, 0.04) 0%, transparent 40%);
+        }
+
+        [data-theme="light"] .bg-pattern {
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(14, 165, 233, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.05) 0%, transparent 40%);
+        }
+
+        /* Header */
+        header {
+            background: rgba(15, 17, 21, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        [data-theme="light"] header {
+            background: rgba(244, 247, 250, 0.85);
+        }
+
+        /* Navigation */
+        .nav-link {
+            position: relative;
+            padding: 0.5rem 1rem;
+            color: var(--fg-muted);
+            transition: all 0.2s ease;
+            border-radius: 0.75rem;
+            display: block;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            color: var(--accent);
+            background: var(--glow);
+        }
+
+        .nav-link.active {
+            color: var(--accent);
+            background: var(--glow);
+            font-weight: 500;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: height 0.2s ease;
+        }
+
+        .nav-link.active::before {
+            height: 50%;
+        }
+
+        /* Cards */
+        .topic-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 
+                        0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            transition: box-shadow 0.3s ease, transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .topic-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 
+                        0 4px 6px -2px rgba(0, 0, 0, 0.03);
+            border-color: rgba(56, 189, 248, 0.2);
+        }
+
+        .topic-header {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s ease;
+        }
+
+        .topic-header:hover {
+            background: var(--card-hover);
+        }
+
+        .topic-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+        }
+
+        .topic-card.open .topic-content {
+            max-height: 5000px;
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .topic-card.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        .chevron {
+            transition: transform 0.3s ease;
+            color: var(--fg-muted);
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .data-table th {
+            background: var(--code-bg);
+            padding: 0.875rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .data-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .data-table tr:hover td {
+            background: var(--glow);
+        }
+
+        /* Code blocks */
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--code-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.85em;
+            color: var(--accent);
+        }
+
+        pre {
+            background: var(--code-bg);
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--fg);
+        }
+
+        /* Complexity badges */
+        .complexity {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: -0.01em;
+        }
+
+        .complexity-best { background: rgba(74, 222, 128, 0.12); color: var(--success); }
+        .complexity-avg { background: rgba(251, 191, 36, 0.12); color: var(--warning); }
+        .complexity-worst { background: rgba(248, 113, 113, 0.12); color: var(--error); }
+
+        /* Principle cards */
+        .principle-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+        }
+
+        .principle-card:hover {
+            border-color: rgba(56, 189, 248, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Theme toggle */
+        .theme-toggle {
+            position: relative;
+            width: 3.5rem;
+            height: 2rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle::after {
+            content: '';
+            position: absolute;
+            top: 0.2rem;
+            left: 0.2rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            background: var(--accent);
+            border-radius: 50%;
+            transition: transform 0.3s ease, background 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        [data-theme="light"] .theme-toggle::after {
+            transform: translateX(1.5rem);
+        }
+
+        /* Mobile menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            z-index: 100;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 5rem;
+            height: calc(100vh - 6rem);
+            overflow-y: auto;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.05s; opacity: 0; }
+        .delay-2 { animation-delay: 0.1s; opacity: 0; }
+        .delay-3 { animation-delay: 0.15s; opacity: 0; }
+        .delay-4 { animation-delay: 0.2s; opacity: 0; }
+
+        /* Focus states */
+        button:focus-visible, a:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        /* Highlight */
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-pattern min-h-screen">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b" style="background: rgba(10, 15, 26, 0.8); border-color: var(--border);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-4">
+                    <button id="mobileMenuBtn" class="lg:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors" aria-label="Toggle menu">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                    <h1 class="font-mono text-lg font-bold">
+                        <span class="highlight">py</span>interview
+                    </h1>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm hidden sm:block" style="color: var(--fg-muted);">Python Developer Cheat Sheet</span>
+                    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <nav id="mobileMenu" class="mobile-menu lg:hidden">
+        <div class="p-4">
+            <div class="flex justify-between items-center mb-6">
+                <span class="font-mono font-bold text-lg">Navigation</span>
+                <button id="closeMobileMenu" class="p-2 rounded-lg hover:bg-gray-800 transition-colors" aria-label="Close menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="mobileNavLinks" class="space-y-2"></div>
+        </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+        <div class="flex gap-8">
+            <!-- Sidebar (Desktop) -->
+            <aside class="hidden lg:block w-64 flex-shrink-0">
+                <div class="sidebar">
+                    <nav id="desktopNavLinks" class="space-y-1"></nav>
+                </div>
+            </aside>
+
+            <!-- Content -->
+            <main class="flex-1 min-w-0">
+                <div id="topicsContainer" class="space-y-4"></div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Topics data - easily extensible
+        const topics = [
+            {
+                id: 'bigo',
+                title: 'Big O Notation',
+                icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+                content: `
+                    <div class="space-y-6">
+                        <p class="text-lg" style="color: var(--fg-muted);">Big O описывает асимптотическую сложность алгоритма — как время выполнения или память растут с увеличением входных данных.</p>
+                        
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="principle-card">
+                                <h4 class="font-bold mb-2 highlight">O(1) — Константная</h4>
+                                <p style="color: var(--fg-muted);">Время не зависит от размера данных. Пример: доступ к элементу массива по индексу.</p>
+                            </div>
+                            <div class="principle-card">
+                                <h4 class="font-bold mb-2 highlight">O(log n) — Логарифмическая</h4>
+                                <p style="color: var(--fg-muted);">Бинарный поиск, сбалансированные деревья. Отлично масштабируется.</p>
+                            </div>
+                            <div class="principle-card">
+                                <h4 class="font-bold mb-2 highlight">O(n) — Линейная</h4>
+                                <p style="color: var(--fg-muted);">Простой проход по массиву. Приемлемо для большинства задач.</p>
+                            </div>
+                            <div class="principle-card">
+                                <h4 class="font-bold mb-2 highlight">O(n log n) — Линейно-логарифмическая</h4>
+                                <p style="color: var(--fg-muted);">Эффективные сортировки: merge sort, quick sort, heap sort.</p>
+                            </div>
+                            <div class="principle-card">
+                                <h4 class="font-bold mb-2 highlight">O(n²) — Квадратичная</h4>
+                                <p style="color: var(--fg-muted);">Вложенные циклы. Bubble sort, insertion sort. Избегать на больших данных.</p>
+                            </div>
+                            <div class="principle-card">
+                                <h4 class="font-bold mb-2 highlight">O(2ⁿ) — Экспоненциальная</h4>
+                                <p style="color: var(--fg-muted);">Рекурсивный Fibonacci. Неприемлемо для реальных задач.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                            <p class="font-mono text-sm"><span class="highlight">Правило:</span> O(1) &lt; O(log n) &lt; O(n) &lt; O(n log n) &lt; O(n²) &lt; O(2ⁿ) &lt; O(n!)</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'complexity',
+                title: 'Time Complexity: Python Structures',
+                icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4',
+                content: `
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Operation</th>
+                                    <th>list</th>
+                                    <th>deque</th>
+                                    <th>dict / set</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>append / add</code></td>
+                                    <td><span class="complexity complexity-avg">O(1)*</span></td>
+                                    <td><span class="complexity complexity-best">O(1)</span></td>
+                                    <td><span class="complexity complexity-best">O(1)</span></td>
+                                </tr>
+                                <tr>
+                                    <td><code>pop() / pop(last)</code></td>
+                                    <td><span class="complexity complexity-best">O(1)</span></td>
+                                    <td><span class="complexity complexity-best">O(1)</span></td>
+                                    <td><span class="complexity complexity-best">O(1)</span></td>
+                                </tr>
+                                <tr>
+                                    <td><code>pop(0) / popleft</code></td>
+                                    <td><span class="complexity complexity-worst">O(n)</span></td>
+                                    <td><span class="complexity complexity-best">O(1)</span></td>
+                                    <td>—</td>
+                                </tr>
+                                <tr>
+                                    <td><code>insert(0, x)</code></td>
+                                    <td><span class="complexity complexity-worst">O(n)</span></td>
+                                    <td><span class="complexity complexity-best">O(1)</span></td>
+                                    <td>—</td>
+                                </tr>
+                                <tr>
+                                    <td><code>x in ...</code></td>
+                                    <td><span class="complexity complexity-worst">O(n)</span></td>
+                                    <td><span class="complexity complexity-worst">O(n)</span></td>
+                                    <td><span class="complexity complexity-best">O(1)</span></td>
+                                </tr>
+                                <tr>
+                                    <td><code>access by index</code></td>
+                                    <td><span class="complexity complexity-best">O(1)</span></td>
+                                    <td><span class="complexity complexity-avg">O(n)</span></td>
+                                    <td><span class="complexity complexity-best">O(1)</span></td>
+                                </tr>
+                                <tr>
+                                    <td><code>delete / remove</code></td>
+                                    <td><span class="complexity complexity-worst">O(n)</span></td>
+                                    <td><span class="complexity complexity-worst">O(n)</span></td>
+                                    <td><span class="complexity complexity-best">O(1)</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="mt-4 text-sm" style="color: var(--fg-muted);">* list.append — амортизированная O(1), может быть O(n) при реаллокации</p>
+                    
+                    <div class="mt-6 p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                        <p class="font-bold mb-2" style="color: var(--warning);">Когда что использовать:</p>
+                        <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                            <li><code>list</code> — доступ по индексу, stack (append/pop)</li>
+                            <li><code>deque</code> — queue, двухсторонняя очередь</li>
+                            <li><code>set</code> — проверка membership, уникальность</li>
+                            <li><code>dict</code> — key-value хранилище, кеши</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                id: 'acid',
+                title: 'ACID Principles',
+                icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+                content: `
+                    <div class="grid gap-6 md:grid-cols-2">
+                        <div class="principle-card">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="w-10 h-10 rounded-lg flex items-center justify-center font-mono font-bold" style="background: rgba(34, 211, 238, 0.15); color: var(--accent);">A</span>
+                                <h4 class="font-bold text-lg">Atomicity</h4>
+                            </div>
+                            <p style="color: var(--fg-muted);">Транзакция выполняется полностью или не выполняется вовсе. Все операции — единое целое. При ошибке — rollback всех изменений.</p>
+                            <div class="mt-3 p-3 rounded-lg text-sm" style="background: var(--code-bg);">
+                                <p><span class="highlight">Пример:</span> Перевод денег — списание + зачисление должны пройти вместе.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="principle-card">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="w-10 h-10 rounded-lg flex items-center justify-center font-mono font-bold" style="background: rgba(34, 211, 238, 0.15); color: var(--accent);">C</span>
+                                <h4 class="font-bold text-lg">Consistency</h4>
+                            </div>
+                            <p style="color: var(--fg-muted);">Транзакция переводит БД из одного валидного состояния в другое. Соблюдаются все constraints, triggers, cascades.</p>
+                            <div class="mt-3 p-3 rounded-lg text-sm" style="background: var(--code-bg);">
+                                <p><span class="highlight">Пример:</span> Foreign keys, NOT NULL, CHECK constraints.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="principle-card">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="w-10 h-10 rounded-lg flex items-center justify-center font-mono font-bold" style="background: rgba(34, 211, 238, 0.15); color: var(--accent);">I</span>
+                                <h4 class="font-bold text-lg">Isolation</h4>
+                            </div>
+                            <p style="color: var(--fg-muted);">Конкурентные транзакции не влияют друг на друга. Уровни изоляции определяют видимость изменений.</p>
+                            <div class="mt-3 p-3 rounded-lg text-sm" style="background: var(--code-bg);">
+                                <p><span class="highlight">Уровни:</span> Read Uncommitted → Read Committed → Repeatable Read → Serializable</p>
+                            </div>
+                        </div>
+                        
+                        <div class="principle-card">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="w-10 h-10 rounded-lg flex items-center justify-center font-mono font-bold" style="background: rgba(34, 211, 238, 0.15); color: var(--accent);">D</span>
+                                <h4 class="font-bold text-lg">Durability</h4>
+                            </div>
+                            <p style="color: var(--fg-muted);">После commit изменения сохраняются permanently. Даже при сбое системы данные восстанавливаются из WAL.</p>
+                            <div class="mt-3 p-3 rounded-lg text-sm" style="background: var(--code-bg);">
+                                <p><span class="highlight">Механизм:</span> Write-Ahead Log (WAL) в PostgreSQL.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'solid',
+                title: 'SOLID Principles',
+                icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z',
+                content: `
+                    <div class="space-y-4">
+                        <div class="principle-card">
+                            <div class="flex items-start gap-4">
+                                <span class="w-12 h-12 rounded-lg flex items-center justify-center font-mono font-bold text-xl flex-shrink-0" style="background: rgba(34, 211, 238, 0.15); color: var(--accent);">S</span>
+                                <div>
+                                    <h4 class="font-bold text-lg">Single Responsibility Principle</h4>
+                                    <p class="mt-1" style="color: var(--fg-muted);">Класс должен иметь только одну причину для изменения. Один класс — одна ответственность.</p>
+                                    <pre class="mt-3 text-sm"><code># Плохо: класс делает всё
+class User:
+    def save(self): ...
+    def send_email(self): ...
+    def validate(self): ...
+
+# Хорошо: разделение ответственности
+class User: ...
+class UserRepository: ...
+class EmailService: ...
+class UserValidator: ...</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="principle-card">
+                            <div class="flex items-start gap-4">
+                                <span class="w-12 h-12 rounded-lg flex items-center justify-center font-mono font-bold text-xl flex-shrink-0" style="background: rgba(34, 211, 238, 0.15); color: var(--accent);">O</span>
+                                <div>
+                                    <h4 class="font-bold text-lg">Open/Closed Principle</h4>
+                                    <p class="mt-1" style="color: var(--fg-muted);">Классы открыты для расширения, закрыты для модификации. Добавляем функционал через наследование/композицию.</p>
+                                    <pre class="mt-3 text-sm"><code># Используем абстракцию и полиморфизм
+from abc import ABC, abstractmethod
+
+class PaymentProcessor(ABC):
+    @abstractmethod
+    def process(self, amount): ...
+
+class StripeProcessor(PaymentProcessor):
+    def process(self, amount): ...
+
+class PayPalProcessor(PaymentProcessor):
+    def process(self, amount): ...</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="principle-card">
+                            <div class="flex items-start gap-4">
+                                <span class="w-12 h-12 rounded-lg flex items-center justify-center font-mono font-bold text-xl flex-shrink-0" style="background: rgba(34, 211, 238, 0.15); color: var(--accent);">L</span>
+                                <div>
+                                    <h4 class="font-bold text-lg">Liskov Substitution Principle</h4>
+                                    <p class="mt-1" style="color: var(--fg-muted);">Объекты подкласса должны заменять объекты базового класса без нарушения логики программы.</p>
+                                    <pre class="mt-3 text-sm"><code># Нарушение: Square не может заменить Rectangle
+class Rectangle:
+    def set_width(self, w): ...
+    def set_height(self, h): ...
+
+class Square(Rectangle):
+    def set_width(self, w):
+        self.width = self.height = w  # Нарушает ожидания!</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="principle-card">
+                            <div class="flex items-start gap-4">
+                                <span class="w-12 h-12 rounded-lg flex items-center justify-center font-mono font-bold text-xl flex-shrink-0" style="background: rgba(34, 211, 238, 0.15); color: var(--accent);">I</span>
+                                <div>
+                                    <h4 class="font-bold text-lg">Interface Segregation Principle</h4>
+                                    <p class="mt-1" style="color: var(--fg-muted);">Клиенты не должны зависеть от методов, которые не используют. Много специализированных интерфейсов лучше одного общего.</p>
+                                    <pre class="mt-3 text-sm"><code># Разделяем интерфейсы
+class Printable(ABC):
+    @abstractmethod
+    def print(self): ...
+
+class Scannable(ABC):
+    @abstractmethod
+    def scan(self): ...
+
+class MultiFunctionPrinter(Printable, Scannable): ...</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="principle-card">
+                            <div class="flex items-start gap-4">
+                                <span class="w-12 h-12 rounded-lg flex items-center justify-center font-mono font-bold text-xl flex-shrink-0" style="background: rgba(34, 211, 238, 0.15); color: var(--accent);">D</span>
+                                <div>
+                                    <h4 class="font-bold text-lg">Dependency Inversion Principle</h4>
+                                    <p class="mt-1" style="color: var(--fg-muted);">Зависимости строятся на абстракциях, а не на конкретных классах. High-level модули не зависят от low-level.</p>
+                                    <pre class="mt-3 text-sm"><code># DI через конструктор
+class UserService:
+    def __init__(self, db: DatabaseInterface):
+        self.db = db  # Зависимость от абстракции
+
+# Внедряем конкретную реализацию
+service = UserService(PostgresDB())</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'oop-principles',
+                title: 'ООП: принципы и отношения',
+                icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
+                content: `
+                    <div class="space-y-6">
+                        <!-- 4 принципа ООП -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Классические принципы ООП</h4>
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Инкапсуляция (Encapsulation)</h5>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Скрытие внутреннего состояния объекта и предоставление доступа через публичный интерфейс (методы).</p>
+                                    <pre class="text-sm"><code>class Account:
+    def __init__(self, owner, balance):
+        self.owner = owner          # public
+        self._balance = balance     # protected (convention)
+        self.__id = 123             # private (name mangling)
+
+    @property
+    def balance(self):
+        return self._balance
+
+    def deposit(self, amount):
+        if amount > 0:
+            self._balance += amount</code></pre>
+                                </div>
+
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Наследование (Inheritance)</h5>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Механизм, при котором один класс (потомок) получает атрибуты и методы другого класса (родителя), расширяя или изменяя его поведение.</p>
+                                    <pre class="text-sm"><code>class Animal:
+    def __init__(self, name):
+        self.name = name
+
+    def speak(self):
+        raise NotImplementedError
+
+class Dog(Animal):
+    def speak(self):
+        return f"{self.name} says Woof!"
+
+class Cat(Animal):
+    def speak(self):
+        return f"{self.name} says Meow!"</code></pre>
+                                </div>
+
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Полиморфизм (Polymorphism)</h5>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Способность объектов с разной реализацией предоставлять одинаковый интерфейс. В Python — duck typing и переопределение методов.</p>
+                                    <pre class="text-sm"><code>def make_sound(animal):
+    # Важно только наличие метода speak
+    print(animal.speak())
+
+make_sound(Dog("Buddy"))   # Buddy says Woof!
+make_sound(Cat("Whiskers"))  # Whiskers says Meow!</code></pre>
+                                </div>
+
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Абстракция (Abstraction)</h5>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Выделение существенных характеристик объекта, скрытие сложности и предоставление простой модели взаимодействия.</p>
+                                    <pre class="text-sm"><code>from abc import ABC, abstractmethod
+
+class Shape(ABC):
+    @abstractmethod
+    def area(self):
+        pass
+
+class Rectangle(Shape):
+    def __init__(self, w, h):
+        self.w = w
+        self.h = h
+
+    def area(self):
+        return self.w * self.h
+
+# shape = Shape()  # Ошибка, нельзя создать экземпляр ABC</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Виды полиморфизма -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Виды полиморфизма</h4>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Вид</th>
+                                            <th>Суть</th>
+                                            <th>В Python</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>Ad-hoc</code> (перегрузка)</td>
+                                            <td>Одна функция/оператор работают по-разному для разных типов (перегрузка функций/операторов).</td>
+                                            <td>Нет перегрузки функций по сигнатуре, но есть: <code>+</code> (int vs str), <code>len()</code>, <code>__add__</code> и т.п.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Parametric</code> (обобщённый)</td>
+                                            <td>Один и тот же код работает для разных типов (дженерики, шаблоны).</td>
+                                            <td>Duck typing, typing.Generic, TypeVar — параметрический полиморфизм на уровне типов.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Subtype / Inclusion</code></td>
+                                            <td>Подтип может использоваться там, где ожидается базовый тип (классическое ООП-наследование).</td>
+                                            <td>Наследование и переопределение методов, super(), абстрактные классы.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Coercion</code> (приведение)</td>
+                                            <td>Неявное приведение типов для унификации интерфейса.</td>
+                                            <td>Неявные преобразования: <code>int + float</code>, <code>str(obj)</code> через <code>__str__</code> и т.д.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3 p-3 rounded-lg text-sm" style="background: var(--code-bg);">
+                                <p><span class="highlight">Важно:</span> В Python чаще всего говорят про <b>subtype полиморфизм</b> (через наследование и duck typing), но язык поддерживает и ad-hoc (+, *, len), и parametric (typing), и coercion (неявные приведения).【turn0search1】【turn0search3】</p>
+                            </div>
+                        </div>
+
+                        <!-- Агрегация vs Композиция -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Агрегация vs Композиция</h4>
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                                    <h5 class="font-bold mb-2" style="color: var(--success);">Агрегация (Aggregation)</h5>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Отношение «has-a», но часть может существовать независимо от целого. Жизенные циклы не связаны.</p>
+                                    <pre class="text-sm"><code>class Department:
+    def __init__(self, name):
+        self.name = name
+
+class University:
+    def __init__(self, departments):
+        self.departments = departments  # агрегация
+
+# Department может существовать без University
+math_dept = Department("Math")
+uni = University([math_dept])</code></pre>
+                                </div>
+
+                                <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                                    <h5 class="font-bold mb-2" style="color: var(--warning);">Композиция (Composition)</h5>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Более сильное отношение «owns-a»: часть не имеет смысла без целого и уничтожается вместе с ним.</p>
+                                    <pre class="text-sm"><code>class Engine:
+    pass
+
+class Car:
+    def __init__(self):
+        self.engine = Engine()  # композиция
+
+# Engine не существует без Car
+# При уничтожении Car исчезает и Engine</code></pre>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Критерий</th>
+                                            <th>Агрегация</th>
+                                            <th>Композиция</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Жизненный цикл</td>
+                                            <td>Объект-часть может жить независимо</td>
+                                            <td>Часть уничтожается вместе с целым</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Владение</td>
+                                            <td>«uses» / «has-a», слабое владение</td>
+                                            <td>«owns-a», сильное владение</td>
+                                        </tr>
+                                        <tr>
+                                            <td>UML</td>
+                                            <td>Пустой ромб на стороне целого</td>
+                                            <td>Заполненный ромб на стороне целого</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Пример</td>
+                                            <td>Университет и кафедры; класс и студенты</td>
+                                            <td>Дом и комнаты; машина и двигатель</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="mt-3 text-sm" style="color: var(--fg-muted);">Агрегация и композиция — разные степени связи между объектами. В композиции целое отвечает за создание и уничтожение частей, в агрегации — нет.【turn0search7】【turn0search8】</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'sorting',
+                title: 'Sorting Algorithms Complexity',
+                icon: 'M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12',
+                content: `
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Algorithm</th>
+                                    <th>Best</th>
+                                    <th>Average</th>
+                                    <th>Worst</th>
+                                    <th>Space</th>
+                                    <th>Stable</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>Merge Sort</code></td>
+                                    <td><span class="complexity complexity-avg">O(n log n)</span></td>
+                                    <td><span class="complexity complexity-avg">O(n log n)</span></td>
+                                    <td><span class="complexity complexity-avg">O(n log n)</span></td>
+                                    <td><span class="complexity complexity-worst">O(n)</span></td>
+                                    <td style="color: var(--success);">Yes</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Quick Sort</code></td>
+                                    <td><span class="complexity complexity-avg">O(n log n)</span></td>
+                                    <td><span class="complexity complexity-avg">O(n log n)</span></td>
+                                    <td><span class="complexity complexity-worst">O(n²)</span></td>
+                                    <td><span class="complexity complexity-best">O(log n)</span></td>
+                                    <td style="color: var(--error);">No</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Heap Sort</code></td>
+                                    <td><span class="complexity complexity-avg">O(n log n)</span></td>
+                                    <td><span class="complexity complexity-avg">O(n log n)</span></td>
+                                    <td><span class="complexity complexity-avg">O(n log n)</span></td>
+                                    <td><span class="complexity complexity-best">O(1)</span></td>
+                                    <td style="color: var(--error);">No</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Tim Sort* (Python)</code></td>
+                                    <td><span class="complexity complexity-best">O(n)</span></td>
+                                    <td><span class="complexity complexity-avg">O(n log n)</span></td>
+                                    <td><span class="complexity complexity-avg">O(n log n)</span></td>
+                                    <td><span class="complexity complexity-worst">O(n)</span></td>
+                                    <td style="color: var(--success);">Yes</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Insertion Sort</code></td>
+                                    <td><span class="complexity complexity-best">O(n)</span></td>
+                                    <td><span class="complexity complexity-worst">O(n²)</span></td>
+                                    <td><span class="complexity complexity-worst">O(n²)</span></td>
+                                    <td><span class="complexity complexity-best">O(1)</span></td>
+                                    <td style="color: var(--success);">Yes</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Bubble Sort</code></td>
+                                    <td><span class="complexity complexity-best">O(n)</span></td>
+                                    <td><span class="complexity complexity-worst">O(n²)</span></td>
+                                    <td><span class="complexity complexity-worst">O(n²)</span></td>
+                                    <td><span class="complexity complexity-best">O(1)</span></td>
+                                    <td style="color: var(--success);">Yes</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Selection Sort</code></td>
+                                    <td><span class="complexity complexity-worst">O(n²)</span></td>
+                                    <td><span class="complexity complexity-worst">O(n²)</span></td>
+                                    <td><span class="complexity complexity-worst">O(n²)</span></td>
+                                    <td><span class="complexity complexity-best">O(1)</span></td>
+                                    <td style="color: var(--error);">No</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-6 grid gap-4 md:grid-cols-2">
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                            <p class="font-bold mb-2" style="color: var(--success);">Stable сортировки</p>
+                            <p class="text-sm" style="color: var(--fg-muted);">Сохраняют порядок равных элементов. Важно при сортировке по нескольким критериям.</p>
+                        </div>
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                            <p class="font-bold mb-2 highlight">Tim Sort в Python</p>
+                            <p class="text-sm" style="color: var(--fg-muted);">Гибрид merge + insertion sort. Оптимизирован для реальных данных с локальной упорядоченностью.</p>
+                        </div>
+                    </div>
+                    
+                    <p class="mt-4 text-sm" style="color: var(--fg-muted);">* Tim Sort — стандартная сортировка в Python (<code>list.sort()</code>, <code>sorted()</code>)</p>
+                `
+            },
+            {
+                id: 'docker',
+                title: 'Docker Essentials',
+                icon: 'M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01',
+                content: `
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Основные концепции</h4>
+                            <div class="grid gap-3 md:grid-cols-2">
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold">Image</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Read-only шаблон с ОС, библиотеками, кодом. Строится из Dockerfile.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold">Container</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Запущенный экземпляр image. Изолированное окружение.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold">Volume</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Персистентное хранилище данных. Данные переживают контейнер.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold">Network</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Изолированная сеть для взаимодействия контейнеров.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Dockerfile для Python</h4>
+                            <pre><code># Мультистейдж билд для уменьшения размера
+FROM python:3.12-slim as builder
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+FROM python:3.12-slim
+
+WORKDIR /app
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY . .
+
+# Non-root user для безопасности
+RUN useradd -m appuser && chown -R appuser:appuser /app
+USER appuser
+
+EXPOSE 8000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]</code></pre>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Частые команды</h4>
+                            <div class="grid gap-2 font-mono text-sm">
+                                <div class="flex gap-4 p-2 rounded" style="background: var(--code-bg);">
+                                    <span style="color: var(--accent);">build</span>
+                                    <span style="color: var(--fg-muted);">docker build -t myapp:latest .</span>
+                                </div>
+                                <div class="flex gap-4 p-2 rounded" style="background: var(--code-bg);">
+                                    <span style="color: var(--accent);">run</span>
+                                    <span style="color: var(--fg-muted);">docker run -d -p 8000:8000 myapp</span>
+                                </div>
+                                <div class="flex gap-4 p-2 rounded" style="background: var(--code-bg);">
+                                    <span style="color: var(--accent);">compose</span>
+                                    <span style="color: var(--fg-muted);">docker compose up -d --build</span>
+                                </div>
+                                <div class="flex gap-4 p-2 rounded" style="background: var(--code-bg);">
+                                    <span style="color: var(--accent);">logs</span>
+                                    <span style="color: var(--fg-muted);">docker logs -f container_name</span>
+                                </div>
+                                <div class="flex gap-4 p-2 rounded" style="background: var(--code-bg);">
+                                    <span style="color: var(--accent);">exec</span>
+                                    <span style="color: var(--fg-muted);">docker exec -it container_name /bin/bash</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                            <p class="font-bold mb-2" style="color: var(--warning);">Best Practices</p>
+                            <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                <li>• Используй <code>.dockerignore</code> для исключения лишних файлов</li>
+                                <li>• Мультистейдж билды для уменьшения размера образа</li>
+                                <li>• Не запускай от root — создавай отдельного пользователя</li>
+                                <li>• Пиннинг версий в requirements.txt</li>
+                                <li>• Один процесс — один контейнер</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+                        {
+                id: 'asyncio',
+                title: 'Python Asyncio',
+                icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+                content: `
+                    <div class="space-y-6">
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                            <p class="font-bold mb-2 highlight">Ключевая идея</p>
+                            <p style="color: var(--fg-muted);">Asyncio — кооперативная многозадачность. Один поток, один event loop. Задачи сами уступают управление в точках await.</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Основные конструкции</h4>
+                            <pre><code>import asyncio
+
+# Определение async функции (корутины)
+async def fetch_data(url):
+    await asyncio.sleep(1)  # Имитация I/O
+    return f"Data from {url}"
+
+# Запуск корутины
+async def main():
+    # Последовательно
+    result = await fetch_data("https://api.example.com")
+    
+    # Параллельно — несколько задач одновременно
+    tasks = [
+        fetch_data("https://api1.com"),
+        fetch_data("https://api2.com"),
+        fetch_data("https://api3.com"),
+    ]
+    results = await asyncio.gather(*tasks)
+    
+    # С таймаутом
+    try:
+        result = await asyncio.wait_for(fetch_data(url), timeout=5.0)
+    except asyncio.TimeoutError:
+        print("Timeout!")
+
+asyncio.run(main())</code></pre>
+                        </div>
+                        
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                                <p class="font-bold mb-2" style="color: var(--success);">Когда использовать</p>
+                                <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                    <li>• HTTP запросы (aiohttp, httpx)</li>
+                                    <li>• Database queries (asyncpg, motor)</li>
+                                    <li>• File I/O (aiofiles)</li>
+                                    <li>• WebSocket соединения</li>
+                                </ul>
+                            </div>
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--error);">
+                                <p class="font-bold mb-2" style="color: var(--error);">Когда НЕ использовать</p>
+                                <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                    <li>• CPU-bound задачи (используй multiprocessing)</li>
+                                    <li>• Блокирующий синхронный I/O</li>
+                                    <li>• Тяжёлые вычисления</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- НОВЫЙ БЛОК: CPU-bound в Asyncio -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">CPU-bound задачи в Asyncio</h4>
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                                <p class="font-bold mb-2" style="color: var(--warning);">Interview Trap: «А как запустить heavy функцию?»</p>
+                                <p class="text-sm mb-3" style="color: var(--fg-muted);">Если нужно выполнить тяжелую функцию в асинхронном коде, используй <code>loop.run_in_executor</code>. Это отправляет задачу в пул потоков или процессов, не блокируя Event Loop.</p>
+                                <pre><code>import asyncio
+from concurrent.futures import ProcessPoolExecutor
+
+def heavy_cpu_task(n):
+    # Блокирующая CPU задача
+    return sum(i * i for i in range(n))
+
+async def main():
+    loop = asyncio.get_running_loop()
+    
+    # ProcessPoolExecutor обходит GIL для CPU задач
+    with ProcessPoolExecutor() as pool:
+        # await не блокирует event loop!
+        result = await loop.run_in_executor(pool, heavy_cpu_task, 10**7)
+    
+    print(f"Result: {result}")
+
+asyncio.run(main())</code></pre>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">asyncio.create_task vs asyncio.gather</h4>
+                            <pre><code># create_task — запускает задачу в фоне
+task = asyncio.create_task(background_work())
+# ... делаем что-то другое ...
+await task  # ждём завершения когда нужно
+
+# gather — ждёт все задачи одновременно
+results = await asyncio.gather(
+    task1(),
+    task2(),
+    task3(),
+    return_exceptions=True  # не падать на ошибке
+)</code></pre>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'system-design',
+                title: 'System Design',
+                icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10',
+                content: `
+                    <div class="space-y-6">
+                        <!-- CAP Theorem -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">CAP Theorem</h4>
+                            <p class="mb-3" style="color: var(--fg-muted);">Распределённая система может гарантировать только два из трёх свойств одновременно.</p>
+                            <div class="grid gap-4 md:grid-cols-3">
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Consistency</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Все узлы видят одинаковые данные в один момент времени. Каждый read возвращает последний write.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Availability</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Каждый запрос получает ответ (успех или неудача). Система всегда доступна.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Partition Tolerance</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Система работает при потере сообщений между узлами. Обязательно для распределённых систем.</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 grid gap-3 md:grid-cols-2">
+                                <div class="p-3 rounded-lg" style="background: var(--code-bg);">
+                                    <p class="font-bold" style="color: var(--accent);">CP (Consistency + Partition)</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">MongoDB, HBase, Redis Cluster. Жертвуем доступностью при разделении.</p>
+                                </div>
+                                <div class="p-3 rounded-lg" style="background: var(--code-bg);">
+                                    <p class="font-bold" style="color: var(--warning);">AP (Availability + Partition)</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Cassandra, DynamoDB, CouchDB. Жертвуем строгой консистентностью.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Consistent Hashing -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Consistent Hashing</h4>
+                            <p class="mb-3" style="color: var(--fg-muted);">Техника распределения данных по узлам, минимизирующая перемещение данных при добавлении/удалении серверов.</p>
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                                    <p class="font-bold mb-2" style="color: var(--success);">Преимущества</p>
+                                    <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                        <li>• При добавлении узла перемещается только K/N данных</li>
+                                        <li>• Горизонтальное масштабирование без даунтайма</li>
+                                        <li>• Virtual nodes для балансировки нагрузки</li>
+                                    </ul>
+                                </div>
+                                <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                                    <p class="font-bold mb-2 highlight">Применение</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Redis Cluster, Cassandra, DynamoDB, CDN, Distributed caches. Hash ring с виртуальными узлами.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rate Limiting -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Rate Limiting Algorithms</h4>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Algorithm</th>
+                                            <th>Description</th>
+                                            <th>Pros</th>
+                                            <th>Cons</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>Token Bucket</code></td>
+                                            <td>Токены добавляются с фиксированной скоростью. Запрос забирает токен.</td>
+                                            <td>Позволяет burst traffic</td>
+                                            <td>Сложность с точной скоростью</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Leaky Bucket</code></td>
+                                            <td>Запросы в очередь, обрабатываются с постоянной скоростью.</td>
+                                            <td>Стабильный output rate</td>
+                                            <td>Нет burst, задержки</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Fixed Window</code></td>
+                                            <td>Считаем запросы за фиксированный интервал (минута, час).</td>
+                                            <td>Простота, мало памяти</td>
+                                            <td>Spike на границе окон</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Sliding Window Log</code></td>
+                                            <td>Храним timestamp каждого запроса, чистим старые.</td>
+                                            <td>Точный контроль</td>
+                                            <td>Много памяти</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Sliding Window Counter</code></td>
+                                            <td>Комбинация fixed window + weighted previous window.</td>
+                                            <td>Баланс точности и памяти</td>
+                                            <td>Приближённый подсчёт</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Circuit Breaker -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Circuit Breaker Pattern</h4>
+                            <p class="mb-3" style="color: var(--fg-muted);">Предотвращает каскадные сбои в распределённых системах. Отключает вызовы к сбойному сервису.</p>
+                            <div class="grid gap-4 md:grid-cols-3">
+                                <div class="principle-card" style="border-left: 3px solid var(--success);">
+                                    <h5 class="font-bold mb-2" style="color: var(--success);">Closed</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Нормальная работа. Запросы проходят. Считаем ошибки.</p>
+                                </div>
+                                <div class="principle-card" style="border-left: 3px solid var(--error);">
+                                    <h5 class="font-bold mb-2" style="color: var(--error);">Open</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Слишком много ошибок. Запросы отклоняются сразу. Таймер восстановления.</p>
+                                </div>
+                                <div class="principle-card" style="border-left: 3px solid var(--warning);">
+                                    <h5 class="font-bold mb-2" style="color: var(--warning);">Half-Open</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Пробуем несколько запросов. Успех → Closed, неудача → Open.</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 p-3 rounded-lg text-sm" style="background: var(--code-bg);">
+                                <p><span class="highlight">Реализации:</span> resilience4j (Java), tenacity (Python), Polly (C#), Hystrix (deprecated)</p>
+                            </div>
+                        </div>
+
+                        <!-- Sharding -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Database Sharding</h4>
+                            <p class="mb-3" style="color: var(--fg-muted);">Горизонтальное разделение данных по разным серверам (shards). Каждый shard содержит подмножество данных.</p>
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                                    <p class="font-bold mb-2 highlight">Стратегии шардирования</p>
+                                    <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                        <li><code>Range-based</code> — по диапазону ключа (A-M, N-Z)</li>
+                                        <li><code>Hash-based</code> — hash(key) % num_shards</li>
+                                        <li><code>Directory</code> — таблица маппинга ключ → shard</li>
+                                        <li><code>Geo-based</code> — по географическому признаку</li>
+                                    </ul>
+                                </div>
+                                <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                                    <p class="font-bold mb-2" style="color: var(--warning);">Проблемы</p>
+                                    <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                        <li>• Hot partitions (неравномерное распределение)</li>
+                                        <li>• Cross-shard JOINs (очень дорого)</li>
+                                        <li>• Rebalancing при добавлении shards</li>
+                                        <li>• Транзакции между shards</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CDN -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">CDN (Content Delivery Network)</h4>
+                            <p class="mb-3" style="color: var(--fg-muted);">Географически распределённые серверы для доставки контента с минимальной задержкой.</p>
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Что кешировать</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Static assets (CSS, JS, images), видео, статический HTML, API responses с длинным TTL.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Стратегии кеширования</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Cache-Control, ETag, Last-Modified, Vary header, Query string caching.</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 p-3 rounded-lg text-sm" style="background: var(--code-bg);">
+                                <p><span class="highlight">Провайдеры:</span> Cloudflare, AWS CloudFront, Fastly, Akamai</p>
+                            </div>
+                        </div>
+
+                        <!-- Load Balancing -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Load Balancing Algorithms</h4>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Algorithm</th>
+                                            <th>Description</th>
+                                            <th>Use Case</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>Round Robin</code></td>
+                                            <td>По очереди на каждый сервер</td>
+                                            <td>Однородные серверы, простые сервисы</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Weighted Round Robin</code></td>
+                                            <td>С весами для каждого сервера</td>
+                                            <td>Разная мощность серверов</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Least Connections</code></td>
+                                            <td>На сервер с минимумом активных соединений</td>
+                                            <td>Долгоживущие соединения (WebSocket)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>IP Hash</code></td>
+                                            <td>Хеш от IP клиента → сервер</td>
+                                            <td>Sticky sessions без external storage</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Least Response Time</code></td>
+                                            <td>На сервер с лучшим временем ответа</td>
+                                            <td>Когда важна latency</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Random</code></td>
+                                            <td>Случайный выбор</td>
+                                            <td>Простое распределение, тестирование</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-4 grid gap-3 md:grid-cols-2">
+                                <div class="p-3 rounded-lg" style="background: var(--code-bg);">
+                                    <p class="font-bold mb-1" style="color: var(--accent);">L4 Load Balancer</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Работает на уровне TCP/UDP. Маршрутизация по IP:port. Быстрый, но менее гибкий.</p>
+                                </div>
+                                <div class="p-3 rounded-lg" style="background: var(--code-bg);">
+                                    <p class="font-bold mb-1" style="color: var(--accent);">L7 Load Balancer</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Работает на уровне HTTP. Маршрутизация по URL, headers, cookies. SSL termination, rate limiting.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+                        {
+                id: 'redis',
+                title: 'Redis',
+                icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4',
+                content: `
+                    <div class="space-y-6">
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                            <p class="font-bold mb-2 highlight">In-Memory Data Structure Store</p>
+                            <p style="color: var(--fg-muted);">Redis (REmote DIctionary Server) — хранилище данных в оперативной памяти. Используется как кэш, брокер сообщений, база данных key-value.</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Типы данных</h4>
+                            <div class="grid gap-3 md:grid-cols-2">
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold">String</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Базовый тип. Кэши, счётчики (INCR), токены.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold">List</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Упорядоченный список. Очереди (LPUSH/RPOP), лента новостей.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold">Set / Sorted Set</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Уникальные значения. Теги, лидерборды (ZSET с score).</p>
+                                </div>
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold">Hash</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Поле-значение. Хранение объектов (user:1 -> {name, email}).</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Persistence (Сохранение данных)</h4>
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                                    <p class="font-bold mb-2" style="color: var(--success);">RDB (Snapshots)</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Периодическое сохранение дампа на диск. Компактный файл, быстрое восстановление. Риск потери данных между снимками.</p>
+                                </div>
+                                <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                                    <p class="font-bold mb-2" style="color: var(--warning);">AOF (Append Only File)</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Запись каждой операции в лог. Выше durability, но файл больше и медленнее. Можно перемешивать с RDB.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Use Cases</h4>
+                            <ul class="space-y-2 text-sm" style="color: var(--fg-muted);">
+                                <li><span class="highlight">Caching:</span> Кэш результатов DB запросов, сессий.</li>
+                                <li><span class="highlight">Rate Limiting:</span> Счётчики с TTL (INCR + EXPIRE).</li>
+                                <li><span class="highlight">Pub/Sub:</span> Простая система уведомлений.</li>
+                                <li><span class="highlight">Leaderboard:</span> ZSET для рейтингов.</li>
+                                <li><span class="highlight">Distributed Lock:</span> Redlock алгоритм.</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'rabbitmq',
+                title: 'RabbitMQ',
+                icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',
+                content: `
+                    <div class="space-y-6">
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                            <p class="font-bold mb-2 highlight">Message Broker (AMQP)</p>
+                            <p style="color: var(--fg-muted);">RabbitMQ реализует протокол AMQP. Гарантирует доставку, маршрутизацию сообщений. Идеален для очередей задач (Jobs) и RPC.</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Архитектура</h4>
+                            <pre><code>Producer -> Exchange -> [Bindings] -> Queue -> Consumer
+
+1. Exchange: Принимает сообщения от продюсера.
+2. Queue: Хранит сообщения.
+3. Binding: Правила связи между Exchange и Queue.</code></pre>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Типы Exchange</h4>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Routing Logic</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>Direct</code></td>
+                                            <td>Точное совпадение routing key.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Fanout</code></td>
+                                            <td>Рассылает во все привязанные очереди (broadcast).</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Topic</code></td>
+                                            <td>Паттерны (wildcards) <code>*.</code> и <code>#.</code> (user.*.created).</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Headers</code></td>
+                                            <td>Маршрутизация по заголовкам (редко).</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                                <p class="font-bold mb-2" style="color: var(--success);">Гарантии доставки</p>
+                                <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                    <li><b>ACK:</b> Consumer подтверждает обработку.</li>
+                                    <li><b>NACK:</b> Отказ, сообщение возвращается в очередь.</li>
+                                    <li><b>Durable:</b> Очередь переживает перезагрузку брокера.</li>
+                                </ul>
+                            </div>
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                                <p class="font-bold mb-2" style="color: var(--warning);">Dead Letter Exchange (DLX)</p>
+                                <p class="text-sm" style="color: var(--fg-muted);">Очередь для сообщений, которые не удалось обработать (rejected или expired). Важно для обработки ошибок.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'kafka',
+                title: 'Apache Kafka',
+                icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+                content: `
+                    <div class="space-y-6">
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                            <p class="font-bold mb-2 highlight">Distributed Event Streaming</p>
+                            <p style="color: var(--fg-muted);">Kafka — это распределённый лог событий (commit log). Высокая пропускная способность, горизонтальное масштабирование. Не удаляет сообщения после чтения.</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Ключевые концепции</h4>
+                            <div class="grid gap-3 md:grid-cols-2">
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold">Topic & Partition</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Топик — это лог. Разбивается на Partition'ы для параллелизма. Порядок гарантирован только внутри одной партиции.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold">Consumer Group</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Группа потребителей читает топик совместно. Каждая партиция читается только одним консьюмером в группе.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold">Offset</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Уникальный ID сообщения в партиции. Consumer хранит offset (где остановился).</p>
+                                </div>
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold">Broker & Zookeeper</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Broker — сервер Kafka. Zookeeper управляет метаданными кластера (в новых версиях KRaft mode).</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Retention Policy</h4>
+                            <p class="mb-2" style="color: var(--fg-muted);">В отличие от RabbitMQ, Kafka хранит сообщения долго (дни/недели) на диске.</p>
+                            <pre><code># Настройки retention
+log.retention.hours=168    # 7 дней
+log.retention.bytes=1073741824 # По размеру</code></pre>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Kafka vs RabbitMQ</h4>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Feature</th>
+                                            <th>RabbitMQ</th>
+                                            <th>Kafka</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Модель</td>
+                                            <td>Smart Broker (маршрутизация)</td>
+                                            <td>Smart Consumer (pull model)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Retention</td>
+                                            <td>Удаляет после ACK</td>
+                                            <td>Хранит по времени/размеру</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Throughput</td>
+                                            <td>Средний (~50k msg/s)</td>
+                                            <td>Очень высокий (миллионы)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Use case</td>
+                                            <td>Jobs, RPC, простые очереди</td>
+                                            <td>Event Sourcing, Logs, Streams</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'celery',
+                title: 'Celery',
+                icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+                content: `
+                    <div class="space-y-6">
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                            <p class="font-bold mb-2 highlight">Distributed Task Queue</p>
+                            <p style="color: var(--fg-muted);">Celery — асинхронная очередь задач для Python. Позволяет выносить тяжелые операции (отправка email, обработка видео) в фоновые воркеры.</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Архитектура</h4>
+                            <pre><code>Producer (Django/FastAPI)
+      |
+      v
+   Broker (Redis/RabbitMQ) <--- Result Backend (DB/Redis)
+      |
+      v
+   Workers (Processes consuming tasks)</code></pre>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Basic Usage</h4>
+                            <pre><code># tasks.py
+from celery import Celery
+
+app = Celery('tasks', broker='redis://localhost:6379/0')
+
+@app.task(bind=True, max_retries=3)
+def send_email(self, to, subject):
+    try:
+        # Логика отправки
+        pass
+    except Exception as exc:
+        raise self.retry(exc=exc, countdown=60) # Retry через 60 сек
+
+# Вызов задачи
+send_email.delay('user@example.com', 'Hello')  # Асинхронно
+send_email.apply_async(args=['user@example.com', 'Hi'], countdown=10) # Отложенный запуск</code></pre>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Celery Beat</h4>
+                            <p class="mb-2" style="color: var(--fg-muted);">Планировщик задач (cron для Python). Запускает задачи периодически.</p>
+                            <pre><code>app.conf.beat_schedule = {
+    'add-every-30-seconds': {
+        'task': 'tasks.add',
+        'schedule': 30.0,
+        'args': (16, 16)
+    },
+}
+# Запуск: celery -A proj beat</code></pre>
+                        </div>
+
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                                <p class="font-bold mb-2" style="color: var(--success);">Brokers</p>
+                                <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                    <li><b>Redis:</b> Быстро, просто, но теряет данные при падении.</li>
+                                    <li><b>RabbitMQ:</b> Надёжно, гарантирует доставку (ACK).</li>
+                                </ul>
+                            </div>
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                                <p class="font-bold mb-2" style="color: var(--warning);">Result Backend</p>
+                                <p class="text-sm" style="color: var(--fg-muted);">Нужен для хранения результатов задач (return value). Redis, Database (Django ORM), RPC.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+                        {
+                id: 'python-internals',
+                title: 'Python Internals (GIL, GC)',
+                icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z',
+                content: `
+                    <div class="space-y-6">
+                        <!-- GIL -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">GIL (Global Interpreter Lock)</h4>
+                            <div class="p-4 rounded-lg mb-4" style="background: var(--code-bg); border-left: 3px solid var(--error);">
+                                <p class="font-bold mb-1" style="color: var(--error);">Проблема</p>
+                                <p class="text-sm" style="color: var(--fg-muted);">Мьютект, который позволяет только одному потоку выполнять Python байт-код одновременно. Это упрощает управление памятью (reference counting), но блокирует параллелизм CPU-bound задач в threading.</p>
+                            </div>
+                            
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2" style="color: var(--success);">Когда GIL не мешает</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">I/O-bound задачи (network, file I/O, sleep). GIL отпускается во время ожидания I/O.</p>
+                                    <p class="text-sm font-mono mt-2" style="color: var(--accent);">→ Use Threads / Asyncio</p>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2" style="color: var(--warning);">Когда GIL мешает</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">CPU-bound задачи (обработка изображений, математика). Потоки не дадут ускорения.</p>
+                                    <p class="text-sm font-mono mt-2" style="color: var(--accent);">→ Use Multiprocessing</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Memory Management -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Memory Management</h4>
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold mb-2">Reference Counting</p>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Основной механизм. У каждого объекта есть счётчик ссылок. Когда refs == 0, память освобождается.</p>
+                                    <pre class="text-sm"><code>import sys
+a = []
+print(sys.getrefcount(a)) # 2 (a + аргумент)</code></pre>
+                                    <p class="text-xs mt-2" style="color: var(--error);">Минус: не удаляет циклические ссылки.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold mb-2">Garbage Collector (gc)</p>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Находит и удаляет циклические ссылки. Работает периодически.</p>
+                                    <pre class="text-sm"><code>import gc
+gc.collect()  # Принудительный запуск
+gc.disable()  # Отключить (редко нужно)</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Decorators & Generators -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Advanced: Decorators & Generators</h4>
+                            <div class="grid gap-4">
+                                <div class="p-4 rounded-lg" style="background: var(--code-bg);">
+                                    <p class="font-bold mb-2 highlight">Decorator with arguments</p>
+                                    <pre><code>def repeat(n):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            for _ in range(n):
+                result = func(*args, **kwargs)
+            return result
+        return wrapper
+    return decorator
+
+@repeat(n=3)
+def say_hello():
+    print("Hello!")</code></pre>
+                                </div>
+                                <div class="p-4 rounded-lg" style="background: var(--code-bg);">
+                                    <p class="font-bold mb-2 highlight">Generator (yield)</p>
+                                    <pre><code>def infinite_stream():
+    n = 0
+    while True:
+        yield n  # Pause and return value
+        n += 1
+
+gen = infinite_stream()
+print(next(gen))  # 0
+print(next(gen))  # 1
+
+# Generator expression
+sum(i*i for i in range(10))</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'orm-nplus1',
+                title: 'ORM & N+1 Problem',
+                icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4',
+                content: `
+                    <div class="space-y-6">
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--error);">
+                            <p class="font-bold mb-2" style="color: var(--error);">N+1 Problem</p>
+                            <p style="color: var(--fg-muted);">Ситуация, когда ORM выполняет 1 запрос на получение списка сущностей и N запросов на получение связанных данных для каждой сущности. Критическая проблема производительности.</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Пример проблемы (Django ORM)</h4>
+                            <pre><code># ПЛОХО: N+1 запросов
+authors = Author.objects.all()  # 1 query
+for author in authors:
+    print(author.book.title)    # N queries (1 per author!)
+
+# ХОРОШО: 1-2 запроса (Eager Loading)
+authors = Author.objects.select_related('book')
+# JOIN выполняется сразу</code></pre>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Решения: Lazy vs Eager Loading</h4>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Strategy</th>
+                                            <th>Django</th>
+                                            <th>SQLAlchemy</th>
+                                            <th>Use Case</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>JOIN (Eager)</code></td>
+                                            <td><code>select_related</code></td>
+                                            <td><code>joinedload</code></td>
+                                            <td>Foreign Key, One-to-One. Один большой запрос.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>IN clause (Eager)</code></td>
+                                            <td><code>prefetch_related</code></td>
+                                            <td><code>selectinload</code></td>
+                                            <td>Many-to-Many, Reverse FK. 2 запроса + merging in Python.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Lazy</code></td>
+                                            <td>Default</td>
+                                            <td>Default</td>
+                                            <td>Данные нужны редко или условно.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                                <p class="font-bold mb-2" style="color: var(--warning);">Django</p>
+                                <pre class="text-sm"><code># FK (One-to-Many)
+User.objects.select_related('profile')
+
+# M2M или Reverse FK
+Author.objects.prefetch_related('books')
+
+# Nested
+Author.objects.prefetch_related(
+    Prefetch('books', queryset=Book.objects.filter(year__gt=2000))
+)</code></pre>
+                            </div>
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                                <p class="font-bold mb-2" style="color: var(--warning);">SQLAlchemy</p>
+                                <pre class="text-sm"><code>from sqlalchemy.orm import joinedload, selectinload
+
+session.query(User).options(
+    joinedload(User.addresses) # Join
+).all()
+
+session.query(User).options(
+    selectinload(User.addresses) # IN clause
+).all()</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'http-api',
+                title: 'HTTP & API Design',
+                icon: 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9',
+                content: `
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">HTTP Methods</h4>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Method</th>
+                                            <th>CRUD</th>
+                                            <th>Idempotent</th>
+                                            <th>Safe</th>
+                                            <th>Body</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>GET</code></td>
+                                            <td>Read</td>
+                                            <td style="color: var(--success);">Yes</td>
+                                            <td style="color: var(--success);">Yes</td>
+                                            <td>No</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>POST</code></td>
+                                            <td>Create</td>
+                                            <td style="color: var(--error);">No</td>
+                                            <td style="color: var(--error);">No</td>
+                                            <td>Yes</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>PUT</code></td>
+                                            <td>Replace</td>
+                                            <td style="color: var(--success);">Yes</td>
+                                            <td style="color: var(--error);">No</td>
+                                            <td>Yes</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>PATCH</code></td>
+                                            <td>Update (partial)</td>
+                                            <td style="color: var(--warning);">Maybe</td>
+                                            <td style="color: var(--error);">No</td>
+                                            <td>Yes</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>DELETE</code></td>
+                                            <td>Delete</td>
+                                            <td style="color: var(--success);">Yes</td>
+                                            <td style="color: var(--error);">No</td>
+                                            <td>Can</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="mt-2 text-sm" style="color: var(--fg-muted);"><span class="highlight">Idempotent:</span> Повторный запрос даёт тот же результат. <span class="highlight">Safe:</span> Не меняет состояние сервера (только чтение).</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Status Codes</h4>
+                            <div class="grid gap-3 md:grid-cols-3">
+                                <div class="principle-card">
+                                    <p class="font-bold mb-1" style="color: var(--success);">2xx Success</p>
+                                    <p class="text-sm font-mono" style="color: var(--fg-muted);">
+                                        200 OK<br>
+                                        201 Created<br>
+                                        204 No Content
+                                    </p>
+                                </div>
+                                <div class="principle-card">
+                                    <p class="font-bold mb-1" style="color: var(--warning);">4xx Client Error</p>
+                                    <p class="text-sm font-mono" style="color: var(--fg-muted);">
+                                        400 Bad Request<br>
+                                        401 Unauthorized<br>
+                                        403 Forbidden<br>
+                                        404 Not Found<br>
+                                        422 Unprocessable
+                                    </p>
+                                </div>
+                                <div class="principle-card">
+                                    <p class="font-bold mb-1" style="color: var(--error);">5xx Server Error</p>
+                                    <p class="text-sm font-mono" style="color: var(--fg-muted);">
+                                        500 Internal Error<br>
+                                        502 Bad Gateway<br>
+                                        503 Unavailable
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mt-4 p-3 rounded-lg text-sm" style="background: var(--code-bg);">
+                                <p><span class="highlight">401 vs 403:</span> 401 — "Я не знаю кто ты" (нужен логин). 403 — "Я знаю кто ты, но тебе нельзя" (нет прав).</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">REST vs GraphQL vs gRPC</h4>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Aspect</th>
+                                            <th>REST</th>
+                                            <th>GraphQL</th>
+                                            <th>gRPC</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Protocol</td>
+                                            <td>HTTP/1.1, JSON</td>
+                                            <td>HTTP/1.1, JSON</td>
+                                            <td>HTTP/2, Protobuf (binary)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Speed</td>
+                                            <td>Normal</td>
+                                            <td>Slower (parsing)</td>
+                                            <td>Fastest (binary)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Use Case</td>
+                                            <td>Public APIs, CRUD</td>
+                                            <td>Complex UI, Mobile Apps</td>
+                                            <td>Microservices, Internal</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Pros</td>
+                                            <td>Simple, Cacheable</td>
+                                            <td>No over/under-fetching</td>
+                                            <td>Strict types, Streaming</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'auth-security',
+                title: 'Authentication & Security',
+                icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+                content: `
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">JWT vs Session Cookies</h4>
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">JWT (JSON Web Token)</h5>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Stateless. Токен хранит данные пользователя (claims). Подписывается сервером.</p>
+                                    <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                        <li style="color: var(--success);">+ Масштабируемость (нет сессий на сервере)</li>
+                                        <li style="color: var(--success);">+ Удобно для Microservices / Mobile</li>
+                                        <li style="color: var(--error);">– Нельзя отозвать сразу (wait for expiry)</li>
+                                        <li style="color: var(--error);">– Payload не зашифрован (только signed)</li>
+                                        <li style="color: var(--error);">– Размер заголовка растет</li>
+                                    </ul>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Session Cookies</h5>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Stateful. Сервер хранит сессию, клиент только ID в cookie.</p>
+                                    <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                        <li style="color: var(--success);">+ Легко отозвать (удалить сессию)</li>
+                                        <li style="color: var(--success);">+ Cookie защищена httpOnly flag</li>
+                                        <li style="color: var(--error);">– CSRF уязвимость (нужен CSRF token)</li>
+                                        <li style="color: var(--error);">– Проблемы с масштабированием (Redis для сессий)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">JWT Architecture</h4>
+                            <pre><code>1. User Login -> Server validates credentials
+2. Server generates JWT (Header.Payload.Signature)
+3. Client stores JWT (LocalStorage or Cookie)
+4. Client sends JWT in Header: Authorization: Bearer <token>
+5. Server verifies signature (no DB lookup needed)</token></code></pre>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Password Hashing</h4>
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--error);">
+                                <p class="font-bold mb-2" style="color: var(--error);">Никогда не храните пароли в открытом виде или через md5/sha1!</p>
+                            </div>
+                            <div class="grid gap-4 md:grid-cols-2 mt-4">
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Why Salt?</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Уникальная случайная строка добавляется к паролю перед хешированием. Защищает от Rainbow Table атак (предвычисленных хешей).</p>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Algorithms</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Использовать медленные алгоритмы:</p>
+                                    <p class="font-mono text-sm" style="color: var(--accent);">bcrypt, argon2, scrypt, PBKDF2</p>
+                                </div>
+                            </div>
+                            <pre class="mt-4"><code># Python (passlib)
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+hashed = pwd_context.hash("password123")
+pwd_context.verify("password123", hashed) # True</code></pre>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Common Vulnerabilities</h4>
+                            <div class="grid gap-3">
+                                <div class="p-3 rounded-lg" style="background: var(--code-bg);">
+                                    <p class="font-bold" style="color: var(--warning);">SQL Injection</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Use ORM or Parameterized queries. NEVER f-string SQL.</p>
+                                </div>
+                                <div class="p-3 rounded-lg" style="background: var(--code-bg);">
+                                    <p class="font-bold" style="color: var(--warning);">XSS (Cross-Site Scripting)</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Sanitize user input. Use Content-Security-Policy (CSP) headers.</p>
+                                </div>
+                                <div class="p-3 rounded-lg" style="background: var(--code-bg);">
+                                    <p class="font-bold" style="color: var(--warning);">CSRF (Cross-Site Request Forgery)</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Use CSRF Tokens. For APIs: SameSite cookie attribute or check Origin header.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'postgres-indexes',
+                title: 'PostgreSQL Indexes',
+                icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4',
+                content: `
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Типы индексов</h4>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Use Case</th>
+                                            <th>Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>B-Tree</code></td>
+                                            <td>По умолчанию. Equality, range, sorting</td>
+                                            <td>&lt;, &gt;, =, BETWEEN, ORDER BY</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Hash</code></td>
+                                            <td>Только equality (=)</td>
+                                            <td>Редко используется, нет WAL</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>GiST</code></td>
+                                            <td>Геометрия, full-text search</td>
+                                            <td>PostGIS, tsvector</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>GIN</code></td>
+                                            <td>Массивы, JSONB, full-text</td>
+                                            <td>Медленный INSERT, быстрый SELECT</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>BRIN</code></td>
+                                            <td>Огромные таблицы с упорядоченными данными</td>
+                                            <td>Очень маленький, блочный</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Создание индексов</h4>
+                            <pre><code>-- Обычный индекс
+CREATE INDEX idx_users_email ON users(email);
+
+-- Составной индекс (порядок важен!)
+CREATE INDEX idx_users_name_date ON users(last_name, created_at);
+
+-- Частичный индекс (экономит место)
+CREATE INDEX idx_active_users ON users(email) WHERE is_active = true;
+
+-- Уникальный индекс
+CREATE UNIQUE INDEX idx_users_email_unique ON users(email);
+
+-- Expression index
+CREATE INDEX idx_users_lower_email ON users(LOWER(email));
+
+-- Concurrent creation (без блокировки записи)
+CREATE INDEX CONCURRENTLY idx_users_name ON users(name);</code></pre>
+                        </div>
+                        
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                                <p class="font-bold mb-2" style="color: var(--success);">Когда индекс полезен</p>
+                                <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                    <li>• WHERE условия с высокой селективностью</li>
+                                    <li>• JOIN по внешним ключам</li>
+                                    <li>• ORDER BY с LIMIT</li>
+                                    <li>• Часто запрашиваемые столбцы</li>
+                                </ul>
+                            </div>
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--error);">
+                                <p class="font-bold mb-2" style="color: var(--error);">Когда индекс вреден</p>
+                                <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                    <li>• Маленькие таблицы (&lt;1000 строк)</li>
+                                    <li>• Низкая селективность (много дубликатов)</li>
+                                    <li>• Частые INSERT/UPDATE/DELETE</li>
+                                    <li>• Возвращается большая часть таблицы</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                            <p class="font-bold mb-2 highlight">Leftmost Prefix Rule</p>
+                            <p class="text-sm mb-2" style="color: var(--fg-muted);">Составной индекс <code>(a, b, c)</code> работает для:</p>
+                            <ul class="space-y-1 text-sm font-mono" style="color: var(--fg-muted);">
+                                <li>• WHERE a = 1</li>
+                                <li>• WHERE a = 1 AND b = 2</li>
+                                <li>• WHERE a = 1 AND b = 2 AND c = 3</li>
+                            </ul>
+                            <p class="text-sm mt-2" style="color: var(--fg-muted);">НЕ работает для: <code>WHERE b = 2</code> или <code>WHERE c = 3</code></p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'postgres-transactions',
+                title: 'PostgreSQL Transactions & Isolation',
+                icon: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4',
+                content: `
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Уровни изоляции</h4>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Level</th>
+                                            <th>Dirty Read</th>
+                                            <th>Non-repeatable Read</th>
+                                            <th>Phantom Read</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>Read Uncommitted</code></td>
+                                            <td style="color: var(--error);">Possible</td>
+                                            <td style="color: var(--error);">Possible</td>
+                                            <td style="color: var(--error);">Possible</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Read Committed</code> *</td>
+                                            <td style="color: var(--success);">Not possible</td>
+                                            <td style="color: var(--error);">Possible</td>
+                                            <td style="color: var(--error);">Possible</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Repeatable Read</code></td>
+                                            <td style="color: var(--success);">Not possible</td>
+                                            <td style="color: var(--success);">Not possible</td>
+                                            <td style="color: var(--success);">Not possible**</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Serializable</code></td>
+                                            <td style="color: var(--success);">Not possible</td>
+                                            <td style="color: var(--success);">Not possible</td>
+                                            <td style="color: var(--success);">Not possible</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="mt-2 text-sm" style="color: var(--fg-muted);">* Default в PostgreSQL. ** В PostgreSQL Repeatable Read защищает от Phantom Read</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Проблемы параллелизма</h4>
+                            <div class="grid gap-4 md:grid-cols-3">
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Dirty Read</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Чтение незафиксированных данных другой транзакции</p>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Non-repeatable Read</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Повторное чтение возвращает другой результат (изменили строку)</p>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Phantom Read</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Появление/исчезновение строк при повторном запросе</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Управление транзакциями</h4>
+                            <pre><code>-- Начать транзакцию
+BEGIN;
+-- или
+START TRANSACTION;
+
+-- Установить уровень изоляции
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+-- Зафиксировать изменения
+COMMIT;
+
+-- Откатить изменения
+ROLLBACK;
+
+-- Savepoint для частичного отката
+SAVEPOINT my_savepoint;
+ROLLBACK TO SAVEPOINT my_savepoint;</code></pre>
+                        </div>
+                        
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                                <p class="font-bold mb-2" style="color: var(--warning);">Read Committed</p>
+                                <p class="text-sm" style="color: var(--fg-muted);">Каждый запрос видит данные, зафиксированные до его начала. Хорошо для высокой конкурентности.</p>
+                            </div>
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                                <p class="font-bold mb-2 highlight">Repeatable Read</p>
+                                <p class="text-sm" style="color: var(--fg-muted);">Снапшот на момент начала транзакции. Все запросы видят одинаковые данные. Требует обработки SerializationError.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'postgres-locks',
+                title: 'PostgreSQL Locking Strategies',
+                icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
+                content: `
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Pessimistic Locking</h4>
+                            <p class="mb-3" style="color: var(--fg-muted);">Блокировка данных заранее, до модификации. Предотвращает конфликты.</p>
+                            <pre><code>-- SELECT FOR UPDATE — блокирует строки
+BEGIN;
+SELECT * FROM accounts WHERE id = 1 FOR UPDATE;
+-- Теперь никто не может изменить эту строку
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+COMMIT;
+
+-- FOR UPDATE NOWAIT — ошибка если строка заблокирована
+SELECT * FROM accounts WHERE id = 1 FOR UPDATE NOWAIT;
+
+-- FOR UPDATE SKIP LOCKED — пропустить заблокированные
+SELECT * FROM tasks WHERE status = 'pending' FOR UPDATE SKIP LOCKED LIMIT 1;</code></pre>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Optimistic Locking</h4>
+                            <p class="mb-3" style="color: var(--fg-muted);">Проверка при обновлении, что данные не изменились. Обычно через version column.</p>
+                            <pre><code>-- Добавляем колонку версии
+ALTER TABLE products ADD COLUMN version INT DEFAULT 1;
+
+-- При чтении получаем текущую версию
+SELECT id, name, quantity, version FROM products WHERE id = 1;
+
+-- При обновлении проверяем версию
+UPDATE products 
+SET quantity = quantity - 1, version = version + 1 
+WHERE id = 1 AND version = 5;
+
+-- Если affected_rows = 0, значит данные изменились
+-- Нужно повторить чтение и обновление</code></pre>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Strategy</th>
+                                        <th>Когда использовать</th>
+                                        <th>Pros</th>
+                                        <th>Cons</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>Pessimistic</code></td>
+                                        <td>Высокая конкуренция за данные</td>
+                                        <td>Гарантия целостности</td>
+                                        <td>Блокировки, deadlocks</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>Optimistic</code></td>
+                                        <td>Низкая конкуренция</td>
+                                        <td>Нет блокировок, выше throughput</td>
+                                        <td>Retries при конфликтах</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Row-level Locks</h4>
+                            <div class="grid gap-3 md:grid-cols-2">
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold">FOR UPDATE</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Эксклюзивная блокировка. Для UPDATE/DELETE.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold">FOR SHARE</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Разделяемая блокировка. Можно читать, нельзя писать.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold">FOR NO KEY UPDATE</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Блокировка без блокировки внешних ключей.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold">FOR KEY SHARE</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Разделяемая для FK. Совместим с NO KEY UPDATE.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                            <p class="font-bold mb-2" style="color: var(--success);">SKIP LOCKED для очередей</p>
+                            <pre><code>-- Идеально для job queue: берём задачу и не блокируем других
+UPDATE tasks 
+SET status = 'processing', worker_id = :worker_id
+WHERE id = (
+    SELECT id FROM tasks 
+    WHERE status = 'pending'
+    ORDER BY created_at
+    FOR UPDATE SKIP LOCKED
+    LIMIT 1
+)
+RETURNING *;</code></pre>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'mvcc',
+                title: 'MVCC, Snapshots & VACUUM',
+                icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+                content: `
+                    <div class="space-y-6">
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                            <p class="font-bold mb-2 highlight">MVCC — Multi-Version Concurrency Control</p>
+                            <p style="color: var(--fg-muted);">PostgreSQL не перезаписывает строки при UPDATE/DELETE. Создаются новые версии, старые сохраняются для активных транзакций. Читатели не блокируют писателей.</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Как работает MVCC</h4>
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold mb-2">xmin</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">ID транзакции, создавшей строку. Видна всем транзакциям с ID ≥ xmin.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold mb-2">xmax</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">ID транзакции, удалившей/обновившей строку. Строка невидима для транзакций с ID ≥ xmax.</p>
+                                </div>
+                            </div>
+                            <pre class="mt-4"><code>-- Посмотреть системные колонки
+SELECT xmin, xmax, * FROM users LIMIT 5;
+
+-- При UPDATE:
+-- 1. Создаётся новая версия строки (новый xmin)
+-- 2. Старая строка получает xmax = ID текущей транзакции
+-- 3. Старая строка становится "dead tuple"</code></pre>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Snapshots</h4>
+                            <p class="mb-3" style="color: var(--fg-muted);">Снапшот определяет, какие строки видны транзакции. Создаётся в момент первого запроса (Read Committed) или в начале транзакции (Repeatable Read).</p>
+                            <pre><code>-- Посмотреть текущий снапшот
+SELECT pg_current_snapshot();
+
+-- Формат: xmin:xmax:xip_list
+-- 100:150:101,102,105
+-- Видны строки с xmin < 100 (созданные до)
+-- Невидимы строки с xmax в списке активных транзакций</code></pre>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">VACUUM</h4>
+                            <div class="p-4 rounded-lg mb-4" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                                <p class="font-bold mb-2" style="color: var(--warning);">Dead Tuples = Bloat</p>
+                                <p class="text-sm" style="color: var(--fg-muted);">UPDATE/DELETE создают "мёртвые" строки. Они занимают место, замедляют сканирование. VACUUM помечает место как доступное для повторного использования.</p>
+                            </div>
+                            <pre><code>-- Ручной запуск
+VACUUM users;              -- Освободить место для повторного использования
+VACUUM FULL users;         -- Перестроить таблицу (блокирует!)
+VACUUM ANALYZE users;      -- + обновить статистику
+
+-- Autovacuum настраивается:
+-- autovacuum_vacuum_threshold = 50
+-- autovacuum_vacuum_scale_factor = 0.2
+
+-- Посмотреть dead tuples
+SELECT schemaname, relname, n_dead_tup, n_live_tup,
+       n_dead_tup::float / NULLIF(n_live_tup, 0) as dead_ratio
+FROM pg_stat_user_tables 
+WHERE n_dead_tup > 0;</code></pre>
+                        </div>
+                        
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                                <p class="font-bold mb-2" style="color: var(--success);">VACUUM</p>
+                                <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                    <li>• Не блокирует таблицу</li>
+                                    <li>• Помечает dead space для reuse</li>
+                                    <li>• Не возвращает место ОС</li>
+                                    <li>• Обновляет visibility map</li>
+                                </ul>
+                            </div>
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--error);">
+                                <p class="font-bold mb-2" style="color: var(--error);">VACUUM FULL</p>
+                                <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                    <li>• Блокирует таблицу (ACCESS EXCLUSIVE)</li>
+                                    <li>• Переписывает таблицу без dead tuples</li>
+                                    <li>• Возвращает место ОС</li>
+                                    <li>• Требует столько же места</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'explain',
+                title: 'EXPLAIN & Query Analysis',
+                icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01',
+                content: `
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Форматы EXPLAIN</h4>
+                            <pre><code>-- Базовый план
+EXPLAIN SELECT * FROM users WHERE email = 'test@example.com';
+
+-- С реальным выполнением
+EXPLAIN ANALYZE SELECT * FROM users WHERE email = 'test@example.com';
+
+-- Детально с буферами
+EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT) 
+SELECT * FROM users WHERE email = 'test@example.com';
+
+-- JSON формат для парсинга
+EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) 
+SELECT * FROM users;</code></pre>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Ключевые метрики</h4>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Metric</th>
+                                            <th>Description</th>
+                                            <th>What to look for</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>cost=0.00..1.01</code></td>
+                                            <td>Планируемая стоимость</td>
+                                            <td>Относительные значения для сравнения планов</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>rows=1</code></td>
+                                            <td>Ожидаемое кол-во строк</td>
+                                            <td>Сравнить с actual rows — большая разница = плохая статистика</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>actual time=0.02..0.03</code></td>
+                                            <td>Реальное время в ms</td>
+                                            <td>Сумма всех actual time = общее время запроса</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>actual rows=1</code></td>
+                                            <td>Реальное кол-во строк</td>
+                                            <td>Сравнить с estimated rows</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>Buffers: shared hit=8</code></td>
+                                            <td>Кешированные страницы</td>
+                                            <td>hit — из cache, read — с диска</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Типы сканирования (от плохого к хорошему)</h4>
+                            <div class="space-y-3">
+                                <div class="principle-card" style="border-left: 3px solid var(--error);">
+                                    <p class="font-mono font-bold">Seq Scan</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Полное сканирование таблицы. Плохо для больших таблиц, если нужна одна строка.</p>
+                                </div>
+                                <div class="principle-card" style="border-left: 3px solid var(--warning);">
+                                    <p class="font-mono font-bold">Bitmap Index Scan + Bitmap Heap Scan</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Индекс используется, но страниц много. Загружает в memory bitmap.</p>
+                                </div>
+                                <div class="principle-card" style="border-left: 3px solid var(--success);">
+                                    <p class="font-mono font-bold">Index Scan</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Прямое чтение из индекса + heap fetch. Отлично для малого кол-ва строк.</p>
+                                </div>
+                                <div class="principle-card" style="border-left: 3px solid var(--success);">
+                                    <p class="font-mono font-bold">Index Only Scan</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Все данные в индексе, heap fetch не нужен. Идеально для covering index.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Пример анализа</h4>
+                            <pre><code>EXPLAIN ANALYZE SELECT * FROM orders WHERE user_id = 123;
+
+-- Плохой план:
+-- Seq Scan on orders  (cost=0.00..25000.00 rows=5 loops=1)
+--   Filter: (user_id = 123)
+--   Rows Removed by Filter: 999995
+-- Total runtime: 350.123 ms
+
+-- Проблема: Seq Scan вместо Index Scan
+-- Решение: CREATE INDEX idx_orders_user_id ON orders(user_id);
+
+-- Хороший план:
+-- Index Scan using idx_orders_user_id on orders  (cost=0.42..8.44 rows=5 loops=1)
+--   Index Cond: (user_id = 123)
+-- Total runtime: 0.089 ms</code></pre>
+                        </div>
+                        
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                                <p class="font-bold mb-2" style="color: var(--warning);">Red Flags</p>
+                                <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                    <li>• Seq Scan на больших таблицах</li>
+                                    <li>• huge rows vs tiny actual rows</li>
+                                    <li>• Nested Loop с огромным outer</li>
+                                    <li>• Sort вместо Index Scan для ORDER BY</li>
+                                </ul>
+                            </div>
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                                <p class="font-bold mb-2" style="color: var(--success);">Оптимизация</p>
+                                <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                    <li>• ANALYZE таблицы для актуальной статистики</li>
+                                    <li>• Покрывающие индексы для Index Only Scan</li>
+                                    <li>• Partial indexes для частых фильтров</li>
+                                    <li>• Переписать запрос если JOIN неэффективен</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+                        {
+                id: 'design-patterns',
+                title: 'Design Patterns',
+                icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z',
+                content: `
+                    <div class="space-y-6">
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                            <p style="color: var(--fg-muted);">Паттерны GoF (Gang of Four) делятся на 3 категории: <span class="highlight">Порождающие</span> (Creational), <span class="highlight">Структурные</span> (Structural) и <span class="highlight">Поведенческие</span> (Behavioral). В Python многие паттерны упрощаются или заменяются языковыми конструкциями.</p>
+                        </div>
+
+                        <!-- Creational -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Creational Patterns</h4>
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Singleton</h5>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Гарантирует единственный экземпляр класса. В Python часто заменяется модулем.</p>
+                                    <pre class="text-sm"><code># Способ 1: Metaclass (Best Practice)
+class SingletonMeta(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super().__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+class Database(metaclass=SingletonMeta):
+    pass
+
+# Способ 2: Module (Pythonic Way)
+# my_singleton.py
+# class _Database: ...
+# instance = _Database()</code></pre>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Factory Method</h5>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Определяет интерфейс создания объекта, но оставляет подклассам решение о том, какой класс инстанцировать.</p>
+                                    <pre class="text-sm"><code>class Dialog:
+    def create_button(self):
+        pass  # Factory method
+
+class WindowsDialog(Dialog):
+    def create_button(self):
+        return WindowsButton()
+
+class WebDialog(Dialog):
+    def create_button(self):
+        return HTMLButton()</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Structural -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Structural Patterns</h4>
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Adapter</h5>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Позволяет объектам с несовместимыми интерфейсами работать вместе.</p>
+                                    <pre class="text-sm"><code>class Target:
+    def request(self): return "Target"
+
+class Adaptee:
+    def specific_request(self): return "Adaptee"
+
+class Adapter(Target):
+    def __init__(self, adaptee):
+        self.adaptee = adaptee
+    
+    def request(self):
+        return self.adaptee.specific_request()</code></pre>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Decorator (Pattern vs Python Feature)</h5>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Динамически добавляет объекту новую функциональность. Python декораторы (@) — это синтаксический сахар для этого паттерна.</p>
+                                    <pre class="text-sm"><code># Паттерн "Декоратор" (обертка)
+class Coffee:
+    def cost(self): return 5
+
+class MilkDecorator:
+    def __init__(self, coffee):
+        self.coffee = coffee
+    
+    def cost(self):
+        return self.coffee.cost() + 2</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Behavioral -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Behavioral Patterns</h4>
+                            <div class="grid gap-4">
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Strategy</h5>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Определяет семейство алгоритмов, инкапсулирует их и делает взаимозаменяемыми. В Python можно передавать функции.</p>
+                                    <pre class="text-sm"><code>def fast_sort(data): return sorted(data)
+def slow_sort(data): return list(reversed(sorted(data)))
+
+class Sorter:
+    def __init__(self, strategy):
+        self.strategy = strategy
+    
+    def sort(self, data):
+        return self.strategy(data)
+
+sorter = Sorter(fast_sort)
+sorter.sort([3, 1, 2])</code></pre>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Observer</h5>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Создает механизм подписки, когда объекты автоматически узнают об изменениях другого объекта (Event system).</p>
+                                    <pre class="text-sm"><code>class Observable:
+    def __init__(self):
+        self._observers = []
+
+    def attach(self, observer):
+        self._observers.append(observer)
+
+    def notify(self, message):
+        for observer in self._observers:
+            observer.update(message)
+
+class Observer:
+    def update(self, message):
+        print(f"Got: {message}")</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                            <p class="font-bold mb-2" style="color: var(--warning);">Anti-Patterns (чего избегать)</p>
+                            <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                <li>• <b>God Object:</b> Класс, который "знает слишком много" или делает слишком много.</li>
+                                <li>• <b>Spaghetti Code:</b> Запутанная структура, трудная для поддержки.</li>
+                                <li>• <b>Copy-Paste Programming:</b> Дублирование кода вместо рефакторинга.</li>
+                                <li>• <b>Premature Optimization:</b> Оптимизация до того, как выявлены узкие места.</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+			{
+                id: 'testing',
+                title: 'Testing (pytest & mocks)',
+                icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+                content: `
+                    <div class="space-y-6">
+                        <!-- Testing Pyramid -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Testing Pyramid</h4>
+                            <div class="grid gap-3 md:grid-cols-3">
+                                <div class="principle-card" style="border-left: 3px solid var(--success);">
+                                    <h5 class="font-bold mb-1">Unit Tests</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Изолированные тесты функций/методов. Быстрые, много.</p>
+                                    <p class="text-xs mt-2 font-mono" style="color: var(--fg-muted);">Speed: Fast | Cost: Low</p>
+                                </div>
+                                <div class="principle-card" style="border-left: 3px solid var(--warning);">
+                                    <h5 class="font-bold mb-1">Integration Tests</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Проверка взаимодействия компонентов (API + DB). Медленнее.</p>
+                                    <p class="text-xs mt-2 font-mono" style="color: var(--fg-muted);">Speed: Med | Cost: Med</p>
+                                </div>
+                                <div class="principle-card" style="border-left: 3px solid var(--error);">
+                                    <h5 class="font-bold mb-1">E2E Tests</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Полный сценарий пользователя (UI + Browser). Самые медленные.</p>
+                                    <p class="text-xs mt-2 font-mono" style="color: var(--fg-muted);">Speed: Slow | Cost: High</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pytest Essentials -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Pytest Essentials</h4>
+                            <div class="grid gap-4">
+                                <div class="p-4 rounded-lg" style="background: var(--code-bg);">
+                                    <p class="font-bold mb-2 highlight">Fixtures</p>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Подготовка данных/состояния для тестов. Встроенные: <code>tmp_path</code>, <code>capsys</code>, <code>monkeypatch</code>.</p>
+                                    <pre><code># conftest.py (shared fixtures)
+import pytest
+
+@pytest.fixture
+def db_session():
+    db = Database()
+    db.connect()
+    yield db  # Setup
+    db.close() # Teardown
+
+def test_query(db_session):
+    assert db_session.query("SELECT 1")</code></pre>
+                                </div>
+                                
+                                <div class="p-4 rounded-lg" style="background: var(--code-bg);">
+                                    <p class="font-bold mb-2 highlight">Parametrize</p>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Запуск одного теста с разными данными.</p>
+                                    <pre><code>@pytest.mark.parametrize("input,expected", [
+    (1, 1),
+    (2, 4),
+    (3, 9),
+])
+def test_square(input, expected):
+    assert square(input) == expected</code></pre>
+                                </div>
+
+                                <div class="p-4 rounded-lg" style="background: var(--code-bg);">
+                                    <p class="font-bold mb-2 highlight">Exceptions</p>
+                                    <pre><code>import pytest
+
+def test_zero_division():
+    with pytest.raises(ZeroDivisionError):
+        1 / 0</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mocking -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Mocking (unittest.mock)</h4>
+                            <p class="mb-3" style="color: var(--fg-muted);">Замена реальных объектов на "заглушки" для изоляции тестов.</p>
+                            
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Patch</h5>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Подмена объекта во время теста.</p>
+                                    <pre class="text-sm"><code>from unittest.mock import patch
+
+# Context manager
+with patch('module.requests.get') as mock_get:
+    mock_get.return_value.json.return_value = {"id": 1}
+    # call function using requests.get
+
+# Decorator
+@patch('module.ClassName')
+def test_something(mock_class):
+    ...</code></pre>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Mock vs MagicMock</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);"><code>Mock</code>: Базовая заглушка.</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);"><code>MagicMock</code>: Поддерживает magic methods (<code>__str__</code>, <code>__getitem__</code>).</p>
+                                    <pre class="text-sm"><code>mock = MagicMock()
+mock.__str__.return_value = "Custom"
+str(mock)  # "Custom"
+
+# Assertions
+mock.method.assert_called_once()
+mock.method.assert_called_with(1, 2)</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TDD -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">TDD (Test Driven Development)</h4>
+                            <div class="flex items-center gap-4 overflow-x-auto pb-2">
+                                <div class="flex-shrink-0 px-4 py-2 rounded-lg font-bold" style="background: rgba(239, 68, 68, 0.15); color: var(--error);">1. Red</div>
+                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                <div class="flex-shrink-0 px-4 py-2 rounded-lg font-bold" style="background: rgba(16, 185, 129, 0.15); color: var(--success);">2. Green</div>
+                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                <div class="flex-shrink-0 px-4 py-2 rounded-lg font-bold" style="background: rgba(245, 158, 11, 0.15); color: var(--warning);">3. Refactor</div>
+                            </div>
+                            <div class="mt-3 grid gap-3 text-sm" style="color: var(--fg-muted);">
+                                <p><span class="highlight" style="color: var(--error);">Red:</span> Написать падающий тест (функции еще нет).</p>
+                                <p><span class="highlight" style="color: var(--success);">Green:</span> Написать минимальный код, чтобы тест прошел.</p>
+                                <p><span class="highlight" style="color: var(--warning);">Refactor:</span> Улучшить код, сохраняя тесты зелеными.</p>
+                            </div>
+                        </div>
+
+                        <!-- Useful Commands -->
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">CLI Commands</h4>
+                            <div class="grid gap-2 font-mono text-sm">
+                                <div class="flex gap-4 p-2 rounded" style="background: var(--code-bg);">
+                                    <span style="color: var(--accent);">run</span>
+                                    <span style="color: var(--fg-muted);">pytest tests/ -v</span>
+                                </div>
+                                <div class="flex gap-4 p-2 rounded" style="background: var(--code-bg);">
+                                    <span style="color: var(--accent);">filter</span>
+                                    <span style="color: var(--fg-muted);">pytest -k "test_name_pattern"</span>
+                                </div>
+                                <div class="flex gap-4 p-2 rounded" style="background: var(--code-bg);">
+                                    <span style="color: var(--accent);">markers</span>
+                                    <span style="color: var(--fg-muted);">pytest -m slow</span>
+                                </div>
+                                <div class="flex gap-4 p-2 rounded" style="background: var(--code-bg);">
+                                    <span style="color: var(--accent);">coverage</span>
+                                    <span style="color: var(--fg-muted);">pytest --cov=myproject tests/</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        // State
+        let currentTheme = localStorage.getItem('theme') || 'dark';
+        let openTopics = new Set();
+        let mobileMenuOpen = false;
+
+        // DOM Elements - initialized after DOMContentLoaded
+        let themeToggle = null;
+        let mobileMenuBtn = null;
+        let closeMobileMenuBtn = null;
+        let mobileMenu = null;
+        let desktopNavLinks = null;
+        let mobileNavLinks = null;
+        let topicsContainer = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize DOM references
+            themeToggle = document.getElementById('themeToggle');
+            mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            closeMobileMenuBtn = document.getElementById('closeMobileMenu');
+            mobileMenu = document.getElementById('mobileMenu');
+            desktopNavLinks = document.getElementById('desktopNavLinks');
+            mobileNavLinks = document.getElementById('mobileNavLinks');
+            topicsContainer = document.getElementById('topicsContainer');
+
+            // Set initial theme
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            
+            // Render navigation and topics
+            renderNavigation();
+            renderTopics();
+            
+            // Event listeners
+            themeToggle.addEventListener('click', toggleTheme);
+            mobileMenuBtn.addEventListener('click', () => toggleMobileMenu(true));
+            closeMobileMenuBtn.addEventListener('click', () => toggleMobileMenu(false));
+            
+            // Navigation click handlers - Added logic to open topics
+            const handleNavClick = (e) => {
+                const link = e.target.closest('.nav-link');
+                if (!link) return;
+
+                const targetId = link.getAttribute('href').substring(1);
+                if (targetId) {
+                    // Ensure topic is open
+                    const card = document.querySelector(`#${targetId} .topic-card`);
+                    if (card && !card.classList.contains('open')) {
+                        toggleTopic(targetId);
+                    }
+                    // Close mobile menu if open
+                    if (mobileMenuOpen) {
+                        toggleMobileMenu(false);
+                    }
+                }
+            };
+
+            desktopNavLinks.addEventListener('click', handleNavClick);
+            mobileNavLinks.addEventListener('click', handleNavClick);
+            
+            // Intersection observer for active nav
+            const observer = new IntersectionObserver(updateActiveNav, {
+                rootMargin: '-20% 0px -80% 0px'
+            });
+            
+            // Use a mutation observer to wait for elements if needed, 
+            // but renderTopics is synchronous so elements should exist here.
+            document.querySelectorAll('.topic-section').forEach(section => {
+                observer.observe(section);
+            });
+        });
+
+        function toggleTheme() {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+        }
+
+        function toggleMobileMenu(open) {
+            mobileMenuOpen = open;
+            mobileMenu.classList.toggle('open', open);
+            document.body.style.overflow = open ? 'hidden' : '';
+        }
+
+        function renderNavigation() {
+            const navHTML = topics.map(topic => `
+                <a href="#${topic.id}" class="nav-link block" data-section="${topic.id}">
+                    ${topic.title}
+                </a>
+            `).join('');
+            
+            desktopNavLinks.innerHTML = navHTML;
+            mobileNavLinks.innerHTML = navHTML;
+        }
+
+        function renderTopics() {
+            topicsContainer.innerHTML = topics.map((topic, index) => `
+                <section id="${topic.id}" class="topic-section animate-in delay-${Math.min(index, 4)}">
+                    <div class="topic-card ${openTopics.has(topic.id) ? 'open' : ''}">
+                        <div class="topic-header" onclick="toggleTopic('${topic.id}')" role="button" aria-expanded="${openTopics.has(topic.id)}" tabindex="0">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background: rgba(34, 211, 238, 0.15);">
+                                    <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${topic.icon}"/>
+                                    </svg>
+                                </div>
+                                <h2 class="font-bold text-lg">${topic.title}</h2>
+                            </div>
+                            <svg class="chevron w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                        <div class="topic-content">
+                            ${topic.content}
+                        </div>
+                    </div>
+                </section>
+            `).join('');
+            
+            // Keyboard support for topic headers
+            document.querySelectorAll('.topic-header').forEach(header => {
+                header.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        header.click();
+                    }
+                });
+            });
+        }
+
+        function toggleTopic(topicId) {
+            const card = document.querySelector(`#${topicId} .topic-card`);
+            if (openTopics.has(topicId)) {
+                openTopics.delete(topicId);
+                card.classList.remove('open');
+            } else {
+                openTopics.add(topicId);
+                card.classList.add('open');
+            }
+        }
+
+        function updateActiveNav(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const sectionId = entry.target.id;
+                    
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.toggle('active', link.dataset.section === sectionId);
+                    });
+                }
+            });
+        }
+
+        // Make toggleTopic available globally
+        window.toggleTopic = toggleTopic;
+    </script>
+</body>
+</html>
