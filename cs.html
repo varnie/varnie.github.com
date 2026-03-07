@@ -1691,7 +1691,7 @@ send_email.apply_async(args=['user@example.com', 'Hi'], countdown=10) # Отло
                     </div>
                 `
             },
-                        {
+            {
                 id: 'python-internals',
                 title: 'Python Internals (GIL, GC)',
                 icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z',
@@ -1775,6 +1775,113 @@ print(next(gen))  # 1
 # Generator expression
 sum(i*i for i in range(10))</code></pre>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+			{
+                id: 'concurrency-models',
+                title: 'Concurrency: Threading vs Asyncio vs Multiprocessing',
+                icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+                content: `
+                    <div class="space-y-6">
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                            <p style="color: var(--fg-muted);">Выбор модели зависит от типа задачи (I/O-bound vs CPU-bound) и необходимости использовать общую память. GIL — главный фактор влияния.</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Comparison Table</h4>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Feature</th>
+                                            <th>Threading</th>
+                                            <th>Asyncio</th>
+                                            <th>Multiprocessing</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><b>Best for</b></td>
+                                            <td style="color: var(--success);">I/O-bound</td>
+                                            <td style="color: var(--success);">I/O-bound (high concurrency)</td>
+                                            <td style="color: var(--warning);">CPU-bound</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Execution</b></td>
+                                            <td>Preemptive (OS switches threads)</td>
+                                            <td>Cooperative (task yields control)</td>
+                                            <td>Preemptive (OS switches processes)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>GIL Impact</b></td>
+                                            <td>Limited by GIL (1 thread at a time)</td>
+                                            <td>Single thread, no GIL contention</td>
+                                            <td><span style="color: var(--success);">Bypasses GIL</span> (separate memory)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Memory</b></td>
+                                            <td>Shared memory (needs Locks)</td>
+                                            <td>Shared memory (no Locks needed usually)</td>
+                                            <td>Separate memory (IPC/Pipes needed)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Overhead</b></td>
+                                            <td>Medium</td>
+                                            <td>Low</td>
+                                            <td>High (new process creation)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Use Case</b></td>
+                                            <td>File I/O, Network calls (legacy)</td>
+                                            <td>Web scrapers, Chat servers, APIs</td>
+                                            <td>Image processing, ML, Data crunching</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="grid gap-4 md:grid-cols-3">
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Threading</h5>
+                                <pre class="text-sm"><code>import threading
+
+def task():
+    print("Running in thread")
+
+t = threading.Thread(target=task)
+t.start()
+t.join()</code></pre>
+                                <p class="text-xs mt-2" style="color: var(--fg-muted);">Use when code is mostly waiting (I/O) and you need simple shared state. Beware of race conditions!</p>
+                            </div>
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Asyncio</h5>
+                                <pre class="text-sm"><code>import asyncio
+
+async def task():
+    await asyncio.sleep(1)
+
+async def main():
+    await asyncio.gather(task(), task())
+
+asyncio.run(main())</code></pre>
+                                <p class="text-xs mt-2" style="color: var(--fg-muted);">Best for massive I/O concurrency (10k+ connections). Single thread, no race conditions on shared vars.</p>
+                            </div>
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Multiprocessing</h5>
+                                <pre class="text-sm"><code>from multiprocessing import Process
+
+def task():
+    print("Process")
+
+if __name__ == '__main__':
+    p = Process(target=task)
+    p.start()
+    p.join()</code></pre>
+                                <p class="text-xs mt-2" style="color: var(--fg-muted);">True parallelism. Uses multiple CPU cores. Heavy memory usage. Data sharing is harder (Queues/Managers).</p>
                             </div>
                         </div>
                     </div>
