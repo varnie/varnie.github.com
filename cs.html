@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Python Interview Cheat Sheet</title>
+    <meta name="description" content="Comprehensive Python interview cheat sheet covering Big O, data structures, SOLID, ACID, asyncio, Docker, system design, and more.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
     <style>
         :root {
             --bg: #0f1115;
@@ -361,15 +364,140 @@
             color: var(--accent);
             font-weight: 600;
         }
+
+        /* Search Modal */
+        .search-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 200;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 15vh;
+        }
+        .search-modal.open { display: flex; }
+        .search-modal-content {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            color: var(--fg);
+            font-size: 1.1rem;
+            outline: none;
+        }
+        .search-input::placeholder { color: var(--fg-muted); }
+        .search-results { max-height: 400px; overflow-y: auto; }
+        .search-result-item {
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+        .search-result-item:hover, .search-result-item.selected { background: var(--glow); }
+        .search-result-item:last-child { border-bottom: none; }
+
+        /* Back to top */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+        }
+        .back-to-top.visible { opacity: 1; visibility: visible; }
+        .back-to-top:hover { transform: translateY(-3px); }
+
+        /* Code copy button */
+        pre { position: relative; }
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.35rem 0.6rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            color: var(--fg-muted);
+            font-size: 0.75rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+        pre:hover .copy-btn { opacity: 1; }
+        .copy-btn:hover { background: var(--accent); color: var(--bg); }
+        .copy-btn.copied { background: var(--success); color: var(--bg); }
+
+        /* Grouped navigation */
+        .nav-group { margin-bottom: 0.5rem; }
+        .nav-group-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--fg-muted);
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+        .nav-group-header:hover { background: var(--glow); color: var(--accent); }
+        .nav-group-header .chevron { width: 1rem; height: 1rem; transition: transform 0.2s; }
+        .nav-group.collapsed .nav-group-header .chevron { transform: rotate(-90deg); }
+        .nav-group.collapsed .nav-group-items { display: none; }
+
+        /* Header buttons */
+        #mobileMenuBtn:hover, #searchBtn:hover, #closeMobileMenu:hover {
+            background: var(--glow);
+            color: var(--accent) !important;
+        }
+
     </style>
 </head>
 <body class="bg-pattern min-h-screen">
+    <!-- Search Modal -->
+    <div id="searchModal" class="search-modal">
+        <div class="search-modal-content">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search topics..." autocomplete="off">
+            <div id="searchResults" class="search-results"></div>
+        </div>
+    </div>
+    <!-- Back to Top -->
+    <button id="backToTop" class="back-to-top" aria-label="Back to top">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+        </svg>
+    </button>
     <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b" style="background: rgba(10, 15, 26, 0.8); border-color: var(--border);">
+    <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b" style="background: var(--bg-secondary); border-color: var(--border);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center gap-4">
-                    <button id="mobileMenuBtn" class="lg:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors" aria-label="Toggle menu">
+                    <button id="mobileMenuBtn" class="lg:hidden p-2 rounded-lg transition-colors" style="color: var(--fg-muted);" aria-label="Toggle menu">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                         </svg>
@@ -380,6 +508,11 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <span class="text-sm hidden sm:block" style="color: var(--fg-muted);">Python Developer Cheat Sheet</span>
+                    <button id="searchBtn" class="p-2 rounded-lg transition-colors" style="color: var(--fg-muted);" aria-label="Search" title="Search (Cmd+K)">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </button>
                     <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"></button>
                 </div>
             </div>
@@ -391,7 +524,7 @@
         <div class="p-4">
             <div class="flex justify-between items-center mb-6">
                 <span class="font-mono font-bold text-lg">Navigation</span>
-                <button id="closeMobileMenu" class="p-2 rounded-lg hover:bg-gray-800 transition-colors" aria-label="Close menu">
+                <button id="closeMobileMenu" class="p-2 rounded-lg transition-colors" style="color: var(--fg-muted);" aria-label="Close menu">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
@@ -419,10 +552,35 @@
     </div>
 
     <script>
-        // Topics data - easily extensible
+            // Topic categories
+    const categories = [
+        { id: 'algorithms', title: 'Algorithms & DS' },
+        { id: 'python', title: 'Python & OOP' },
+        { id: 'databases', title: 'Databases' },
+        { id: 'system', title: 'System Design' },
+        { id: 'devops', title: 'DevOps' },
+        { id: 'queues', title: 'Message Queues' },
+        { id: 'web', title: 'Web Frameworks' },
+        { id: 'tools', title: 'Tools & Testing' },
+    ];
+
+    // Category titles map
+    const catTitles = {
+        'algorithms': 'Algorithms & DS',
+        'python': 'Python & OOP',
+        'databases': 'Databases',
+        'system': 'System Design',
+        'devops': 'DevOps',
+        'queues': 'Message Queues',
+        'web': 'Web Frameworks',
+        'tools': 'Tools & Testing'
+    };
+
+    // Topics data - easily extensible
         const topics = [
             {
                 id: 'bigo',
+                category: 'algorithms',
                 title: 'Big O Notation',
                 icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
                 content: `
@@ -464,6 +622,7 @@
             },
             {
                 id: 'complexity',
+                category: 'algorithms',
                 title: 'Time Complexity: Python Structures',
                 icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4',
                 content: `
@@ -538,6 +697,7 @@
             },
             {
                 id: 'acid',
+                category: 'databases',
                 title: 'ACID Principles',
                 icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
                 content: `
@@ -590,6 +750,7 @@
             },
             {
                 id: 'solid',
+                category: 'python',
                 title: 'SOLID Principles',
                 icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z',
                 content: `
@@ -696,6 +857,7 @@ service = UserService(PostgresDB())</code></pre>
             },
             {
                 id: 'oop-principles',
+                category: 'python',
                 title: 'ООП: принципы и отношения',
                 icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
                 content: `
@@ -891,6 +1053,7 @@ class Car:
             },
             {
                 id: 'sorting',
+                category: 'algorithms',
                 title: 'Sorting Algorithms Complexity',
                 icon: 'M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12',
                 content: `
@@ -983,6 +1146,7 @@ class Car:
             },
             {
                 id: 'docker',
+                category: 'devops',
                 title: 'Docker Essentials',
                 icon: 'M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01',
                 content: `
@@ -1073,6 +1237,7 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]</code></pre>
             },
                         {
                 id: 'asyncio',
+                category: 'python',
                 title: 'Python Asyncio',
                 icon: 'M13 10V3L4 14h7v7l9-11h-7z',
                 content: `
@@ -1180,6 +1345,7 @@ results = await asyncio.gather(
             },
             {
                 id: 'system-design',
+                category: 'system',
                 title: 'System Design',
                 icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10',
                 content: `
@@ -1413,6 +1579,7 @@ results = await asyncio.gather(
             },
                         {
                 id: 'redis',
+                category: 'databases',
                 title: 'Redis',
                 icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4',
                 content: `
@@ -1473,6 +1640,7 @@ results = await asyncio.gather(
             },
             {
                 id: 'rabbitmq',
+                category: 'queues',
                 title: 'RabbitMQ',
                 icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',
                 content: `
@@ -1542,6 +1710,7 @@ results = await asyncio.gather(
             },
             {
                 id: 'kafka',
+                category: 'queues',
                 title: 'Apache Kafka',
                 icon: 'M13 10V3L4 14h7v7l9-11h-7z',
                 content: `
@@ -1622,6 +1791,7 @@ log.retention.bytes=1073741824 # По размеру</code></pre>
             },
             {
                 id: 'celery',
+                category: 'queues',
                 title: 'Celery',
                 icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
                 content: `
@@ -1693,6 +1863,7 @@ send_email.apply_async(args=['user@example.com', 'Hi'], countdown=10) # Отло
             },
             {
                 id: 'python-internals',
+                category: 'python',
                 title: 'Python Internals (GIL, GC)',
                 icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z',
                 content: `
@@ -1782,6 +1953,7 @@ sum(i*i for i in range(10))</code></pre>
             },
 			{
                 id: 'concurrency-models',
+                category: 'python',
                 title: 'Concurrency: Threading vs Asyncio vs Multiprocessing',
                 icon: 'M13 10V3L4 14h7v7l9-11h-7z',
                 content: `
@@ -1889,6 +2061,7 @@ if __name__ == '__main__':
             },
             {
                 id: 'orm-nplus1',
+                category: 'databases',
                 title: 'ORM & N+1 Problem',
                 icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4',
                 content: `
@@ -1978,6 +2151,7 @@ session.query(User).options(
             },
             {
                 id: 'http-api',
+                category: 'web',
                 title: 'HTTP & API Design',
                 icon: 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9',
                 content: `
@@ -2118,6 +2292,7 @@ session.query(User).options(
             },
             {
                 id: 'auth-security',
+                category: 'web',
                 title: 'Authentication & Security',
                 icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
                 content: `
@@ -2205,6 +2380,7 @@ pwd_context.verify("password123", hashed) # True</code></pre>
             },
             {
                 id: 'postgres-indexes',
+                category: 'databases',
                 title: 'PostgreSQL Indexes',
                 icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4',
                 content: `
@@ -2308,6 +2484,7 @@ CREATE INDEX CONCURRENTLY idx_users_name ON users(name);</code></pre>
             },
             {
                 id: 'postgres-transactions',
+                category: 'databases',
                 title: 'PostgreSQL Transactions & Isolation',
                 icon: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4',
                 content: `
@@ -2409,6 +2586,7 @@ ROLLBACK TO SAVEPOINT my_savepoint;</code></pre>
             },
             {
                 id: 'postgres-locks',
+                category: 'databases',
                 title: 'PostgreSQL Locking Strategies',
                 icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
                 content: `
@@ -2516,6 +2694,7 @@ RETURNING *;</code></pre>
             },
             {
                 id: 'mvcc',
+                category: 'databases',
                 title: 'MVCC, Snapshots & VACUUM',
                 icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
                 content: `
@@ -2605,6 +2784,7 @@ WHERE n_dead_tup > 0;</code></pre>
             },
             {
                 id: 'explain',
+                category: 'databases',
                 title: 'EXPLAIN & Query Analysis',
                 icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01',
                 content: `
@@ -2734,6 +2914,7 @@ SELECT * FROM users;</code></pre>
             },
                         {
                 id: 'design-patterns',
+                category: 'tools',
                 title: 'Design Patterns',
                 icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z',
                 content: `
@@ -2875,6 +3056,7 @@ class Observer:
             },
 			{
                 id: 'testing',
+                category: 'tools',
                 title: 'Testing (pytest & mocks)',
                 icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
                 content: `
@@ -3027,7 +3209,7 @@ mock.method.assert_called_with(1, 2)</code></pre>
 
         // State
         let currentTheme = localStorage.getItem('theme') || 'dark';
-        let openTopics = new Set();
+        let openTopics = new Set(['bigo', 'complexity', 'solid', 'sorting', 'asyncio']);
         let mobileMenuOpen = false;
 
         // DOM Elements - initialized after DOMContentLoaded
@@ -3056,6 +3238,7 @@ mock.method.assert_called_with(1, 2)</code></pre>
             // Render navigation and topics
             renderNavigation();
             renderTopics();
+            addCopyButtons();
             
             // Event listeners
             themeToggle.addEventListener('click', toggleTheme);
@@ -3109,15 +3292,42 @@ mock.method.assert_called_with(1, 2)</code></pre>
         }
 
         function renderNavigation() {
-            const navHTML = topics.map(topic => `
-                <a href="#${topic.id}" class="nav-link block" data-section="${topic.id}">
-                    ${topic.title}
-                </a>
+            const grouped = {};
+            topics.forEach(t => {
+                const cat = t.category || 'tools';
+                if (!grouped[cat]) grouped[cat] = [];
+                grouped[cat].push(t);
+            });
+            
+            const navHTML = Object.entries(grouped).map(([catId, catTopics]) => `
+                <div class="nav-group" data-category="${catId}">
+                    <div class="nav-group-header" onclick="toggleNavGroup('${catId}')">
+                        <svg class="chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                        <span>${catTitles[catId] || catId}</span>
+                    </div>
+                    <div class="nav-group-items">
+                        ${catTopics.map(topic => `
+                            <a href="#${topic.id}" class="nav-link block" data-section="${topic.id}">${topic.title}</a>
+                        `).join('')}
+                    </div>
+                </div>
             `).join('');
             
             desktopNavLinks.innerHTML = navHTML;
             mobileNavLinks.innerHTML = navHTML;
+            
+            document.querySelectorAll('.nav-group-header').forEach(header => {
+                header.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    header.closest('.nav-group').classList.toggle('collapsed');
+                });
+            });
         }
+        window.toggleNavGroup = function(catId) {
+            document.querySelector(`.nav-group[data-category="${catId}"]`)?.classList.toggle('collapsed');
+        };
 
         function renderTopics() {
             topicsContainer.innerHTML = topics.map((topic, index) => `
@@ -3176,6 +3386,88 @@ mock.method.assert_called_with(1, 2)</code></pre>
                 }
             });
         }
+
+        // Search functionality
+        let searchBtn, searchModal, searchInput, searchResults, backToTop, selectedSearchIndex = 0;
+
+        function initSearch() {
+            searchBtn = document.getElementById('searchBtn');
+            searchModal = document.getElementById('searchModal');
+            searchInput = document.getElementById('searchInput');
+            searchResults = document.getElementById('searchResults');
+            backToTop = document.getElementById('backToTop');
+
+            if (!searchBtn || !searchModal) return;
+
+            searchBtn.addEventListener('click', openSearch);
+            searchModal.addEventListener('click', (e) => { if (e.target === searchModal) closeSearch(); });
+            searchInput.addEventListener('input', handleSearch);
+            searchInput.addEventListener('keydown', handleSearchKeydown);
+            
+            document.addEventListener('keydown', (e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
+                if (e.key === 'Escape' && searchModal.classList.contains('open')) closeSearch();
+            });
+
+            window.addEventListener('scroll', handleScroll);
+            backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        }
+
+        function openSearch() { searchModal.classList.add('open'); searchInput.focus(); renderSearchResults(''); }
+        function closeSearch() { searchModal.classList.remove('open'); searchInput.value = ''; }
+        function handleSearch(e) { renderSearchResults(e.target.value.toLowerCase()); }
+
+        function renderSearchResults(query) {
+            const filtered = topics.filter(t => t.title.toLowerCase().includes(query) || t.id.toLowerCase().includes(query));
+            selectedSearchIndex = 0;
+            searchResults.innerHTML = filtered.map((t, i) => `
+                <div class="search-result-item ${i === 0 ? 'selected' : ''}" data-id="${t.id}" onclick="navigateToTopic('${t.id}')">
+                    <div class="font-medium">${t.title}</div>
+                    <div class="text-sm" style="color: var(--fg-muted);">${catTitles[t.category] || t.category} · #${t.id}</div>
+                </div>
+            `).join('') || '<div class="search-result-item" style="color: var(--fg-muted);">No results found</div>';
+        }
+
+        function handleSearchKeydown(e) {
+            const items = searchResults.querySelectorAll('.search-result-item[data-id]');
+            if (!items.length) return;
+            if (e.key === 'ArrowDown') { e.preventDefault(); selectedSearchIndex = Math.min(selectedSearchIndex + 1, items.length - 1); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); selectedSearchIndex = Math.max(selectedSearchIndex - 1, 0); }
+            else if (e.key === 'Enter') { e.preventDefault(); items[selectedSearchIndex]?.click(); }
+            items.forEach((item, i) => item.classList.toggle('selected', i === selectedSearchIndex));
+            items[selectedSearchIndex]?.scrollIntoView({ block: 'nearest' });
+        }
+
+        function navigateToTopic(topicId) {
+            closeSearch();
+            const card = document.querySelector(`#${topicId} .topic-card`);
+            if (card && !card.classList.contains('open')) toggleTopic(topicId);
+            document.getElementById(topicId)?.scrollIntoView({ behavior: 'smooth' });
+        }
+        window.navigateToTopic = navigateToTopic;
+
+        function handleScroll() { backToTop?.classList.toggle('visible', window.scrollY > 300); }
+
+        // Copy buttons
+        function addCopyButtons() {
+            document.querySelectorAll('pre').forEach(pre => {
+                if (pre.querySelector('.copy-btn')) return;
+                const btn = document.createElement('button');
+                btn.className = 'copy-btn'; btn.textContent = 'Copy'; btn.setAttribute('aria-label', 'Copy code');
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const code = pre.querySelector('code')?.textContent || pre.textContent;
+                    navigator.clipboard.writeText(code).then(() => {
+                        btn.textContent = 'Copied!'; btn.classList.add('copied');
+                        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+                    });
+                });
+                pre.appendChild(btn);
+            });
+        }
+
+        // Initialize search and copy buttons after render
+        setTimeout(() => { initSearch(); addCopyButtons(); }, 100);
 
         // Make toggleTopic available globally
         window.toggleTopic = toggleTopic;
