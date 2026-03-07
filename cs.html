@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script>hljs.highlightAll();</script>
     <style>
         :root {
             --bg: #0f1115;
@@ -869,7 +868,7 @@ service = UserService(PostgresDB())</code></pre>
                                 <div class="principle-card">
                                     <h5 class="font-bold mb-2">Инкапсуляция (Encapsulation)</h5>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Скрытие внутреннего состояния объекта и предоставление доступа через публичный интерфейс (методы).</p>
-                                    <pre class="text-sm"><code>class Account:
+                                    <pre class="text-sm"><code class="language-python">class Account:
     def __init__(self, owner, balance):
         self.owner = owner          # public
         self._balance = balance     # protected (convention)
@@ -887,7 +886,7 @@ service = UserService(PostgresDB())</code></pre>
                                 <div class="principle-card">
                                     <h5 class="font-bold mb-2">Наследование (Inheritance)</h5>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Механизм, при котором один класс (потомок) получает атрибуты и методы другого класса (родителя), расширяя или изменяя его поведение.</p>
-                                    <pre class="text-sm"><code>class Animal:
+                                    <pre class="text-sm"><code class="language-python">class Animal:
     def __init__(self, name):
         self.name = name
 
@@ -906,18 +905,27 @@ class Cat(Animal):
                                 <div class="principle-card">
                                     <h5 class="font-bold mb-2">Полиморфизм (Polymorphism)</h5>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Способность объектов с разной реализацией предоставлять одинаковый интерфейс. В Python — duck typing и переопределение методов.</p>
-                                    <pre class="text-sm"><code>def make_sound(animal):
-    # Важно только наличие метода speak
+                                    <pre class="text-sm"><code class="language-python"># Duck typing — важно наличие метода, не тип
+def make_sound(animal):
     print(animal.speak())
 
 make_sound(Dog("Buddy"))   # Buddy says Woof!
-make_sound(Cat("Whiskers"))  # Whiskers says Meow!</code></pre>
+make_sound(Cat("Whiskers"))  # Whiskers says Meow!
+
+# через Protocol (статическая типизация)
+from typing import Protocol
+
+class Speakable(Protocol):
+    def speak(self) -> str: ...
+
+def process(obj: Speakable):
+    print(obj.speak())</code></pre>
                                 </div>
 
                                 <div class="principle-card">
                                     <h5 class="font-bold mb-2">Абстракция (Abstraction)</h5>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Выделение существенных характеристик объекта, скрытие сложности и предоставление простой модели взаимодействия.</p>
-                                    <pre class="text-sm"><code>from abc import ABC, abstractmethod
+                                    <pre class="text-sm"><code class="language-python">from abc import ABC, abstractmethod
 
 class Shape(ABC):
     @abstractmethod
@@ -952,29 +960,29 @@ class Rectangle(Shape):
                                     <tbody>
                                         <tr>
                                             <td><code>Ad-hoc</code> (перегрузка)</td>
-                                            <td>Одна функция/оператор работают по-разному для разных типов (перегрузка функций/операторов).</td>
-                                            <td>Нет перегрузки функций по сигнатуре, но есть: <code>+</code> (int vs str), <code>len()</code>, <code>__add__</code> и т.п.</td>
+                                            <td>Один оператор работает по-разному для разных типов.</td>
+                                            <td>Перегрузка операторов: <code>__add__</code>, <code>__mul__</code>, <code>__eq__</code>. Функции <code>len()</code>, <code>str()</code> работают с разными типами.</td>
                                         </tr>
                                         <tr>
-                                            <td><code>Parametric</code> (обобщённый)</td>
-                                            <td>Один и тот же код работает для разных типов (дженерики, шаблоны).</td>
-                                            <td>Duck typing, typing.Generic, TypeVar — параметрический полиморфизм на уровне типов.</td>
+                                            <td><code>Parametric</code> (параметрический)</td>
+                                            <td>Один код работает для любых типов. Тип — параметр.</td>
+                                            <td><code>typing.Generic</code>, <code>TypeVar</code>, дженерики.</td>
                                         </tr>
                                         <tr>
-                                            <td><code>Subtype / Inclusion</code></td>
-                                            <td>Подтип может использоваться там, где ожидается базовый тип (классическое ООП-наследование).</td>
-                                            <td>Наследование и переопределение методов, super(), абстрактные классы.</td>
+                                            <td><code>Subtype</code> (подтипов)</td>
+                                            <td>Подтип заменяет базовый без изменения контракта.</td>
+                                            <td>Наследование, <code>ABC</code>, <code>Protocol</code>.</td>
                                         </tr>
                                         <tr>
-                                            <td><code>Coercion</code> (приведение)</td>
-                                            <td>Неявное приведение типов для унификации интерфейса.</td>
-                                            <td>Неявные преобразования: <code>int + float</code>, <code>str(obj)</code> через <code>__str__</code> и т.д.</td>
+                                            <td><code>Duck Typing</code></td>
+                                            <td>"Если это ходит как утка и крякает как утка — это утка". Важен интерфейс, не тип.</td>
+                                            <td>Динамическая типизация Python. <code>Protocol</code> для статической проверки.</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                             <div class="mt-3 p-3 rounded-lg text-sm" style="background: var(--code-bg);">
-                                <p><span class="highlight">Важно:</span> В Python чаще всего говорят про <b>subtype полиморфизм</b> (через наследование и duck typing), но язык поддерживает и ad-hoc (+, *, len), и parametric (typing), и coercion (неявные приведения).【turn0search1】【turn0search3】</p>
+                                <p><span class="highlight">Важно:</span> <b>Duck typing</b> — фишка Python, не классический полиморфизм. Объект определяется по поведению (какие методы есть), не по типу. В классическом ООП используется <b>subtype polymorphism</b> — наследование.</p>
                             </div>
                         </div>
 
@@ -985,7 +993,7 @@ class Rectangle(Shape):
                                 <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
                                     <h5 class="font-bold mb-2" style="color: var(--success);">Агрегация (Aggregation)</h5>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Отношение «has-a», но часть может существовать независимо от целого. Жизенные циклы не связаны.</p>
-                                    <pre class="text-sm"><code>class Department:
+                                    <pre class="text-sm"><code class="language-python">class Department:
     def __init__(self, name):
         self.name = name
 
@@ -1001,7 +1009,7 @@ uni = University([math_dept])</code></pre>
                                 <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
                                     <h5 class="font-bold mb-2" style="color: var(--warning);">Композиция (Composition)</h5>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Более сильное отношение «owns-a»: часть не имеет смысла без целого и уничтожается вместе с ним.</p>
-                                    <pre class="text-sm"><code>class Engine:
+                                    <pre class="text-sm"><code class="language-python">class Engine:
     pass
 
 class Car:
@@ -1175,7 +1183,7 @@ class Car:
                         
                         <div>
                             <h4 class="font-bold mb-3 highlight">Dockerfile для Python</h4>
-                            <pre><code># Мультистейдж билд для уменьшения размера
+                            <pre><code class="language-python"># Мультистейдж билд для уменьшения размера
 FROM python:3.12-slim as builder
 
 WORKDIR /app
@@ -1249,7 +1257,7 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]</code></pre>
                         
                         <div>
                             <h4 class="font-bold mb-3 highlight">Основные конструкции</h4>
-                            <pre><code>import asyncio
+                            <pre><code class="language-python">import asyncio
 
 # Определение async функции (корутины)
 async def fetch_data(url):
@@ -1304,7 +1312,7 @@ asyncio.run(main())</code></pre>
                             <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
                                 <p class="font-bold mb-2" style="color: var(--warning);">Interview Trap: «А как запустить heavy функцию?»</p>
                                 <p class="text-sm mb-3" style="color: var(--fg-muted);">Если нужно выполнить тяжелую функцию в асинхронном коде, используй <code>loop.run_in_executor</code>. Это отправляет задачу в пул потоков или процессов, не блокируя Event Loop.</p>
-                                <pre><code>import asyncio
+                                <pre><code class="language-python">import asyncio
 from concurrent.futures import ProcessPoolExecutor
 
 def heavy_cpu_task(n):
@@ -1327,7 +1335,7 @@ asyncio.run(main())</code></pre>
                         
                         <div>
                             <h4 class="font-bold mb-3 highlight">asyncio.create_task vs asyncio.gather</h4>
-                            <pre><code># create_task — запускает задачу в фоне
+                            <pre><code class="language-python"># create_task — запускает задачу в фоне
 task = asyncio.create_task(background_work())
 # ... делаем что-то другое ...
 await task  # ждём завершения когда нужно
@@ -1652,7 +1660,7 @@ results = await asyncio.gather(
 
                         <div>
                             <h4 class="font-bold mb-3 highlight">Архитектура</h4>
-                            <pre><code>Producer -> Exchange -> [Bindings] -> Queue -> Consumer
+                            <pre><code class="language-python">Producer -> Exchange -> [Bindings] -> Queue -> Consumer
 
 1. Exchange: Принимает сообщения от продюсера.
 2. Queue: Хранит сообщения.
@@ -1745,7 +1753,7 @@ results = await asyncio.gather(
                         <div>
                             <h4 class="font-bold mb-3 highlight">Retention Policy</h4>
                             <p class="mb-2" style="color: var(--fg-muted);">В отличие от RabbitMQ, Kafka хранит сообщения долго (дни/недели) на диске.</p>
-                            <pre><code># Настройки retention
+                            <pre><code class="language-python"># Настройки retention
 log.retention.hours=168    # 7 дней
 log.retention.bytes=1073741824 # По размеру</code></pre>
                         </div>
@@ -1803,7 +1811,7 @@ log.retention.bytes=1073741824 # По размеру</code></pre>
 
                         <div>
                             <h4 class="font-bold mb-3 highlight">Архитектура</h4>
-                            <pre><code>Producer (Django/FastAPI)
+                            <pre><code class="language-python">Producer (Django/FastAPI)
       |
       v
    Broker (Redis/RabbitMQ) <--- Result Backend (DB/Redis)
@@ -1814,7 +1822,7 @@ log.retention.bytes=1073741824 # По размеру</code></pre>
 
                         <div>
                             <h4 class="font-bold mb-3 highlight">Basic Usage</h4>
-                            <pre><code># tasks.py
+                            <pre><code class="language-python"># tasks.py
 from celery import Celery
 
 app = Celery('tasks', broker='redis://localhost:6379/0')
@@ -1835,7 +1843,7 @@ send_email.apply_async(args=['user@example.com', 'Hi'], countdown=10) # Отло
                         <div>
                             <h4 class="font-bold mb-3 highlight">Celery Beat</h4>
                             <p class="mb-2" style="color: var(--fg-muted);">Планировщик задач (cron для Python). Запускает задачи периодически.</p>
-                            <pre><code>app.conf.beat_schedule = {
+                            <pre><code class="language-python">app.conf.beat_schedule = {
     'add-every-30-seconds': {
         'task': 'tasks.add',
         'schedule': 30.0,
@@ -1897,7 +1905,7 @@ send_email.apply_async(args=['user@example.com', 'Hi'], countdown=10) # Отло
                                 <div class="principle-card">
                                     <p class="font-mono font-bold mb-2">Reference Counting</p>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Основной механизм. У каждого объекта есть счётчик ссылок. Когда refs == 0, память освобождается.</p>
-                                    <pre class="text-sm"><code>import sys
+                                    <pre class="text-sm"><code class="language-python">import sys
 a = []
 print(sys.getrefcount(a)) # 2 (a + аргумент)</code></pre>
                                     <p class="text-xs mt-2" style="color: var(--error);">Минус: не удаляет циклические ссылки.</p>
@@ -1905,7 +1913,7 @@ print(sys.getrefcount(a)) # 2 (a + аргумент)</code></pre>
                                 <div class="principle-card">
                                     <p class="font-mono font-bold mb-2">Garbage Collector (gc)</p>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Находит и удаляет циклические ссылки. Работает периодически.</p>
-                                    <pre class="text-sm"><code>import gc
+                                    <pre class="text-sm"><code class="language-python">import gc
 gc.collect()  # Принудительный запуск
 gc.disable()  # Отключить (редко нужно)</code></pre>
                                 </div>
@@ -1918,7 +1926,7 @@ gc.disable()  # Отключить (редко нужно)</code></pre>
                             <div class="grid gap-4">
                                 <div class="p-4 rounded-lg" style="background: var(--code-bg);">
                                     <p class="font-bold mb-2 highlight">Decorator with arguments</p>
-                                    <pre><code>def repeat(n):
+                                    <pre><code class="language-python">def repeat(n):
     def decorator(func):
         def wrapper(*args, **kwargs):
             for _ in range(n):
@@ -1933,7 +1941,7 @@ def say_hello():
                                 </div>
                                 <div class="p-4 rounded-lg" style="background: var(--code-bg);">
                                     <p class="font-bold mb-2 highlight">Generator (yield)</p>
-                                    <pre><code>def infinite_stream():
+                                    <pre><code class="language-python">def infinite_stream():
     n = 0
     while True:
         yield n  # Pause and return value
@@ -2019,7 +2027,7 @@ sum(i*i for i in range(10))</code></pre>
                         <div class="grid gap-4 md:grid-cols-3">
                             <div class="principle-card">
                                 <h5 class="font-bold mb-2">Threading</h5>
-                                <pre class="text-sm"><code>import threading
+                                <pre class="text-sm"><code class="language-python">import threading
 
 def task():
     print("Running in thread")
@@ -2031,7 +2039,7 @@ t.join()</code></pre>
                             </div>
                             <div class="principle-card">
                                 <h5 class="font-bold mb-2">Asyncio</h5>
-                                <pre class="text-sm"><code>import asyncio
+                                <pre class="text-sm"><code class="language-python">import asyncio
 
 async def task():
     await asyncio.sleep(1)
@@ -2044,7 +2052,7 @@ asyncio.run(main())</code></pre>
                             </div>
                             <div class="principle-card">
                                 <h5 class="font-bold mb-2">Multiprocessing</h5>
-                                <pre class="text-sm"><code>from multiprocessing import Process
+                                <pre class="text-sm"><code class="language-python">from multiprocessing import Process
 
 def task():
     print("Process")
@@ -2073,7 +2081,7 @@ if __name__ == '__main__':
 
                         <div>
                             <h4 class="font-bold mb-3 highlight">Пример проблемы (Django ORM)</h4>
-                            <pre><code># ПЛОХО: N+1 запросов
+                            <pre><code class="language-python"># ПЛОХО: N+1 запросов
 authors = Author.objects.all()  # 1 query
 for author in authors:
     print(author.book.title)    # N queries (1 per author!)
@@ -2122,7 +2130,7 @@ authors = Author.objects.select_related('book')
                         <div class="grid gap-4 md:grid-cols-2">
                             <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
                                 <p class="font-bold mb-2" style="color: var(--warning);">Django</p>
-                                <pre class="text-sm"><code># FK (One-to-Many)
+                                <pre class="text-sm"><code class="language-python"># FK (One-to-Many)
 User.objects.select_related('profile')
 
 # M2M или Reverse FK
@@ -2135,7 +2143,7 @@ Author.objects.prefetch_related(
                             </div>
                             <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
                                 <p class="font-bold mb-2" style="color: var(--warning);">SQLAlchemy</p>
-                                <pre class="text-sm"><code>from sqlalchemy.orm import joinedload, selectinload
+                                <pre class="text-sm"><code class="language-python">from sqlalchemy.orm import joinedload, selectinload
 
 session.query(User).options(
     joinedload(User.addresses) # Join
@@ -2326,7 +2334,7 @@ session.query(User).options(
 
                         <div>
                             <h4 class="font-bold mb-3 highlight">JWT Architecture</h4>
-                            <pre><code>1. User Login -> Server validates credentials
+                            <pre><code class="language-python">1. User Login -> Server validates credentials
 2. Server generates JWT (Header.Payload.Signature)
 3. Client stores JWT (LocalStorage or Cookie)
 4. Client sends JWT in Header: Authorization: Bearer <token>
@@ -2429,7 +2437,7 @@ pwd_context.verify("password123", hashed) # True</code></pre>
                         
                         <div>
                             <h4 class="font-bold mb-3 highlight">Создание индексов</h4>
-                            <pre><code>-- Обычный индекс
+                            <pre><code class="language-sql">Обычный индекс
 CREATE INDEX idx_users_email ON users(email);
 
 -- Составной индекс (порядок важен!)
@@ -2552,7 +2560,7 @@ CREATE INDEX CONCURRENTLY idx_users_name ON users(name);</code></pre>
                         
                         <div>
                             <h4 class="font-bold mb-3 highlight">Управление транзакциями</h4>
-                            <pre><code>-- Начать транзакцию
+                            <pre><code class="language-sql">Начать транзакцию
 BEGIN;
 -- или
 START TRANSACTION;
@@ -2594,7 +2602,7 @@ ROLLBACK TO SAVEPOINT my_savepoint;</code></pre>
                         <div>
                             <h4 class="font-bold mb-3 highlight">Pessimistic Locking</h4>
                             <p class="mb-3" style="color: var(--fg-muted);">Блокировка данных заранее, до модификации. Предотвращает конфликты.</p>
-                            <pre><code>-- SELECT FOR UPDATE — блокирует строки
+                            <pre><code class="language-sql">SELECT FOR UPDATE — блокирует строки
 BEGIN;
 SELECT * FROM accounts WHERE id = 1 FOR UPDATE;
 -- Теперь никто не может изменить эту строку
@@ -2611,7 +2619,7 @@ SELECT * FROM tasks WHERE status = 'pending' FOR UPDATE SKIP LOCKED LIMIT 1;</co
                         <div>
                             <h4 class="font-bold mb-3 highlight">Optimistic Locking</h4>
                             <p class="mb-3" style="color: var(--fg-muted);">Проверка при обновлении, что данные не изменились. Обычно через version column.</p>
-                            <pre><code>-- Добавляем колонку версии
+                            <pre><code class="language-sql">Добавляем колонку версии
 ALTER TABLE products ADD COLUMN version INT DEFAULT 1;
 
 -- При чтении получаем текущую версию
@@ -2677,7 +2685,7 @@ WHERE id = 1 AND version = 5;
                         
                         <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
                             <p class="font-bold mb-2" style="color: var(--success);">SKIP LOCKED для очередей</p>
-                            <pre><code>-- Идеально для job queue: берём задачу и не блокируем других
+                            <pre><code class="language-sql">Идеально для job queue: берём задачу и не блокируем других
 UPDATE tasks 
 SET status = 'processing', worker_id = :worker_id
 WHERE id = (
@@ -2728,7 +2736,7 @@ SELECT xmin, xmax, * FROM users LIMIT 5;
                         <div>
                             <h4 class="font-bold mb-3 highlight">Snapshots</h4>
                             <p class="mb-3" style="color: var(--fg-muted);">Снапшот определяет, какие строки видны транзакции. Создаётся в момент первого запроса (Read Committed) или в начале транзакции (Repeatable Read).</p>
-                            <pre><code>-- Посмотреть текущий снапшот
+                            <pre><code class="language-sql">Посмотреть текущий снапшот
 SELECT pg_current_snapshot();
 
 -- Формат: xmin:xmax:xip_list
@@ -2743,7 +2751,7 @@ SELECT pg_current_snapshot();
                                 <p class="font-bold mb-2" style="color: var(--warning);">Dead Tuples = Bloat</p>
                                 <p class="text-sm" style="color: var(--fg-muted);">UPDATE/DELETE создают "мёртвые" строки. Они занимают место, замедляют сканирование. VACUUM помечает место как доступное для повторного использования.</p>
                             </div>
-                            <pre><code>-- Ручной запуск
+                            <pre><code class="language-sql">Ручной запуск
 VACUUM users;              -- Освободить место для повторного использования
 VACUUM FULL users;         -- Перестроить таблицу (блокирует!)
 VACUUM ANALYZE users;      -- + обновить статистику
@@ -2791,7 +2799,7 @@ WHERE n_dead_tup > 0;</code></pre>
                     <div class="space-y-6">
                         <div>
                             <h4 class="font-bold mb-3 highlight">Форматы EXPLAIN</h4>
-                            <pre><code>-- Базовый план
+                            <pre><code class="language-sql">Базовый план
 EXPLAIN SELECT * FROM users WHERE email = 'test@example.com';
 
 -- С реальным выполнением
@@ -2872,7 +2880,7 @@ SELECT * FROM users;</code></pre>
                         
                         <div>
                             <h4 class="font-bold mb-3 highlight">Пример анализа</h4>
-                            <pre><code>EXPLAIN ANALYZE SELECT * FROM orders WHERE user_id = 123;
+                            <pre><code class="language-sql"> ANALYZE SELECT * FROM orders WHERE user_id = 123;
 
 -- Плохой план:
 -- Seq Scan on orders  (cost=0.00..25000.00 rows=5 loops=1)
@@ -2930,7 +2938,7 @@ SELECT * FROM users;</code></pre>
                                 <div class="principle-card">
                                     <h5 class="font-bold mb-2">Singleton</h5>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Гарантирует единственный экземпляр класса. В Python часто заменяется модулем.</p>
-                                    <pre class="text-sm"><code># Способ 1: Metaclass (Best Practice)
+                                    <pre class="text-sm"><code class="language-python"># Способ 1: Metaclass (Best Practice)
 class SingletonMeta(type):
     _instances = {}
     def __call__(cls, *args, **kwargs):
@@ -2949,7 +2957,7 @@ class Database(metaclass=SingletonMeta):
                                 <div class="principle-card">
                                     <h5 class="font-bold mb-2">Factory Method</h5>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Определяет интерфейс создания объекта, но оставляет подклассам решение о том, какой класс инстанцировать.</p>
-                                    <pre class="text-sm"><code>class Dialog:
+                                    <pre class="text-sm"><code class="language-python">class Dialog:
     def create_button(self):
         pass  # Factory method
 
@@ -2971,7 +2979,7 @@ class WebDialog(Dialog):
                                 <div class="principle-card">
                                     <h5 class="font-bold mb-2">Adapter</h5>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Позволяет объектам с несовместимыми интерфейсами работать вместе.</p>
-                                    <pre class="text-sm"><code>class Target:
+                                    <pre class="text-sm"><code class="language-python">class Target:
     def request(self): return "Target"
 
 class Adaptee:
@@ -2987,7 +2995,7 @@ class Adapter(Target):
                                 <div class="principle-card">
                                     <h5 class="font-bold mb-2">Decorator (Pattern vs Python Feature)</h5>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Динамически добавляет объекту новую функциональность. Python декораторы (@) — это синтаксический сахар для этого паттерна.</p>
-                                    <pre class="text-sm"><code># Паттерн "Декоратор" (обертка)
+                                    <pre class="text-sm"><code class="language-python"># Паттерн "Декоратор" (обертка)
 class Coffee:
     def cost(self): return 5
 
@@ -3008,7 +3016,7 @@ class MilkDecorator:
                                 <div class="principle-card">
                                     <h5 class="font-bold mb-2">Strategy</h5>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Определяет семейство алгоритмов, инкапсулирует их и делает взаимозаменяемыми. В Python можно передавать функции.</p>
-                                    <pre class="text-sm"><code>def fast_sort(data): return sorted(data)
+                                    <pre class="text-sm"><code class="language-python">def fast_sort(data): return sorted(data)
 def slow_sort(data): return list(reversed(sorted(data)))
 
 class Sorter:
@@ -3024,7 +3032,7 @@ sorter.sort([3, 1, 2])</code></pre>
                                 <div class="principle-card">
                                     <h5 class="font-bold mb-2">Observer</h5>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Создает механизм подписки, когда объекты автоматически узнают об изменениях другого объекта (Event system).</p>
-                                    <pre class="text-sm"><code>class Observable:
+                                    <pre class="text-sm"><code class="language-python">class Observable:
     def __init__(self):
         self._observers = []
 
@@ -3090,7 +3098,7 @@ class Observer:
                                 <div class="p-4 rounded-lg" style="background: var(--code-bg);">
                                     <p class="font-bold mb-2 highlight">Fixtures</p>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Подготовка данных/состояния для тестов. Встроенные: <code>tmp_path</code>, <code>capsys</code>, <code>monkeypatch</code>.</p>
-                                    <pre><code># conftest.py (shared fixtures)
+                                    <pre><code class="language-python"># conftest.py (shared fixtures)
 import pytest
 
 @pytest.fixture
@@ -3107,7 +3115,7 @@ def test_query(db_session):
                                 <div class="p-4 rounded-lg" style="background: var(--code-bg);">
                                     <p class="font-bold mb-2 highlight">Parametrize</p>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Запуск одного теста с разными данными.</p>
-                                    <pre><code>@pytest.mark.parametrize("input,expected", [
+                                    <pre><code class="language-python">@pytest.mark.parametrize("input,expected", [
     (1, 1),
     (2, 4),
     (3, 9),
@@ -3118,7 +3126,7 @@ def test_square(input, expected):
 
                                 <div class="p-4 rounded-lg" style="background: var(--code-bg);">
                                     <p class="font-bold mb-2 highlight">Exceptions</p>
-                                    <pre><code>import pytest
+                                    <pre><code class="language-python">import pytest
 
 def test_zero_division():
     with pytest.raises(ZeroDivisionError):
@@ -3136,7 +3144,7 @@ def test_zero_division():
                                 <div class="principle-card">
                                     <h5 class="font-bold mb-2">Patch</h5>
                                     <p class="text-sm mb-2" style="color: var(--fg-muted);">Подмена объекта во время теста.</p>
-                                    <pre class="text-sm"><code>from unittest.mock import patch
+                                    <pre class="text-sm"><code class="language-python">from unittest.mock import patch
 
 # Context manager
 with patch('module.requests.get') as mock_get:
@@ -3152,7 +3160,7 @@ def test_something(mock_class):
                                     <h5 class="font-bold mb-2">Mock vs MagicMock</h5>
                                     <p class="text-sm" style="color: var(--fg-muted);"><code>Mock</code>: Базовая заглушка.</p>
                                     <p class="text-sm" style="color: var(--fg-muted);"><code>MagicMock</code>: Поддерживает magic methods (<code>__str__</code>, <code>__getitem__</code>).</p>
-                                    <pre class="text-sm"><code>mock = MagicMock()
+                                    <pre class="text-sm"><code class="language-python">mock = MagicMock()
 mock.__str__.return_value = "Custom"
 str(mock)  # "Custom"
 
@@ -3239,6 +3247,10 @@ mock.method.assert_called_with(1, 2)</code></pre>
             renderNavigation();
             renderTopics();
             addCopyButtons();
+            // Only highlight blocks that haven't been highlighted yet
+            document.querySelectorAll('pre code:not(.hljs)').forEach(block => {
+                hljs.highlightElement(block);
+            });
             
             // Event listeners
             themeToggle.addEventListener('click', toggleTheme);
@@ -3252,6 +3264,13 @@ mock.method.assert_called_with(1, 2)</code></pre>
 
                 const targetId = link.getAttribute('href').substring(1);
                 if (targetId) {
+                    // Ensure topic's category group is expanded
+                    const topic = topics.find(t => t.id === targetId);
+                    if (topic) {
+                        const group = document.querySelector(`.nav-group[data-category="${topic.category}"]`);
+                        if (group) group.classList.remove('collapsed');
+                    }
+                    
                     // Ensure topic is open
                     const card = document.querySelector(`#${targetId} .topic-card`);
                     if (card && !card.classList.contains('open')) {
@@ -3261,6 +3280,10 @@ mock.method.assert_called_with(1, 2)</code></pre>
                     if (mobileMenuOpen) {
                         toggleMobileMenu(false);
                     }
+                    // Manually set active nav link
+                    document.querySelectorAll('.nav-link').forEach(l => {
+                        l.classList.toggle('active', l.dataset.section === targetId);
+                    });
                 }
             };
 
@@ -3443,6 +3466,18 @@ mock.method.assert_called_with(1, 2)</code></pre>
             const card = document.querySelector(`#${topicId} .topic-card`);
             if (card && !card.classList.contains('open')) toggleTopic(topicId);
             document.getElementById(topicId)?.scrollIntoView({ behavior: 'smooth' });
+            
+            // Find the topic's category and expand it
+            const topic = topics.find(t => t.id === topicId);
+            if (topic) {
+                const group = document.querySelector(`.nav-group[data-category="${topic.category}"]`);
+                if (group) group.classList.remove('collapsed');
+            }
+            
+            // Manually set active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.toggle('active', link.dataset.section === topicId);
+            });
         }
         window.navigateToTopic = navigateToTopic;
 
@@ -3450,19 +3485,19 @@ mock.method.assert_called_with(1, 2)</code></pre>
 
         // Copy buttons
         function addCopyButtons() {
-            document.querySelectorAll('pre').forEach(pre => {
-                if (pre.querySelector('.copy-btn')) return;
+            document.querySelectorAll('pre code').forEach(block => {
+                if (block.parentElement.querySelector('.copy-btn')) return;
                 const btn = document.createElement('button');
                 btn.className = 'copy-btn'; btn.textContent = 'Copy'; btn.setAttribute('aria-label', 'Copy code');
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const code = pre.querySelector('code')?.textContent || pre.textContent;
+                    const code = block.textContent;
                     navigator.clipboard.writeText(code).then(() => {
                         btn.textContent = 'Copied!'; btn.classList.add('copied');
                         setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
                     });
                 });
-                pre.appendChild(btn);
+                block.parentElement.appendChild(btn);
             });
         }
 
