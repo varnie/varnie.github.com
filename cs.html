@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="dark">
+<html lang="ru" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <style>
         :root {
             --bg: #0f1115;
@@ -1869,18 +1870,28 @@ CREATE INDEX CONCURRENTLY idx_users_name ON users(name);</code></pre>
                         
                         <div>
                             <h4 class="font-bold mb-3 highlight">Проблемы параллелизма</h4>
-                            <div class="grid gap-4 md:grid-cols-3">
+                            <div class="space-y-4">
                                 <div class="principle-card">
                                     <h5 class="font-bold mb-2">Dirty Read</h5>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Чтение незафиксированных данных другой транзакции</p>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Чтение незафиксированных данных другой транзакции, которая может откатиться.</p>
+                                    <pre class="text-xs"><code class="language-sql">T1: UPDATE users SET balance = balance - 100 WHERE id = 1
+T2: SELECT balance FROM users WHERE id = 1  -- видит -100 (грязные данные)
+T1: ROLLBACK  -- откатили изменения
+-- T2 работала с данными, которых никогда не существовало!</code></pre>
                                 </div>
                                 <div class="principle-card">
                                     <h5 class="font-bold mb-2">Non-repeatable Read</h5>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Повторное чтение возвращает другой результат (изменили строку)</p>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Повторное чтение той же строки возвращает разные данные (другая транзакция изменила и зафиксировала).</p>
+                                    <pre class="text-xs"><code class="language-sql">T1: SELECT balance FROM users WHERE id = 1  -- 1000
+T2: UPDATE users SET balance = 2000 WHERE id = 1; COMMIT
+T1: SELECT balance FROM users WHERE id = 1  -- 2000 (другое значение!)</code></pre>
                                 </div>
                                 <div class="principle-card">
                                     <h5 class="font-bold mb-2">Phantom Read</h5>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Появление/исчезновение строк при повторном запросе</p>
+                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Повторный SELECT возвращает больше/меньше строк (другая транзакция добавила/удавила строки).</p>
+                                    <pre class="text-xs"><code class="language-sql">T1: SELECT COUNT(*) FROM orders WHERE status = 'new'  -- 10
+T2: INSERT INTO orders VALUES (...); COMMIT
+T1: SELECT COUNT(*) FROM orders WHERE status = 'new'  -- 11 (новые строки!)</code></pre>
                                 </div>
                             </div>
                         </div>
