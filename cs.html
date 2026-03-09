@@ -2702,12 +2702,42 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]</code></pre>
                     </div>
                 `
             },
-            { id: 'http-api',
+            { id: 'rest-api',
             category: 'web',
-            title: 'HTTP & API Design',
-            icon: 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9',
+            title: 'REST API Principles',
+            icon: 'M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
             content: `
                     <div class="space-y-6">
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Principles of REST</h4>
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">1. Client-Server</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Клиент и сервер независимы. Клиент — UI, сервер — данные и бизнес-логика.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">2. Stateless</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Каждый запрос содержит всю информацию. Сервер не хранит состояние между запросами.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">3. Cacheable</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Ответы могут кэшироваться. Улучшает производительность, снижает нагрузку.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">4. Uniform Interface</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Ресурсы идентифицируются URL. Стандартные HTTP-методы.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">5. Layered System</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Прокси, балансировщики. Клиент не знает о слоях.</p>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">6. Code on Demand (optional)</h5>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Сервер может отправлять код (JS). Редко используется.</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div>
                             <h4 class="font-bold mb-3 highlight">HTTP Methods</h4>
                             <div class="overflow-x-auto">
@@ -2795,6 +2825,91 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]</code></pre>
                             </div>
                             <div class="mt-4 p-3 rounded-lg text-sm" style="background: var(--code-bg);">
                                 <p><span class="highlight">401 vs 403:</span> 401 — "Я не знаю кто ты" (нужен логин). 403 — "Я знаю кто ты, но тебе нельзя" (нет прав).</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">URL Design Best Practices</h4>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Bad</th>
+                                            <th>Good</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>/getUsers</code></td>
+                                            <td><code>GET /users</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>/user/123/update</code></td>
+                                            <td><code>PATCH /users/123</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>/users/123/posts/</code></td>
+                                            <td><code>GET /users/123/posts</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>/users?action=search</code></td>
+                                            <td><code>GET /users?status=active</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>/UserInfo</code></td>
+                                            <td><code>/users</code> (lowercase, plural)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">JSON:API Convention</h4>
+                            <pre class="text-sm"><code class="language-json">// Request
+GET /users/123?include=posts
+
+// Response
+{
+  "data": {
+    "id": "123",
+    "type": "user",
+    "attributes": {
+      "name": "Ivan",
+      "email": "ivan@example.com"
+    },
+    "relationships": {
+      "posts": {
+        "data": [{"type": "post", "id": "1"}]
+      }
+    },
+    "links": {
+      "self": "/users/123"
+    }
+  },
+  "included": [
+    {"id": "1", "type": "post", "attributes": {"title": "Hello"}}
+  ]
+}</code></pre>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Versioning Strategies</h4>
+                            <div class="grid gap-4 md:grid-cols-3">
+                                <div class="p-3 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                                    <p class="font-bold text-sm mb-1">URL Path</p>
+                                    <p class="text-xs font-mono" style="color: var(--fg-muted);">/api/v1/users</p>
+                                    <p class="text-xs mt-1" style="color: var(--fg-muted);">Просто, явно. Минус: дублирование кода.</p>
+                                </div>
+                                <div class="p-3 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                                    <p class="font-bold text-sm mb-1">Header</p>
+                                    <p class="text-xs font-mono" style="color: var(--fg-muted);">Accept: application/vnd.app.v1+json</p>
+                                    <p class="text-xs mt-1" style="color: var(--fg-muted);">Чистые URL. Сложнее для клиентов.</p>
+                                </div>
+                                <div class="p-3 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                                    <p class="font-bold text-sm mb-1">Query Param</p>
+                                    <p class="text-xs font-mono" style="color: var(--fg-muted);">/users?version=1</p>
+                                    <p class="text-xs mt-1" style="color: var(--fg-muted);">Гибко. Кэширование сложнее.</p>
+                                </div>
                             </div>
                         </div>
 
@@ -2815,7 +2930,7 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]</code></pre>
                                             <td>Protocol</td>
                                             <td>HTTP/1.1, JSON</td>
                                             <td>HTTP/1.1, JSON</td>
-                                            <td>HTTP/2, Protobuf (binary)</td>
+                                            <td>HTTP/2, Protobuf</td>
                                         </tr>
                                         <tr>
                                             <td>Speed</td>
@@ -2826,8 +2941,8 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]</code></pre>
                                         <tr>
                                             <td>Use Case</td>
                                             <td>Public APIs, CRUD</td>
-                                            <td>Complex UI, Mobile Apps</td>
-                                            <td>Microservices, Internal</td>
+                                            <td>Complex UI, Mobile</td>
+                                            <td>Microservices</td>
                                         </tr>
                                         <tr>
                                             <td>Pros</td>
@@ -2838,6 +2953,17 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]</code></pre>
                                     </tbody>
                                 </table>
                             </div>
+                        </div>
+
+                        <div class="p-3 rounded-lg" style="background: var(--code-bg);">
+                            <p class="font-bold mb-2 highlight">Key Takeaways</p>
+                            <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                                <li>• REST — архитектурный стиль, не протокол</li>
+                                <li>• Ресурсы — существительные, методы — глаголы</li>
+                                <li>• Stateless = масштабируемость</li>
+                                <li>• HATEOAS — клиент discover-ит API по ссылкам</li>
+                                <li>• Используйте правильные статус-коды</li>
+                            </ul>
                         </div>
                     </div>
                 `
