@@ -1061,6 +1061,33 @@ class Car:
 # При уничтожении Car исчезает и Engine</code></pre>
                                 </div>
                             </div>
+                            
+                            <div class="mt-4">
+                                <h4 class="font-bold mb-3 highlight">Что такое MRO (Method Resolution Order)?</h4>
+                                <p class="mb-3">
+                                    <b>MRO</b> — это порядок, в котором Python ищет методы и атрибуты в иерархии классов. Это критически важно при <b>множественном наследовании</b>, чтобы избежать неопределённости (проблема «ромба»). Python использует алгоритм <b>C3-линеаризации</b>.
+                                </p>
+                                <pre class="code-block mb-3"><code>class A:
+    def hello(self): print("A")
+
+class B(A):
+    def hello(self): print("B")
+
+class C(A):
+    def hello(self): print("C")
+
+class D(B, C):
+    pass
+
+# Порядок поиска: D -> B -> C -> A -> object
+print(D.mro())
+
+obj = D()
+obj.hello()  # Выведет "B"</code></pre>
+                                <p class="text-sm" style="color: var(--fg-muted);">
+                                    Посмотреть порядок можно через атрибут <code>__mro__</code> или метод <code>.mro()</code>.
+                                </p>
+                            </div>
 
                             <div class="mt-4 overflow-x-auto">
                                 <table class="data-table">
@@ -1544,10 +1571,7 @@ if __name__ == '__main__':
                                 <span class="w-10 h-10 rounded-lg flex items-center justify-center font-mono font-bold" style="background: rgba(34, 211, 238, 0.15); color: var(--accent);">I</span>
                                 <h4 class="font-bold text-lg">Isolation</h4>
                             </div>
-                            <p style="color: var(--fg-muted);">Конкурентные транзакции не влияют друг на друга. Уровни изоляции определяют видимость изменений.</p>
-                            <div class="mt-3 p-3 rounded-lg text-sm" style="background: var(--code-bg);">
-                                <p><span class="highlight">Уровни:</span> Read Uncommitted → Read Committed → Repeatable Read → Serializable</p>
-                            </div>
+                            <p style="color: var(--fg-muted);">Конкурентные транзакции не влияют друг на друга. Определяет видимость изменений.</p>
                         </div>
                         
                         <div class="principle-card">
@@ -1561,71 +1585,206 @@ if __name__ == '__main__':
                             </div>
                         </div>
                     </div>
-                `
-            },
-            {
-            id: 'redis',
-            category: 'databases',
-            title: 'Redis',
-            icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4',
-            content: `
-                    <div class="space-y-6">
-                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
-                            <p class="font-bold mb-2 highlight">In-Memory Data Structure Store</p>
-                            <p style="color: var(--fg-muted);">Redis (REmote DIctionary Server) — хранилище данных в оперативной памяти. Используется как кэш, брокер сообщений, база данных key-value.</p>
+
+                    <div class="mt-6 p-4 rounded-lg" style="background: var(--code-bg);">
+                        <h4 class="font-bold mb-3 highlight">Mechanisms: Snapshots & WAL</h4>
+                        <p style="color: var(--fg-muted);" class="mb-4">WAL и Snapshots — механизмы, позволяющие БД работать быстро без потери надёжности.</p>
+                        
+                        <div class="mb-4">
+                            <h5 class="font-bold mb-2">Snapshots (Снимки данных)</h5>
+                            <p style="color: var(--fg-muted);" class="text-sm mb-2">Снэпшот — «глаза» транзакции. Определяет, какие данные видит транзакция.</p>
+                            <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                                <li>• Содержит список активных транзакций</li>
+                                <li>• Благодаря MVCC старая версия не затирается, создаётся новая</li>
+                                <li>• <strong>Read Committed:</strong> снэпшот создаётся для каждого оператора</li>
+                                <li>• <strong>Repeatable Read / Serializable:</strong> снэпшот создаётся один раз при первом запросе</li>
+                            </ul>
                         </div>
 
                         <div>
-                            <h4 class="font-bold mb-3 highlight">Типы данных</h4>
-                            <div class="grid gap-3 md:grid-cols-2">
-                                <div class="principle-card">
-                                    <p class="font-mono font-bold">String</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Базовый тип. Кэши, счётчики (INCR), токены.</p>
-                                </div>
-                                <div class="principle-card">
-                                    <p class="font-mono font-bold">List</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Упорядоченный список. Очереди (LPUSH/RPOP), лента новостей.</p>
-                                </div>
-                                <div class="principle-card">
-                                    <p class="font-mono font-bold">Set / Sorted Set</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Уникальные значения. Теги, лидерборды (ZSET с score).</p>
-                                </div>
-                                <div class="principle-card">
-                                    <p class="font-mono font-bold">Hash</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Поле-значение. Хранение объектов (user:1 -> {name, email}).</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h4 class="font-bold mb-3 highlight">Persistence (Сохранение данных)</h4>
-                            <div class="grid gap-4 md:grid-cols-2">
-                                <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
-                                    <p class="font-bold mb-2" style="color: var(--success);">RDB (Snapshots)</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Периодическое сохранение дампа на диск. Компактный файл, быстрое восстановление. Риск потери данных между снимками.</p>
-                                </div>
-                                <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
-                                    <p class="font-bold mb-2" style="color: var(--warning);">AOF (Append Only File)</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Запись каждой операции в лог. Выше durability, но файл больше и медленнее. Можно перемешивать с RDB.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h4 class="font-bold mb-3 highlight">Use Cases</h4>
-                            <ul class="space-y-2 text-sm" style="color: var(--fg-muted);">
-                                <li><span class="highlight">Caching:</span> Кэш результатов DB запросов, сессий.</li>
-                                <li><span class="highlight">Rate Limiting:</span> Счётчики с TTL (INCR + EXPIRE).</li>
-                                <li><span class="highlight">Pub/Sub:</span> Простая система уведомлений.</li>
-                                <li><span class="highlight">Leaderboard:</span> ZSET для рейтингов.</li>
-                                <li><span class="highlight">Distributed Lock:</span> Redlock алгоритм.</li>
+                            <h5 class="font-bold mb-2">WAL (Write-Ahead Logging)</h5>
+                            <p style="color: var(--fg-muted);" class="text-sm mb-2">WAL — «чёрный ящик». Обеспечивает Durability.</p>
+                            <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                                <li>• Изменение сначала записывается в WAL на диск, потом в таблицы</li>
+                                <li>• Запись в лог — мгновенно, обновление таблиц — долго</li>
+                                <li>• После сбоя Postgres читает WAL и восстанавливает данные</li>
                             </ul>
                         </div>
                     </div>
                 `
             },
             {
-            id: 'orm-nplus1',
+                id: 'redis',
+                category: 'databases',
+                title: 'Redis, RabbitMQ, Kafka, Celery',
+                icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s8-1.79 8-4',
+                content: `
+                    <div class="space-y-6">
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                            <p class="font-bold mb-2 highlight">Redis — In-Memory Data Structure Store</p>
+                            <p style="color: var(--fg-muted);">Сверхбыстрое хранилище «ключ-значение» в оперативной памяти. Однопоточный (в ядре), что гарантирует атомарность операций.</p>
+                            <ul class="mt-2 space-y-1 text-sm" style="color: var(--fg-muted);">
+                                <li>• <strong>Типы данных:</strong> Strings, Lists, Sets, Hashes, Sorted Sets (ZSet)</li>
+                                <li>• <strong>Сценарии:</strong> Кэширование, сессии, счётчики, простые очереди (LPUSH/RPOP), Pub/Sub</li>
+                                <li>• <strong>Persistence:</strong> RDB (снимки по расписанию) или AOF (лог каждой операции)</li>
+                            </ul>
+                            <pre class="mt-3"><code class="language-python">r.set('user:1', 'active', ex=3600)  # Кэш с TTL
+r.zadd('leaderboard', {'player1': 100})  # Рейтинг с авто-сортировкой</code></pre>
+                        </div>
+
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                            <p class="font-bold mb-2" style="color: var(--success);">RabbitMQ — Message Broker</p>
+                            <p style="color: var(--fg-muted);">Умный брокер сообщений. Приоритет на гарантию доставки и гибкую маршрутизацию. Работает по протоколу AMQP.</p>
+                            <ul class="mt-2 space-y-1 text-sm" style="color: var(--fg-muted);">
+                                <li>• <strong>Архитектура:</strong> Producer → Exchange → Binding → Queue → Consumer</li>
+                                <li>• <strong>Фишка:</strong> Сообщения подтверждаются (ACK). Если потребитель упал — переложит в очередь для другого</li>
+                                <li>• <strong>Когда юзать:</strong> Сложная логика (заказ → склад + логистика через Fanout Exchange)</li>
+                            </ul>
+                            <pre class="mt-3"><code class="language-python">channel.basic_publish(exchange='logs', routing_key='', body='Hello!')
+channel.basic_consume(queue='hello', on_message_callback=callback, auto_ack=False)</code></pre>
+                        </div>
+
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                            <p class="font-bold mb-2" style="color: var(--warning);">Apache Kafka — Distributed Streaming Platform</p>
+                            <p style="color: var(--fg-muted);">Огромный, быстрый, распределённый лог. Хранит сообщения на диске. Читатели управляют Offset.</p>
+                            <ul class="mt-2 space-y-1 text-sm" style="color: var(--fg-muted);">
+                                <li>• <strong>Архитектура:</strong> Topic → Partitions. Сообщения хранятся N дней (Retention)</li>
+                                <li>• <strong>Гарантии:</strong> Порядок сообщений — только внутри одной партиции</li>
+                                <li>• <strong>Когда юзать:</strong> Логи, аналитика, Event Sourcing (миллионы событий/сек)</li>
+                                <li>• <strong>Отличие:</strong> В Rabbit сообщение удаляется после чтения, в Kafka — лежит до истечения срока</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                            <p class="font-bold mb-2 highlight">Celery — Task Queue</p>
+                            <p style="color: var(--fg-muted);">Фреймворк для отложенных/фоновых задач в Python. Надстройка над Redis или RabbitMQ.</p>
+                            <ul class="mt-2 space-y-1 text-sm" style="color: var(--fg-muted);">
+                                <li>• <strong>Зачем:</strong> Юзер не ждёт 10 сек, пока отправится Email или сгенерится PDF</li>
+                                <li>• <strong>Компоненты:</strong> Worker (выполняет), Broker (передаёт), Result Backend (хранит ответ)</li>
+                            </ul>
+                            <pre class="mt-3"><code class="language-python">@app.task
+def send_email(user_id):
+    pass
+
+send_email.delay(123)  # Задача улетает в фон мгновенно</code></pre>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Инструмент</th>
+                                        <th>Главный козырь</th>
+                                        <th>Минус</th>
+                                        <th>Когда брать</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Redis</strong></td>
+                                        <td>Скорость (микросекунды)</td>
+                                        <td>Ограничен памятью (RAM)</td>
+                                        <td>Кэш, быстрые счётчики</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>RabbitMQ</strong></td>
+                                        <td>Гибкость маршрутизации</td>
+                                        <td>Сложность кластеризации</td>
+                                        <td>Бизнес-логика, транзакционные письма</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Kafka</strong></td>
+                                        <td>Пропускная способность</td>
+                                        <td>Тяжела в настройке</td>
+                                        <td>Big Data, логи, стриминг</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Celery</strong></td>
+                                        <td>Удобство для Python</td>
+                                        <td>Зависит от брокера</td>
+                                        <td>Фоновые задачи в Django/FastAPI</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg);">
+                            <p class="font-bold mb-3 highlight">Вопрос на засыпку: «Почему Celery + Redis — это классика?»</p>
+                            <p style="color: var(--fg-muted);">Ответ: Redis быстрый и лёгкий как брокер, а Celery даёт Python-разработчику готовый интерфейс для очередей без написания сложного кода обмена сообщениями.</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Как выбирать</h4>
+                            <div class="space-y-4">
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">1. Модель данных и нагрузка</h5>
+                                    <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                                        <li>• <strong>Redis:</strong> Низкая задержка (микросекунды), данные в RAM. Кэш, сессии, быстрые счётчики.</li>
+                                        <li>• <strong>Kafka:</strong> Гигантские потоки (миллионы событий/сек). Данные хранятся долго, можно перечитать.</li>
+                                        <li>• <strong>RabbitMQ:</strong> Средняя нагрузка, сложная бизнес-логика. Важна судьба каждого сообщения.</li>
+                                    </ul>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">2. Гарантии доставки</h5>
+                                    <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                                        <li>• <strong>At-most-once</strong> (Redis/Celery): Сообщение может потеряться. Ок для кэша.</li>
+                                        <li>• <strong>At-least-once</strong> (RabbitMQ/Kafka): Доставится минимум один раз. Требует идемпотентности.</li>
+                                        <li>• <strong>Exactly-once</strong> (Kafka Streams): Самый дорогой. Нужен только в финтехе.</li>
+                                    </ul>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">3. Жизненный цикл сообщения</h5>
+                                    <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                                        <li>• <strong>Ephemeral</strong> (RabbitMQ/Redis): Прочитал — удалил.</li>
+                                        <li>• <strong>Durable Log</strong> (Kafka): Прочитал — осталось. Можно «отмотать» назад.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Сценарий</th>
+                                        <th>Инструмент</th>
+                                        <th>Почему</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Кэш профиля пользователя</td>
+                                        <td>Redis</td>
+                                        <td>Самый быстрый доступ по ключу</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Отправка Email после регистрации</td>
+                                        <td>Celery + Redis/Rabbit</td>
+                                        <td>Юзер не ждёт SMTP-сервер</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Биллинг (списание денег)</td>
+                                        <td>RabbitMQ</td>
+                                        <td>Гарантия (ACK), задача не пропадёт</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Сбор логов со всех серверов</td>
+                                        <td>Kafka</td>
+                                        <td>Огромный поток, долгое хранение</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Чат в реальном времени</td>
+                                        <td>Redis (Pub/Sub)</td>
+                                        <td>Мгновенная доставка без хранения истории</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'orm-nplus1',
             category: 'databases',
             title: 'ORM & N+1 Problem',
             icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4',
@@ -1826,106 +1985,103 @@ CREATE INDEX CONCURRENTLY idx_users_name ON users(name);</code></pre>
             content: `
                     <div class="space-y-6">
                         <div>
-                            <h4 class="font-bold mb-3 highlight">Уровни изоляции</h4>
-                            <div class="overflow-x-auto">
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Level</th>
-                                            <th>Dirty Read</th>
-                                            <th>Non-repeatable Read</th>
-                                            <th>Phantom Read</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><code>Read Uncommitted</code></td>
-                                            <td style="color: var(--error);">Possible</td>
-                                            <td style="color: var(--error);">Possible</td>
-                                            <td style="color: var(--error);">Possible</td>
-                                        </tr>
-                                        <tr>
-                                            <td><code>Read Committed</code> *</td>
-                                            <td style="color: var(--success);">Not possible</td>
-                                            <td style="color: var(--error);">Possible</td>
-                                            <td style="color: var(--error);">Possible</td>
-                                        </tr>
-                                        <tr>
-                                            <td><code>Repeatable Read</code></td>
-                                            <td style="color: var(--success);">Not possible</td>
-                                            <td style="color: var(--success);">Not possible</td>
-                                            <td style="color: var(--success);">Not possible**</td>
-                                        </tr>
-                                        <tr>
-                                            <td><code>Serializable</code></td>
-                                            <td style="color: var(--success);">Not possible</td>
-                                            <td style="color: var(--success);">Not possible</td>
-                                            <td style="color: var(--success);">Not possible</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <h4 class="font-bold mb-3 highlight">1. Read Committed (По умолчанию)</h4>
+                            <p class="mb-3" style="color: var(--fg-muted);">Каждый SELECT внутри транзакции видит новый снимок данных. Если между запросами кто-то закоммитил — увидишь новые данные.</p>
+                            <div class="p-3 rounded-lg mb-3" style="background: var(--code-bg);">
+                                <p class="text-sm font-bold mb-1" style="color: var(--warning);">Проблема: Non-repeatable read</p>
                             </div>
-                            <p class="mt-2 text-sm" style="color: var(--fg-muted);">* Default в PostgreSQL. ** В PostgreSQL Repeatable Read защищает от Phantom Read</p>
-                        </div>
-                        
-                        <div>
-                            <h4 class="font-bold mb-3 highlight">Проблемы параллелизма</h4>
-                            <div class="space-y-4">
-                                <div class="principle-card">
-                                    <h5 class="font-bold mb-2">Dirty Read</h5>
-                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Чтение незафиксированных данных другой транзакции, которая может откатиться.</p>
-                                    <pre class=""><code class="language-sql">T1: UPDATE users SET balance = balance - 100 WHERE id = 1
-T2: SELECT balance FROM users WHERE id = 1  -- видит -100 (грязные данные)
-T1: ROLLBACK  -- откатили изменения
--- T2 работала с данными, которых никогда не существовало!</code></pre>
-                                </div>
-                                <div class="principle-card">
-                                    <h5 class="font-bold mb-2">Non-repeatable Read</h5>
-                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Повторное чтение той же строки возвращает разные данные (другая транзакция изменила и зафиксировала).</p>
-                                    <pre class=""><code class="language-sql">T1: SELECT balance FROM users WHERE id = 1  -- 1000
-T2: UPDATE users SET balance = 2000 WHERE id = 1; COMMIT
-T1: SELECT balance FROM users WHERE id = 1  -- 2000 (другое значение!)</code></pre>
-                                </div>
-                                <div class="principle-card">
-                                    <h5 class="font-bold mb-2">Phantom Read</h5>
-                                    <p class="text-sm mb-2" style="color: var(--fg-muted);">Повторный SELECT возвращает больше/меньше строк (другая транзакция добавила/удавила строки).</p>
-                                    <pre class=""><code class="language-sql">T1: SELECT COUNT(*) FROM orders WHERE status = 'new'  -- 10
-T2: INSERT INTO orders VALUES (...); COMMIT
-T1: SELECT COUNT(*) FROM orders WHERE status = 'new'  -- 11 (новые строки!)</code></pre>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <h4 class="font-bold mb-3 highlight">Управление транзакциями</h4>
-                            <pre><code class="language-sql">Начать транзакцию
+                            <pre><code class="language-sql">-- Т1
 BEGIN;
--- или
-START TRANSACTION;
+SELECT balance FROM accounts WHERE id = 1;  -- 100
 
--- Установить уровень изоляции
-SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
-
--- Зафиксировать изменения
+-- Т2 (параллельно)
+UPDATE accounts SET balance = 200 WHERE id = 1;
 COMMIT;
 
--- Откатить изменения
-ROLLBACK;
-
--- Savepoint для частичного отката
-SAVEPOINT my_savepoint;
-ROLLBACK TO SAVEPOINT my_savepoint;</code></pre>
+-- Снова Т1
+SELECT balance FROM accounts WHERE id = 1;  -- ОП! Уже 200
+COMMIT;</code></pre>
                         </div>
-                        
-                        <div class="grid gap-4 md:grid-cols-2">
-                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
-                                <p class="font-bold mb-2" style="color: var(--warning);">Read Committed</p>
-                                <p class="text-sm" style="color: var(--fg-muted);">Каждый запрос видит данные, зафиксированные до его начала. Хорошо для высокой конкурентности.</p>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">2. Repeatable Read</h4>
+                            <p class="mb-3" style="color: var(--fg-muted);">Снимок делается один раз в начале транзакции. Данные «заморожены». При попытке обновить изменённую строку — ошибка сериализации.</p>
+                            <pre><code class="language-sql">-- Т1
+BEGIN ISOLATION LEVEL REPEATABLE READ;
+SELECT balance FROM accounts WHERE id = 1;  -- 100
+
+-- Т2 (параллельно)
+UPDATE accounts SET balance = 200 WHERE id = 1;
+COMMIT;
+
+-- Т1
+UPDATE accounts SET balance = 300 WHERE id = 1;
+-- ОШИБКА: could not serialize access due to concurrent update</code></pre>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">3. Serializable</h4>
+                            <p class="mb-3" style="color: var(--fg-muted);">Самый строгий уровень. База следит за логическими связями. Если результат параллельных транзакций отличается от последовательного — одна будет откачена.</p>
+                            <div class="p-3 rounded-lg mb-3" style="background: var(--code-bg);">
+                                <p class="text-sm font-bold mb-1" style="color: var(--error);">Минус: высокий оверхед, частые откаты</p>
                             </div>
-                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
-                                <p class="font-bold mb-2 highlight">Repeatable Read</p>
-                                <p class="text-sm" style="color: var(--fg-muted);">Снапшот на момент начала транзакции. Все запросы видят одинаковые данные. Требует обработки SerializationError.</p>
-                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                            <h4 class="font-bold mb-3 highlight">FOR UPDATE — пессимистическая блокировка</h4>
+                            <p class="mb-3" style="color: var(--fg-muted);">Даже на Read Committed можно гарантировать целостность с помощью <code>SELECT ... FOR UPDATE</code>. Остальные транзакции встанут в очередь.</p>
+                            <pre><code class="language-sql">BEGIN;  -- Обычный Read Committed
+
+-- Блокируем строку ПЕРЕД чтением
+SELECT balance FROM accounts WHERE id = 1 FOR UPDATE;
+
+-- Проверяем баланс в коде (данные не изменятся)
+
+-- Обновляем
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+
+COMMIT;  -- Lock снимается</code></pre>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Уровень</th>
+                                        <th>Снимок</th>
+                                        <th>Что ловит</th>
+                                        <th>Когда использовать</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>Read Committed</code></td>
+                                        <td>На каждый запрос</td>
+                                        <td>Ничего (Lost Update возможен)</td>
+                                        <td>90% задач + FOR UPDATE</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>Repeatable Read</code></td>
+                                        <td>Один на транзакцию</td>
+                                        <td>Serialization Error</td>
+                                        <td>Отчёты, нужна консистентная "картинка"</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>Serializable</code></td>
+                                        <td>Глобальный трекинг</td>
+                                        <td>Serialization Failure</td>
+                                        <td>Сложные системы (редко)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg);">
+                            <p class="font-bold mb-2 highlight">Золотое правило:</p>
+                            <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                                <li>• <strong>Скорость + надёжность:</strong> Read Committed + SELECT ... FOR UPDATE</li>
+                                <li>• <strong>Застывшая база для отчёта:</strong> Repeatable Read</li>
+                            </ul>
                         </div>
                     </div>
                 `
@@ -1997,43 +2153,6 @@ WHERE id = 1 AND version = 5;
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>
-                        
-                        <div>
-                            <h4 class="font-bold mb-3 highlight">Row-level Locks</h4>
-                            <div class="grid gap-3 md:grid-cols-2">
-                                <div class="principle-card">
-                                    <p class="font-mono font-bold">FOR UPDATE</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Эксклюзивная блокировка. Для UPDATE/DELETE.</p>
-                                </div>
-                                <div class="principle-card">
-                                    <p class="font-mono font-bold">FOR SHARE</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Разделяемая блокировка. Можно читать, нельзя писать.</p>
-                                </div>
-                                <div class="principle-card">
-                                    <p class="font-mono font-bold">FOR NO KEY UPDATE</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Блокировка без блокировки внешних ключей.</p>
-                                </div>
-                                <div class="principle-card">
-                                    <p class="font-mono font-bold">FOR KEY SHARE</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Разделяемая для FK. Совместим с NO KEY UPDATE.</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
-                            <p class="font-bold mb-2" style="color: var(--success);">SKIP LOCKED для очередей</p>
-                            <pre><code class="language-sql">Идеально для job queue: берём задачу и не блокируем других
-UPDATE tasks 
-SET status = 'processing', worker_id = :worker_id
-WHERE id = (
-    SELECT id FROM tasks 
-    WHERE status = 'pending'
-    ORDER BY created_at
-    FOR UPDATE SKIP LOCKED
-    LIMIT 1
-)
-RETURNING *;</code></pre>
                         </div>
                     </div>
                 `
@@ -2583,231 +2702,7 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]</code></pre>
                     </div>
                 `
             },
-            {
-            id: 'rabbitmq',
-            category: 'queues',
-            title: 'RabbitMQ',
-            icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',
-            content: `
-                    <div class="space-y-6">
-                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
-                            <p class="font-bold mb-2 highlight">Message Broker (AMQP)</p>
-                            <p style="color: var(--fg-muted);">RabbitMQ реализует протокол AMQP. Гарантирует доставку, маршрутизацию сообщений. Идеален для очередей задач (Jobs) и RPC.</p>
-                        </div>
-
-                        <div>
-                            <h4 class="font-bold mb-3 highlight">Архитектура</h4>
-                            <pre><code class="language-python">Producer -> Exchange -> [Bindings] -> Queue -> Consumer
-
-1. Exchange: Принимает сообщения от продюсера.
-2. Queue: Хранит сообщения.
-3. Binding: Правила связи между Exchange и Queue.</code></pre>
-                        </div>
-
-                        <div>
-                            <h4 class="font-bold mb-3 highlight">Типы Exchange</h4>
-                            <div class="overflow-x-auto">
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Type</th>
-                                            <th>Routing Logic</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><code>Direct</code></td>
-                                            <td>Точное совпадение routing key.</td>
-                                        </tr>
-                                        <tr>
-                                            <td><code>Fanout</code></td>
-                                            <td>Рассылает во все привязанные очереди (broadcast).</td>
-                                        </tr>
-                                        <tr>
-                                            <td><code>Topic</code></td>
-                                            <td>Паттерны (wildcards) <code>*.</code> и <code>#.</code> (user.*.created).</td>
-                                        </tr>
-                                        <tr>
-                                            <td><code>Headers</code></td>
-                                            <td>Маршрутизация по заголовкам (редко).</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="grid gap-4 md:grid-cols-2">
-                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
-                                <p class="font-bold mb-2" style="color: var(--success);">Гарантии доставки</p>
-                                <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
-                                    <li><b>ACK:</b> Consumer подтверждает обработку.</li>
-                                    <li><b>NACK:</b> Отказ, сообщение возвращается в очередь.</li>
-                                    <li><b>Durable:</b> Очередь переживает перезагрузку брокера.</li>
-                                </ul>
-                            </div>
-                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
-                                <p class="font-bold mb-2" style="color: var(--warning);">Dead Letter Exchange (DLX)</p>
-                                <p class="text-sm" style="color: var(--fg-muted);">Очередь для сообщений, которые не удалось обработать (rejected или expired). Важно для обработки ошибок.</p>
-                            </div>
-                        </div>
-                    </div>
-                `
-            },
-            {
-            id: 'kafka',
-            category: 'queues',
-            title: 'Apache Kafka',
-            icon: 'M13 10V3L4 14h7v7l9-11h-7z',
-            content: `
-                    <div class="space-y-6">
-                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
-                            <p class="font-bold mb-2 highlight">Distributed Event Streaming</p>
-                            <p style="color: var(--fg-muted);">Kafka — это распределённый лог событий (commit log). Высокая пропускная способность, горизонтальное масштабирование. Не удаляет сообщения после чтения.</p>
-                        </div>
-
-                        <div>
-                            <h4 class="font-bold mb-3 highlight">Ключевые концепции</h4>
-                            <div class="grid gap-3 md:grid-cols-2">
-                                <div class="principle-card">
-                                    <p class="font-mono font-bold">Topic & Partition</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Топик — это лог. Разбивается на Partition'ы для параллелизма. Порядок гарантирован только внутри одной партиции.</p>
-                                </div>
-                                <div class="principle-card">
-                                    <p class="font-mono font-bold">Consumer Group</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Группа потребителей читает топик совместно. Каждая партиция читается только одним консьюмером в группе.</p>
-                                </div>
-                                <div class="principle-card">
-                                    <p class="font-mono font-bold">Offset</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Уникальный ID сообщения в партиции. Consumer хранит offset (где остановился).</p>
-                                </div>
-                                <div class="principle-card">
-                                    <p class="font-mono font-bold">Broker & Zookeeper</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Broker — сервер Kafka. Zookeeper управляет метаданными кластера (в новых версиях KRaft mode).</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h4 class="font-bold mb-3 highlight">Retention Policy</h4>
-                            <p class="mb-2" style="color: var(--fg-muted);">В отличие от RabbitMQ, Kafka хранит сообщения долго (дни/недели) на диске.</p>
-                            <pre><code class="language-python"># Настройки retention
-log.retention.hours=168    # 7 дней
-log.retention.bytes=1073741824 # По размеру</code></pre>
-                        </div>
-
-                        <div>
-                            <h4 class="font-bold mb-3 highlight">Kafka vs RabbitMQ</h4>
-                            <div class="overflow-x-auto">
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Feature</th>
-                                            <th>RabbitMQ</th>
-                                            <th>Kafka</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Модель</td>
-                                            <td>Smart Broker (маршрутизация)</td>
-                                            <td>Smart Consumer (pull model)</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Retention</td>
-                                            <td>Удаляет после ACK</td>
-                                            <td>Хранит по времени/размеру</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Throughput</td>
-                                            <td>Средний (~50k msg/s)</td>
-                                            <td>Очень высокий (миллионы)</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Use case</td>
-                                            <td>Jobs, RPC, простые очереди</td>
-                                            <td>Event Sourcing, Logs, Streams</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                `
-            },
-            {
-            id: 'celery',
-            category: 'queues',
-            title: 'Celery',
-            icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-            content: `
-                    <div class="space-y-6">
-                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
-                            <p class="font-bold mb-2 highlight">Distributed Task Queue</p>
-                            <p style="color: var(--fg-muted);">Celery — асинхронная очередь задач для Python. Позволяет выносить тяжелые операции (отправка email, обработка видео) в фоновые воркеры.</p>
-                        </div>
-
-                        <div>
-                            <h4 class="font-bold mb-3 highlight">Архитектура</h4>
-                            <pre><code class="language-python">Producer (Django/FastAPI)
-      |
-      v
-   Broker (Redis/RabbitMQ) <--- Result Backend (DB/Redis)
-      |
-      v
-   Workers (Processes consuming tasks)</code></pre>
-                        </div>
-
-                        <div>
-                            <h4 class="font-bold mb-3 highlight">Basic Usage</h4>
-                            <pre><code class="language-python"># tasks.py
-from celery import Celery
-
-app = Celery('tasks', broker='redis://localhost:6379/0')
-
-@app.task(bind=True, max_retries=3)
-def send_email(self, to, subject):
-    try:
-        # Логика отправки
-        pass
-    except Exception as exc:
-        raise self.retry(exc=exc, countdown=60) # Retry через 60 сек
-
-# Вызов задачи
-send_email.delay('user@example.com', 'Hello')  # Асинхронно
-send_email.apply_async(args=['user@example.com', 'Hi'], countdown=10) # Отложенный запуск</code></pre>
-                        </div>
-
-                        <div>
-                            <h4 class="font-bold mb-3 highlight">Celery Beat</h4>
-                            <p class="mb-2" style="color: var(--fg-muted);">Планировщик задач (cron для Python). Запускает задачи периодически.</p>
-                            <pre><code class="language-python">app.conf.beat_schedule = {
-    'add-every-30-seconds': {
-        'task': 'tasks.add',
-        'schedule': 30.0,
-        'args': (16, 16)
-    },
-}
-# Запуск: celery -A proj beat</code></pre>
-                        </div>
-
-                        <div class="grid gap-4 md:grid-cols-2">
-                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
-                                <p class="font-bold mb-2" style="color: var(--success);">Brokers</p>
-                                <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
-                                    <li><b>Redis:</b> Быстро, просто, но теряет данные при падении.</li>
-                                    <li><b>RabbitMQ:</b> Надёжно, гарантирует доставку (ACK).</li>
-                                </ul>
-                            </div>
-                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
-                                <p class="font-bold mb-2" style="color: var(--warning);">Result Backend</p>
-                                <p class="text-sm" style="color: var(--fg-muted);">Нужен для хранения результатов задач (return value). Redis, Database (Django ORM), RPC.</p>
-                            </div>
-                        </div>
-                    </div>
-                `
-            },
-            {
-            id: 'http-api',
+            { id: 'http-api',
             category: 'web',
             title: 'HTTP & API Design',
             icon: 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9',
