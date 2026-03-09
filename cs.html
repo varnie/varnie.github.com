@@ -2377,6 +2377,149 @@ SELECT * FROM users;</code></pre>
                     </div>
                 `
             },
+            { id: 'db-replication',
+            category: 'databases',
+            title: 'Replication & Sharding',
+            icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4',
+            content: `
+                    <div class="space-y-6">
+                        <p style="color: var(--fg-muted);">Два основных способа масштабирования баз данных.</p>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">1. Репликация (Replication)</h4>
+                            <p class="mb-3" style="color: var(--fg-muted);">Создание полных копий (реплик) всей базы данных на нескольких серверах.</p>
+                            
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="p-3 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                                    <p class="font-bold mb-2" style="color: var(--success);">Зачем?</p>
+                                    <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                                        <li>• Отказоустойчивость (High Availability)</li>
+                                        <li>• Ускорение чтений</li>
+                                    </ul>
+                                </div>
+                                <div class="p-3 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                                    <p class="font-bold mb-2 highlight">Механика</p>
+                                    <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                                        <li>• Записи идут на Master-узел</li>
+                                        <li>• Синхронизирует изменения с Replica</li>
+                                        <li>• Читать можно с любого узла</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="grid gap-4 md:grid-cols-2 mt-4">
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2" style="color: var(--success);">Плюсы</h5>
+                                    <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                                        <li>✓ Если упадет сервер — данные не пропадут</li>
+                                        <li>✓ Разгружает от тяжелых SELECT</li>
+                                    </ul>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2" style="color: var(--error);">Минусы</h5>
+                                    <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                                        <li>✗ Консистентность (lag)</li>
+                                        <li>✗ Много одинаковых данных на диске</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 p-3 rounded-lg" style="background: var(--code-bg);">
+                                <p class="font-bold text-sm mb-1 highlight">Когда внедрять:</p>
+                                <p class="text-sm" style="color: var(--fg-muted);">Когда чтений в разы больше, чем записей, или цена простоя слишком высока.</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">2. Шардинг (Sharding)</h4>
+                            <p class="mb-3" style="color: var(--fg-muted);">Горизонтальное партиционирование. Разрезание одной таблицы на части и распределение по серверам.</p>
+                            
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="p-3 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                                    <p class="font-bold mb-2" style="color: var(--success);">Зачем?</p>
+                                    <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                                        <li>• Масштабирование записи</li>
+                                        <li>• Обход ограничений железа (диск, CPU)</li>
+                                    </ul>
+                                </div>
+                                <div class="p-3 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                                    <p class="font-bold mb-2 highlight">Механика</p>
+                                    <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                                        <li>• Данные делятся по ключу (user_id)</li>
+                                        <li>• Каждый сервер хранит свою часть</li>
+                                        <li>• <code>shard = hash(id) % num_shards</code></li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="grid gap-4 md:grid-cols-2 mt-4">
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2" style="color: var(--success);">Плюсы</h5>
+                                    <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                                        <li>✓ Петабайты данных</li>
+                                        <li>✓ Распределение нагрузки на запись</li>
+                                    </ul>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2" style="color: var(--error);">Минусы</h5>
+                                    <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                                        <li>✗ Высокая сложность</li>
+                                        <li>✗ Невозможны JOIN между шардами</li>
+                                        <li>✗ Сложный решардинг</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 p-3 rounded-lg" style="background: var(--code-bg);">
+                                <p class="font-bold text-sm mb-1 highlight">Когда внедрять:</p>
+                                <p class="text-sm" style="color: var(--fg-muted);">Когда данные не влезают на один сервер или один сервер не успевает обрабатывать поток записей.</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Сравнение</h4>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Параметр</th>
+                                            <th>Репликация</th>
+                                            <th>Шардинг</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Данные</td>
+                                            <td>На каждом узле — всё</td>
+                                            <td>На каждом узле — часть</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Главная цель</td>
+                                            <td>Доступность и Чтение</td>
+                                            <td>Объем и Запись</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Сложность</td>
+                                            <td>Низкая/Средняя</td>
+                                            <td>Высокая</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Отказ узла</td>
+                                            <td>Незаметен (есть копии)</td>
+                                            <td>Часть данных недоступна</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="p-3 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                            <p class="font-bold mb-2 highlight">Best Practice</p>
+                            <p class="text-sm" style="color: var(--fg-muted);">В крупных системах они работают вместе: данные сначала делятся на шарды, а затем каждый шард реплицируется для надежности.</p>
+                        </div>
+                    </div>
+                `
+            },
             {
             id: 'system-design',
             category: 'system',
