@@ -1200,29 +1200,6 @@ print(p1.age, p2.age)  # 30 25 — независимые значения</code
         </div>`
 },
 {
-    id: 'python-internals', category: 'python', title: 'Python Internals (GIL, GC)',
-    icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z',
-    content: `
-        <div class="space-y-6">
-            <div>
-                <h4 class="font-bold mb-3 highlight">GIL (Global Interpreter Lock)</h4>
-                <div class="p-4 rounded-lg mb-4" style="background:var(--code-bg);border-left:3px solid var(--error)">
-                    <p class="font-bold mb-1" style="color:var(--error)">Что это</p>
-                    <p class="text-sm" style="color:var(--fg-muted)">Мьютекс, который позволяет только одному потоку выполнять Python-байткод одновременно. Упрощает управление памятью (reference counting), но блокирует параллелизм CPU-bound задач в threading.</p>
-                </div>
-                <div class="p-4 rounded-lg mb-4" style="background:var(--code-bg);border-left:3px solid var(--warning)">
-                    <p class="font-bold mb-1" style="color:var(--warning)">Важно: Python 3.13+</p>
-                    <p class="text-sm" style="color:var(--fg-muted)">В Python 3.13 появился экспериментальный режим <b>«free-threaded»</b> (без GIL, <code>--disable-gil</code>). Для большинства продакшн-систем GIL по-прежнему актуален.</p>
-                </div>
-                <div class="grid gap-4 md:grid-cols-2">
-                    <div class="principle-card">
-                        <h5 class="font-bold mb-2" style="color:var(--success)">Когда GIL не мешает</h5>
-                        <p class="text-sm" style="color:var(--fg-muted)">I/O-bound задачи (network, file I/O, sleep). GIL отпускается во время ожидания I/O.</p>
-                        <p class="text-sm font-mono mt-2" style="color:var(--accent)">→ Threads / Asyncio</p>
-                    </div>
-                `
-            },
-            {
             id: 'python-internals',
             category: 'python',
             title: 'Python Internals (GIL, GC)',
@@ -1295,6 +1272,64 @@ def repeat(n):
 def say_hello():
     print("Hello!")</code></pre>
                 </div>
+            </div>
+        </div>`
+},
+{
+    id: 'django-orm',
+    category: 'python',
+    title: 'Django ORM Essentials',
+    icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4',
+    content: `
+        <div class="space-y-6">
+            <div>
+                <h4 class="font-bold mb-3 highlight">QuerySet Lazy Evaluation</h4>
+                <p class="mb-3" style="color:var(--fg-muted);">QuerySet ленивый — не выполняет запрос, пока не произойдёт evaluation (iter, bool, len, repr, pickle).</p>
+                <pre><code class="language-python">qs = User.objects.filter(is_active=True)  # no query yet
+qs = qs.filter(age__gte=18)              # still no query
+users = list(qs)                          # hits DB now</code></pre>
+            </div>
+            <div class="grid gap-4 md:grid-cols-2">
+                <div class="principle-card">
+                    <h5 class="font-bold mb-2">N+1 Problem & Prefetch</h5>
+                    <pre class="text-sm"><code class="language-python"># BAD: N+1 — по запросу на каждого автора
+for book in Book.objects.all():
+    print(book.author.name)
+
+# GOOD: prefetch_related (для M2M/reverse)
+books = Book.objects.prefetch_related('author')
+for book in books:
+    print(book.author.name)
+
+# select_related (для FK/O2O — JOIN)
+books = Book.objects.select_related('author')</code></pre>
+                </div>
+                <div class="principle-card">
+                    <h5 class="font-bold mb-2">Aggregation & Annotation</h5>
+                    <pre class="text-sm"><code class="language-python">from django.db.models import Count, Avg
+
+# Annotation — добавить поле к каждому объекту
+authors = Author.objects.annotate(
+    book_count=Count('book'),
+    avg_rating=Avg('book__rating')
+)
+
+# Aggregation — подсчёт по всему QuerySet
+stats = Book.objects.aggregate(
+    total=Count('id'),
+    avg_price=Avg('price')
+)</code></pre>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="data-table">
+                    <thead><tr><th>Method</th><th>SQL</th><th>When</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>select_related</code></td><td>JOIN</td><td>FK/O2O — одна запись</td></tr>
+                        <tr><td><code>prefetch_related</code></td><td>Доп. запрос + Python join</td><td>M2M/reverse — много</td></tr>
+                        <tr><td><code>only</code> / <code>defer</code></td><td>SELECT конкретных полей</td><td>Тяжёлые / не нужные поля</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>`
 },
@@ -2147,6 +2182,57 @@ def send_email(user_id):
         </div>`
             },
             {
+            id: 'sql-window-functions',
+            category: 'databases',
+            title: 'SQL Window Functions',
+            icon: 'M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z',
+            content: `
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="font-bold mb-3 highlight">OVER & PARTITION BY</h4>
+                        <pre><code class="language-sql">SELECT
+    department,
+    employee,
+    salary,
+    AVG(salary) OVER (PARTITION BY department) AS dept_avg,
+    MAX(salary) OVER (PARTITION BY department) AS dept_max
+FROM employees;</code></pre>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="principle-card">
+                            <h5 class="font-bold mb-2">ROW_NUMBER / RANK / DENSE_RANK</h5>
+                            <pre class="text-sm"><code class="language-sql">SELECT
+    ROW_NUMBER() OVER (ORDER BY salary DESC) AS row_num,
+    RANK()       OVER (ORDER BY salary DESC) AS rnk,
+    DENSE_RANK() OVER (ORDER BY salary DESC) AS drnk
+FROM employees;</code></pre>
+                            <p class="text-xs mt-2" style="color:var(--fg-muted)">ROW_NUMBER — уникальные номера; RANK — пропускает при равенстве; DENSE_RANK — не пропускает.</p>
+                        </div>
+                        <div class="principle-card">
+                            <h5 class="font-bold mb-2">LEAD / LAG</h5>
+                            <pre class="text-sm"><code class="language-sql">-- Сравнение с предыдущей строкой
+SELECT
+    date,
+    revenue,
+    LAG(revenue, 1) OVER (ORDER BY date) AS prev_day,
+    revenue - LAG(revenue, 1) OVER (ORDER BY date) AS delta
+FROM daily_sales;</code></pre>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--accent)">
+                        <p class="font-bold mb-2 highlight">Frame Specification</p>
+                        <pre class="text-sm"><code class="language-sql">-- Скользящее среднее за 7 дней
+SELECT
+    date, revenue,
+    AVG(revenue) OVER (ORDER BY date
+        ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS ma_7
+FROM daily_sales;
+
+-- UNBOUNDED PRECEDING, N FOLLOWING, CURRENT ROW</code></pre>
+                    </div>
+                </div>`
+            },
+            {
             id: 'caching',
             category: 'system',
             title: 'Caching Strategies',
@@ -2356,8 +2442,154 @@ app = FastAPI(lifespan=lifespan)</code></pre>
                                 <li><b>Exactly-once:</b> Kafka transactions + idempotent producer (финтех)</li>
                             </ul>
                         </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Backpressure</h4>
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <div class="principle-card">
+                                    <p class="font-mono font-bold mb-2">asyncio.Queue with maxsize</p>
+                                    <pre class="text-sm"><code class="language-python">async def producer(q: asyncio.Queue):
+    for i in range(100):
+        await q.put(i)  # блокируется, если q.full()
+
+async def consumer(q: asyncio.Queue):
+    while True:
+        item = await q.get()
+        await process(item)
+
+q = asyncio.Queue(maxsize=10)
+await asyncio.gather(producer(q), consumer(q))</code></pre>
+                                </div>
+                                <div class="principle-card">
+                                    <h5 class="font-bold mb-2">Bulkhead Pattern</h5>
+                                    <p class="text-sm mb-2" style="color:var(--fg-muted)">Изолирует ресурсы, чтобы сбой в одном не затронул другие. Разделение пулов соединений / тредов.</p>
+                                    <pre class="text-sm"><code class="language-python"># Раздельные пулы для разных сервисов
+db_pool = await asyncpg.create_pool(max_size=20)
+cache_pool = await redis.create_pool(max_size=10)
+api_pool = httpx.AsyncClient(limits=Limits(max_keepalive=10))</code></pre>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 `
+            },
+            {
+            id: 'distributed-systems',
+            category: 'system',
+            title: 'Distributed Systems Patterns',
+            icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4',
+            content: `
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="font-bold mb-3 highlight">Consistent Hashing</h4>
+                        <p class="mb-3" style="color: var(--fg-muted);">Распределение данных по узлам с минимальным перемещением при изменении числа узлов.</p>
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                                <p class="font-bold mb-2" style="color: var(--success);">Преимущества</p>
+                                <ul class="space-y-1 text-sm" style="color: var(--fg-muted);">
+                                    <li>• K/N данных перемещается при добавлении узла</li>
+                                    <li>• Virtual nodes для балансировки</li>
+                                </ul>
+                            </div>
+                            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                                <p class="font-bold mb-2 highlight">Применение</p>
+                                <p class="text-sm" style="color: var(--fg-muted);">Redis Cluster, Cassandra, DynamoDB, CDN.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-3 highlight">Rate Limiting Algorithms</h4>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead><tr><th>Algorithm</th><th>Description</th><th>Pros</th><th>Cons</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>Token Bucket</code></td><td>Токены с фикс. скоростью</td><td>Burst</td><td>Сложность</td></tr>
+                                    <tr><td><code>Leaky Bucket</code></td><td>Очередь с пост. скоростью</td><td>Стабильный output</td><td>Нет burst</td></tr>
+                                    <tr><td><code>Fixed Window</code></td><td>Счётчик за интервал</td><td>Простота</td><td>Spike на границе</td></tr>
+                                    <tr><td><code>Sliding Window</code></td><td>Timestamp кажд. запроса</td><td>Точность</td><td>Память</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-3 highlight">CAP Theorem</h4>
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="principle-card">
+                                <p class="font-mono font-bold mb-2">Consistency, Availability, Partition Tolerance</p>
+                                <p class="text-sm" style="color: var(--fg-muted);">Только 2 из 3 возможны. CP: MongoDB, HBase. AP: Cassandra, DynamoDB.</p>
+                            </div>
+                            <div class="principle-card">
+                                <p class="font-mono font-bold mb-2">PACELC</p>
+                                <p class="text-sm" style="color: var(--fg-muted);">При Partition — C или A; иначе — C или Latency. DynamoDB: PA/EL.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-3 highlight">Load Balancing</h4>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead><tr><th>Algorithm</th><th>Когда</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>Round Robin</code></td><td>Однородные серверы</td></tr>
+                                    <tr><td><code>Least Connections</code></td><td>Долгоживущие соединения</td></tr>
+                                    <tr><td><code>IP Hash</code></td><td>Sticky sessions</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>`
+            },
+            {
+            id: 'microservices',
+            category: 'system',
+            title: 'Microservices Patterns',
+            icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10',
+            content: `
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="font-bold mb-3 highlight">Saga Pattern</h4>
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Choreography</h5>
+                                <p class="text-sm" style="color: var(--fg-muted);">Сервисы через события. Нет координатора.</p>
+                            </div>
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Orchestration</h5>
+                                <p class="text-sm" style="color: var(--fg-muted);">Центральный оркестратор. Компенсации при ошибке.</p>
+<pre class="text-sm"><code class="language-python">class OrderSaga:
+    async def execute(self, order_id):
+        await payment.charge(order_id)
+        try:
+            await inventory.reserve(order_id)
+        except:
+            await payment.refund(order_id)
+            raise</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-3 highlight">CQRS & Event Sourcing</h4>
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">CQRS</h5>
+                                <p class="text-sm" style="color: var(--fg-muted);">Разделение Command/Query. Разные модели для чтения и записи.</p>
+                            </div>
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Event Sourcing</h5>
+                                <p class="text-sm" style="color: var(--fg-muted);">Храним события, а не состояние. Audit log, time travel.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                        <p class="font-bold mb-2" style="color: var(--warning);">Anti-patterns</p>
+                        <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                            <li>• <b>Distributed monolith:</b> много сервисов, деплоятся вместе</li>
+                            <li>• <b>Shared database:</b> сервисы должны владеть своими данными</li>
+                            <li>• <b>Nanoservices:</b> слишком мелко → оверхед</li>
+                            <li>• <b>Synchronous chains:</b> A→B→C→D — один сбой валит всё</li>
+                        </ul>
+                    </div>
+                </div>`
             },
             {
             id: 'docker',
@@ -2410,6 +2642,24 @@ USER appuser
 
 EXPOSE 8000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]</code></pre>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">HEALTHCHECK</h4>
+                            <pre><code class="language-plaintext">HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1</code></pre>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">.dockerignore</h4>
+                            <pre><code class="language-plaintext">__pycache__
+*.pyc
+.env
+.git
+*.md
+node_modules
+.cache
+*.egg-info</code></pre>
                         </div>
                         
                         <div>
@@ -3258,6 +3508,176 @@ async def sse_endpoint():
                 `
             },
             {
+            id: 'graphql',
+            category: 'web',
+            title: 'GraphQL Essentials',
+            icon: 'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5',
+            content: `
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="font-bold mb-3 highlight">Schema & Types</h4>
+                        <pre><code class="language-python">import strawberry
+
+@strawberry.type
+class User:
+    id: strawberry.ID
+    name: str
+    email: str
+    posts: list["Post"]
+
+@strawberry.type
+class Query:
+    @strawberry.field
+    def user(self, id: strawberry.ID) -> User | None:
+        return db.get_user(id)
+
+schema = strawberry.Schema(query=Query)</code></pre>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="principle-card">
+                            <h5 class="font-bold mb-2">Mutations</h5>
+                            <pre class="text-sm"><code class="language-python">@strawberry.type
+class Mutation:
+    @strawberry.mutation
+    def create_user(self, name: str, email: str) -> User:
+        return db.create_user(name, email)</code></pre>
+                        </div>
+                        <div class="principle-card">
+                            <h5 class="font-bold mb-2">N+1 — DataLoader</h5>
+                            <pre class="text-sm"><code class="language-python">from strawberry.dataloader import DataLoader
+loader = DataLoader(load_users)
+# Батчит: WHERE id IN (...)</code></pre>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                        <p class="font-bold mb-2" style="color: var(--warning);">REST vs GraphQL</p>
+                        <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                            <li><b>REST:</b> несколько эндпоинтов, фикс. response, легко кешировать</li>
+                            <li><b>GraphQL:</b> один эндпоинт, клиент выбирает поля, гибкость</li>
+                            <li><b>Overfetching:</b> REST страдает, GraphQL решает</li>
+                        </ul>
+                    </div>
+                </div>`
+            },
+            {
+            id: 'websockets-sse',
+            category: 'web',
+            title: 'WebSockets & SSE',
+            icon: 'M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+            content: `
+                <div class="space-y-6">
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="principle-card">
+                            <h5 class="font-bold mb-2">WebSocket (FastAPI)</h5>
+                            <pre class="text-sm"><code class="language-python">from fastapi import WebSocket, WebSocketDisconnect
+
+class ConnectionManager:
+    def __init__(self):
+        self.active: list[WebSocket] = []
+    async def connect(self, ws):
+        await ws.accept(); self.active.append(ws)
+    async def disconnect(self, ws):
+        self.active.remove(ws)
+    async def broadcast(self, msg):
+        for ws in self.active:
+            await ws.send_text(msg)
+
+manager = ConnectionManager()
+
+@app.websocket("/ws/{client_id}")
+async def ws_endpoint(ws: WebSocket, client_id: str):
+    await manager.connect(ws)
+    try:
+        while True:
+            data = await ws.receive_text()
+            await manager.broadcast(f"{client_id}: {data}")
+    except WebSocketDisconnect:
+        await manager.disconnect(ws)</code></pre>
+                        </div>
+                        <div class="principle-card">
+                            <h5 class="font-bold mb-2">Server-Sent Events</h5>
+                            <pre class="text-sm"><code class="language-python">from sse_starlette.sse import EventSourceResponse
+
+@app.get("/events")
+async def sse_endpoint():
+    async def event_generator():
+        async for update in subscribe():
+            yield {"event": "update", "data": json.dumps(update)}
+    return EventSourceResponse(event_generator())
+
+# Client: new EventSource("/events")</code></pre>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead><tr><th>Feature</th><th>WebSocket</th><th>SSE</th><th>Polling</th></tr></thead>
+                            <tbody>
+                                <tr><td>Direction</td><td>Bidirectional</td><td>Server → Client</td><td>Client → Server</td></tr>
+                                <tr><td>Reconnect</td><td>Manual</td><td>Built-in</td><td>Manual</td></tr>
+                                <tr><td>Use case</td><td>Chat, games</td><td>Notifications</td><td>Status checks</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>`
+            },
+            {
+            id: 'grpc',
+            category: 'web',
+            title: 'gRPC & Protobuf',
+            icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4',
+            content: `
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="font-bold mb-3 highlight">Protobuf Schema</h4>
+                        <pre><code class="language-plaintext">syntax = "proto3";
+
+service UserService {
+    rpc GetUser (GetUserRequest) returns (User);
+    rpc ListUsers (ListUsersRequest) returns (stream User);
+}
+
+message User { string id = 1; string name = 2; string email = 3; }</code></pre>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="principle-card">
+                            <h5 class="font-bold mb-2">Python Server</h5>
+                            <pre class="text-sm"><code class="language-python">import grpc, user_pb2, user_pb2_grpc
+from concurrent import futures
+
+class UserServicer(user_pb2_grpc.UserServiceServicer):
+    def GetUser(self, request, context):
+        u = db.get_user(request.id)
+        return user_pb2.User(id=u.id, name=u.name, email=u.email)
+
+server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+user_pb2_grpc.add_UserServiceServicer_to_server(UserServicer(), server)
+server.add_insecure_port("[::]:50051")
+server.start()</code></pre>
+                        </div>
+                        <div class="principle-card">
+                            <h5 class="font-bold mb-2">Python Client</h5>
+                            <pre class="text-sm"><code class="language-python">import grpc, user_pb2, user_pb2_grpc
+
+with grpc.insecure_channel("localhost:50051") as ch:
+    stub = user_pb2_grpc.UserServiceStub(ch)
+    user = stub.GetUser(user_pb2.GetUserRequest(id="123"))
+    print(user.name)</code></pre>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead><tr><th>Feature</th><th>REST</th><th>gRPC</th></tr></thead>
+                            <tbody>
+                                <tr><td>Transport</td><td>HTTP/1.1</td><td>HTTP/2</td></tr>
+                                <tr><td>Payload</td><td>JSON</td><td>Protobuf (binary)</td></tr>
+                                <tr><td>Streaming</td><td>No</td><td>Unary/Server/Client/Bidi</td></tr>
+                                <tr><td>Speed</td><td>Slower</td><td>~10x faster</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>`
+            },
+            {
             id: 'design-patterns',
             category: 'tools',
             title: 'Design Patterns',
@@ -3386,7 +3806,7 @@ class Observer:
         </div>`
 },
 {
-    id: 'testing', category: 'tools', title: 'Testing (pytest & mocks)',
+    id: 'testing', category: 'tools', title: 'Testing (pytest & advanced)',
     icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
     content: `
         <div class="space-y-6">
@@ -3399,7 +3819,7 @@ class Observer:
                 </div>
             </div>
             <div>
-                <h4 class="font-bold mb-3 highlight">Pytest Fixtures</h4>
+                <h4 class="font-bold mb-3 highlight">Pytest Fixtures: Basics & Scopes</h4>
                 <pre><code class="language-python"># conftest.py
 import pytest
 
@@ -3407,8 +3827,24 @@ import pytest
 def db_session():
     db = Database()
     db.connect()
-    yield db       # setup
-    db.close()     # teardown (выполнится даже при ошибке в тесте)
+    yield db
+    db.close()
+
+@pytest.fixture(scope="session")
+def db_pool():
+    pool = create_pool()
+    yield pool
+    pool.close()
+
+@pytest.fixture(scope="function")
+async def db_session_scoped(db_pool):
+    async with db_pool.acquire() as conn:
+        async with conn.transaction():
+            yield conn
+
+@pytest.fixture(autouse=True)
+def setup_test_env():
+    os.environ["TESTING"] = "1"
 
 def test_query(db_session):
     assert db_session.query("SELECT 1")</code></pre>
@@ -3425,185 +3861,25 @@ def test_square(input, expected):
                 <h4 class="font-bold mb-3 highlight">Mocking</h4>
                 <div class="grid gap-4 md:grid-cols-2">
                     <div class="principle-card">
-                        <h5 class="font-bold mb-2">patch</h5>
-                        <pre class="text-sm"><code class="language-python">from unittest.mock import patch
+                        <h5 class="font-bold mb-2">patch & patch.object</h5>
+                        <pre class="text-sm"><code class="language-python">from unittest.mock import patch, AsyncMock
 
 with patch('module.requests.get') as mock_get:
     mock_get.return_value.json.return_value = {"id": 1}
-    result = call_api()
+
+with patch.object(EmailService, "send") as mock_send:
+    mock_send.return_value = True
+    mock_send.assert_called_once()
 
 @patch('module.ClassName')
 def test_something(mock_cls):
     ...</code></pre>
                     </div>
                     <div class="principle-card">
-                        <h5 class="font-bold mb-2">Mock vs MagicMock</h5>
-                        <pre class="text-sm"><code class="language-python">mock = MagicMock()
-mock.__str__.return_value = "Custom"
-str(mock)  # "Custom"
-
-# Assertions
-mock.method.assert_called_once()
-mock.method.assert_called_with(1, 2)
-mock.method.assert_not_called()</code></pre>
-                    </div>
-                `
-            },
-            {
-            id: 'profiling',
-            category: 'tools',
-            title: 'Profiling & Optimization',
-            icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
-            content: `
-                    <div class="space-y-6">
-                        <div>
-                            <h4 class="font-bold mb-3 highlight">Profiling Tools</h4>
-                            <div class="grid gap-4 md:grid-cols-2">
-                                <div class="principle-card">
-                                    <h5 class="font-bold mb-2">cProfile</h5>
-                                    <pre class="text-sm"><code class="language-python"># Command line
-python -m cProfile -o output.prof my_script.py
-
-# Code
-import cProfile
-profiler = cProfile.Profile()
-profiler.enable()
-run_slow_function()
-profiler.disable()
-profiler.print_stats(sort="cumtime")
-
-# Analyse: snakeviz output.prof
-# pip install snakeviz && snakeviz output.prof</code></pre>
-                                </div>
-                                <div class="principle-card">
-                                    <h5 class="font-bold mb-2">py-spy (sampling profiler)</h5>
-                                    <pre class="text-sm"><code class="language-bash"># Без остановки кода, без изменений
-py-spy record -o profile.svg --pid 12345
-py-spy top --pid 12345
-
-# Для запуска Python процесса
-py-spy record -o profile.svg -- python my_script.py
-
-# Дает flamegraph сразу</code></pre>
-                                </div>
-                                <div class="principle-card">
-                                    <h5 class="font-bold mb-2">memory_profiler</h5>
-                                    <pre class="text-sm"><code class="language-python">from memory_profiler import profile
-
-@profile
-def process_data():
-    large_list = [i for i in range(100_000)]
-    return sum(large_list)
-
-# Запуск:
-# python -m memory_profiler my_script.py
-
-# Построчная таблица памяти</code></pre>
-                                </div>
-                                <div class="principle-card">
-                                    <h5 class="font-bold mb-2">timeit & __slots__</h5>
-                                    <pre class="text-sm"><code class="language-python">import timeit
-
-# Micro-benchmarks
-timeit.timeit("sum(range(100))", number=10000)
-
-# __slots__ — экономия памяти
-class Point:
-    __slots__ = ("x", "y")
-    def __init__(self, x, y):
-        self.x, self.y = x, y
-
-# Point без __slots__: ~72 bytes
-# Point с __slots__:  ~56 bytes
-# На 10M объектов — 160MB разницы</code></pre>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h4 class="font-bold mb-3 highlight">Основные оптимизации</h4>
-                            <div class="grid gap-3">
-                                <div class="p-3 rounded-lg" style="background: var(--code-bg);">
-                                    <p class="font-bold" style="color: var(--accent);">Connection Pooling</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Всегда используй пул соединений (asyncpg.create_pool, redis.ConnectionPool). Создание соединения — дорого.</p>
-                                </div>
-                                <div class="p-3 rounded-lg" style="background: var(--code-bg);">
-                                    <p class="font-bold" style="color: var(--accent);">Lazy Evaluation</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);">Генераторы вместо списков. <code>any()</code>/<code>all()</code> с generator expression — short-circuit.</p>
-                                </div>
-                                <div class="p-3 rounded-lg" style="background: var(--code-bg);">
-                                    <p class="font-bold" style="color: var(--accent);">Built-in functions</p>
-                                    <p class="text-sm" style="color: var(--fg-muted);"><code>map()</code>, <code>filter()</code>, <code>itertools</code>, <code>collections.deque</code> — быстрее ручных циклов на Python.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `
-            },
-            {
-            id: 'testing-advanced',
-            category: 'tools',
-            title: 'Testing Advanced Patterns',
-            icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-            content: `
-                    <div class="space-y-6">
-                        <div>
-                            <h4 class="font-bold mb-3 highlight">pytest Fixtures: Scopes & Autouse</h4>
-                            <pre class="text-sm"><code class="language-python"># conftest.py
-import pytest
-
-@pytest.fixture(scope="session")  # 1 раз за сессию
-def db_pool():
-    pool = create_pool()
-    yield pool
-    pool.close()
-
-@pytest.fixture(scope="function")  # Каждый тест — новый
-async def db_session(db_pool):
-    async with db_pool.acquire() as conn:
-        async with conn.transaction():
-            yield conn
-            raise pytest.fail("Rollback!")
-
-@pytest.fixture(autouse=True)  # Всегда применяется
-def setup_test_data(db_session):
-    await db_session.execute("TRUNCATE users CASCADE")</code></pre>
-                        </div>
-
-                        <div class="grid gap-4 md:grid-cols-2">
-                            <div class="principle-card">
-                                <h5 class="font-bold mb-2">Factory Boy</h5>
-                                <pre class="text-sm"><code class="language-python">import factory
-
-class UserFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = User
-        django_get_or_create = ("email",)
-
-    username = factory.Sequence(lambda n: f"user{n}")
-    email = factory.LazyAttribute(lambda o: f"{o.username}@example.com")
-    is_active = True
-
-# Использование
-user = UserFactory()
-admin = UserFactory(is_superuser=True)
-batch = UserFactory.create_batch(10)</code></pre>
-                            </div>
-                            <div class="principle-card">
-                                <h5 class="font-bold mb-2">Mock Deep: patch.object, spec, wraps</h5>
-                                <pre class="text-sm"><code class="language-python">from unittest.mock import patch, AsyncMock
-
-# patch.object — подмена метода
-with patch.object(EmailService, "send") as mock_send:
-    mock_send.return_value = True
-    register_user(...)
-    mock_send.assert_called_once()
-
-# spec — сохраняет сигнатуру
-mock = MagicMock(spec=Database)
+                        <h5 class="font-bold mb-2">spec, wraps, MagicMock</h5>
+                        <pre class="text-sm"><code class="language-python">mock = MagicMock(spec=Database)
 mock.execute.side_effect = RuntimeError("DB down")
 
-# wraps — обёртка с сохранением логики
 def spy_send(original):
     def wrapper(*a, **kw):
         print(f"send called with {a}")
@@ -3611,39 +3887,51 @@ def spy_send(original):
     return wrapper
 
 with patch.object(EmailService, "send", wraps=spy_send):
-    ...</code></pre>
-                            </div>
-                        </div>
+    ...
 
-                        <div class="grid gap-4 md:grid-cols-2">
-                            <div class="principle-card">
-                                <h5 class="font-bold mb-2">Hypothesis (Property-based)</h5>
-                                <pre class="text-sm"><code class="language-python">from hypothesis import given, strategies as st
+mock.method.assert_called_once()
+mock.method.assert_called_with(1, 2)
+mock.method.assert_not_called()</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="grid gap-4 md:grid-cols-2">
+                <div class="principle-card">
+                    <h5 class="font-bold mb-2">Factory Boy</h5>
+                    <pre class="text-sm"><code class="language-python">import factory
+
+class UserFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = User
+        django_get_or_create = ("email",)
+    username = factory.Sequence(lambda n: f"user{n}")
+    email = factory.LazyAttribute(lambda o: f"{o.username}@example.com")
+    is_active = True
+
+user = UserFactory()
+admin = UserFactory(is_superuser=True)
+batch = UserFactory.create_batch(10)</code></pre>
+                </div>
+                <div class="principle-card">
+                    <h5 class="font-bold mb-2">Hypothesis</h5>
+                    <pre class="text-sm"><code class="language-python">from hypothesis import given, strategies as st
 
 @given(st.lists(st.integers()))
 def test_sorting_property(items):
     result = sorted(items)
-    # Sorting invariants
     assert len(result) == len(items)
     assert all(result[i] <= result[i+1]
                for i in range(len(result)-1))
-    assert set(result) == set(items)
-
-# Находит кейсы, о которых вы не подумали
-# >> from hypothesis import find
-# >> find(st.lists(st.integers()),
-#         lambda x: sorted(x) != sorted(x, reverse=True))
-# [0, -1]</code></pre>
-                            </div>
-                            <div class="principle-card">
-                                <h5 class="font-bold mb-2">monkeypatch & tmp_path</h5>
-                                <pre class="text-sm"><code class="language-python"># monkeypatch — замена атрибутов
-def test_env(monkeypatch):
+    assert set(result) == set(items)</code></pre>
+                </div>
+            </div>
+            <div class="grid gap-4 md:grid-cols-2">
+                <div class="principle-card">
+                    <h5 class="font-bold mb-2">monkeypatch & tmp_path</h5>
+                    <pre class="text-sm"><code class="language-python">def test_env(monkeypatch):
     monkeypatch.setenv("DATABASE_URL", "sqlite:///test.db")
     monkeypatch.setattr("module.Config.KEY", "test")
-    # Восстанавливается после теста
 
-# tmp_path — временная директория
 def test_file_operations(tmp_path):
     d = tmp_path / "sub"
     d.mkdir()
@@ -3651,26 +3939,121 @@ def test_file_operations(tmp_path):
     f.write_text("hello")
     assert f.read_text() == "hello"
 
-# capsys — захват stdout
 def test_output(capsys):
     print("hello")
     captured = capsys.readouterr()
     assert captured.out == "hello\\n"</code></pre>
-                            </div>
-                        </div>
+                </div>
+                <div class="principle-card">
+                    <h5 class="font-bold mb-2">Pytest plugins</h5>
+                    <pre class="text-sm"><code># pytest-cov, pytest-xdist, pytest-asyncio
+# pytest-timeout, freezegun, pytest-mock
 
-                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
-                            <p class="font-bold mb-2 highlight">Best Practices</p>
-                            <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
-                                <li>• Arrange-Act-Assert (AAA) — структурируй тесты</li>
-                                <li>• Один assert на один тест (или assert по одной концепции)</li>
-                                <li>• Не мокай то, чем не владеешь (не мокай requests, мокай свой слой)</li>
-                                <li>• Используй <code>pytest.mark.parametrize</code> вместо копипасты тестов</li>
-                                <li>• conftest.py для shared fixtures, не для тестов</li>
-                            </ul>
-                        </div>
+@pytest.mark.asyncio
+async def test_async_call():
+    result = await fetch_data()
+    assert result.status == 200</code></pre>
+                </div>
+            </div>
+            <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                <p class="font-bold mb-2 highlight">Best Practices</p>
+                <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                    <li>• Arrange-Act-Assert (AAA) — структурируй тесты</li>
+                    <li>• Один assert на один тест (или assert по одной концепции)</li>
+                    <li>• Не мокай то, чем не владеешь (не мокай requests, мокай свой слой)</li>
+                    <li>• Используй <code>pytest.mark.parametrize</code> вместо копипасты тестов</li>
+                    <li>• conftest.py для shared fixtures, не для тестов</li>
+                </ul>
+            </div>
+        </div>`
+},
+{
+    id: 'profiling', category: 'tools', title: 'Profiling & Optimization',
+    icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+    content: `
+        <div class="space-y-6">
+            <div>
+                <h4 class="font-bold mb-3 highlight">Profiling Tools</h4>
+                <div class="grid gap-4 md:grid-cols-2">
+                    <div class="principle-card">
+                        <h5 class="font-bold mb-2">cProfile</h5>
+                        <pre class="text-sm"><code class="language-python">python -m cProfile -o output.prof my_script.py
+
+import cProfile
+profiler = cProfile.Profile()
+profiler.enable()
+run_slow_function()
+profiler.disable()
+profiler.print_stats(sort="cumtime")
+
+# Analyse: snakeviz output.prof</code></pre>
                     </div>
-                `
+                    <div class="principle-card">
+                        <h5 class="font-bold mb-2">py-spy</h5>
+                        <pre class="text-sm"><code class="language-bash">py-spy record -o profile.svg --pid 12345
+py-spy top --pid 12345
+py-spy record -o profile.svg -- python my_script.py</code></pre>
+                    </div>
+                    <div class="principle-card">
+                        <h5 class="font-bold mb-2">memory_profiler</h5>
+                        <pre class="text-sm"><code class="language-python">from memory_profiler import profile
+
+@profile
+def process_data():
+    large_list = [i for i in range(100_000)]
+    return sum(large_list)
+
+# python -m memory_profiler my_script.py</code></pre>
+                    </div>
+                    <div class="principle-card">
+                        <h5 class="font-bold mb-2">tracemalloc</h5>
+                        <pre class="text-sm"><code class="language-python">import tracemalloc
+tracemalloc.start()
+snap1 = tracemalloc.take_snapshot()
+data = [i for i in range(100_000)]
+snap2 = tracemalloc.take_snapshot()
+diff = snap2.compare_to(snap1, 'lineno')
+for stat in diff[:5]:
+    print(stat)</code></pre>
+                    </div>
+                    <div class="principle-card">
+                        <h5 class="font-bold mb-2">objgraph</h5>
+                        <pre class="text-sm"><code class="language-python">import objgraph
+objgraph.show_most_common_types()
+objgraph.show_growth()
+objgraph.show_backrefs([leaky_obj],
+    filename="backrefs.png")</code></pre>
+                    </div>
+                    <div class="principle-card">
+                        <h5 class="font-bold mb-2">timeit & __slots__</h5>
+                        <pre class="text-sm"><code class="language-python">timeit.timeit("sum(range(100))", number=10000)
+
+class Point:
+    __slots__ = ("x", "y")
+# ~72 bytes без __slots__
+# ~56 bytes с __slots__
+# На 10M — 160MB разницы</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-bold mb-3 highlight">Основные оптимизации</h4>
+                <div class="grid gap-3">
+                    <div class="p-3 rounded-lg" style="background: var(--code-bg);">
+                        <p class="font-bold" style="color: var(--accent);">Connection Pooling</p>
+                        <p class="text-sm" style="color: var(--fg-muted);">Всегда используй пул соединений (asyncpg.create_pool, redis.ConnectionPool).</p>
+                    </div>
+                    <div class="p-3 rounded-lg" style="background: var(--code-bg);">
+                        <p class="font-bold" style="color: var(--accent);">Lazy Evaluation</p>
+                        <p class="text-sm" style="color: var(--fg-muted);">Генераторы вместо списков. <code>any()</code>/<code>all()</code> short-circuit.</p>
+                    </div>
+                    <div class="p-3 rounded-lg" style="background: var(--code-bg);">
+                        <p class="font-bold" style="color: var(--accent);">Built-in functions</p>
+                        <p class="text-sm" style="color: var(--fg-muted);"><code>map()</code>, <code>filter()</code>, <code>itertools</code>, <code>collections.deque</code> — быстрее ручных циклов.</p>
+                    </div>
+                </div>
+            </div>
+        </div>`
             },
 // ══════════════════════════════════════════════
 //  NEW SECTION: Git workflow
