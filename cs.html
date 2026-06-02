@@ -2547,15 +2547,46 @@ api_pool = httpx.AsyncClient(limits=Limits(max_keepalive=10))</code></pre>
             content: `
                 <div class="space-y-6">
                     <div>
+                        <h4 class="font-bold mb-3 highlight">2PC (Two-Phase Commit)</h4>
+                        <p class="mb-3" style="color: var(--fg-muted);">Строгая согласованность (ACID) в реальном времени. Центральный координатор управляет участниками.</p>
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Phase 1: Prepare</h5>
+                                <p class="text-sm" style="color: var(--fg-muted);">Координатор спрашивает всех: «Готовы?». Каждый сервис проверяет валидность, блокирует строки, отвечает Ready или Abort.</p>
+                            </div>
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Phase 2: Commit</h5>
+                                <p class="text-sm" style="color: var(--fg-muted);">Все Ready → Commit. Хотя бы один Abort (или timeout) → Rollback всем. Блокировки снимаются.</p>
+                            </div>
+                        </div>
+                        <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--error);">
+                            <p class="font-bold mb-1" style="color: var(--error);">Минусы</p>
+                            <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                                <li>• Блокировки на всё время транзакции — плохо для high-load</li>
+                                <li>• Координатор — single point of failure</li>
+                                <li>• Не масштабируется, редко используется в реальных микросервисах</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
                         <h4 class="font-bold mb-3 highlight">Saga Pattern</h4>
+                        <p class="mb-3" style="color: var(--fg-muted);">Вместо одной ACID-транзакции — цепочка локальных транзакций с <b>Eventual Consistency</b>. При ошибке запускаются <b>компенсирующие транзакции</b> (refund, отмена брони) в обратном порядке.</p>
                         <div class="grid gap-4 md:grid-cols-2">
                             <div class="principle-card">
                                 <h5 class="font-bold mb-2">Choreography</h5>
-                                <p class="text-sm" style="color: var(--fg-muted);">Сервисы через события. Нет координатора.</p>
+                                <p class="text-sm" style="color: var(--fg-muted);">Сервисы общаются через события (Kafka/RabbitMQ). Сервис A сделал → событие → Сервис B услышал → сделал своё.</p>
+                                <ul class="text-xs mt-2 space-y-1" style="color: var(--fg-muted);">
+                                    <li>✅ Loose coupling, нет единой точки отказа</li>
+                                    <li>❌ Сложно отлаживать, тяжело понять общую картину</li>
+                                </ul>
                             </div>
                             <div class="principle-card">
                                 <h5 class="font-bold mb-2">Orchestration</h5>
-                                <p class="text-sm" style="color: var(--fg-muted);">Центральный оркестратор. Компенсации при ошибке.</p>
+                                <p class="text-sm" style="color: var(--fg-muted);">Выделенный <b>Saga Manager</b> (State Machine) управляет шагами через HTTP/gRPC/Kafka.</p>
+                                <ul class="text-xs mt-2 space-y-1" style="color: var(--fg-muted);">
+                                    <li>✅ Логика процесса в одном месте, легко понять</li>
+                                    <li>❌ Оркестратор — единая точка отказа и tight coupling</li>
+                                </ul>
 <pre class="text-sm"><code class="language-python">class OrderSaga:
     async def execute(self, order_id):
         await payment.charge(order_id)
@@ -2567,16 +2598,25 @@ api_pool = httpx.AsyncClient(limits=Limits(max_keepalive=10))</code></pre>
                             </div>
                         </div>
                     </div>
+                    <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                        <p class="font-bold mb-2 highlight">Decision: 2PC vs Saga vs Tools</p>
+                        <ul class="text-sm space-y-1" style="color: var(--fg-muted);">
+                            <li><b>2PC</b> — когда нужна строгая ACID и низкая нагрузка (не high-load)</li>
+                            <li><b>Saga Choreography</b> — high-load, loose coupling, допустима eventual consistency</li>
+                            <li><b>Saga Orchestration</b> — сложный бизнес-процесс, нужна visibility и контроль</li>
+                            <li><b>Инструменты:</b> <b>Temporal</b> / <b>Camunda</b> / <b>Cadence</b> — надёжная оркестрация с retry, timeout, state persistence</li>
+                        </ul>
+                    </div>
                     <div>
                         <h4 class="font-bold mb-3 highlight">CQRS & Event Sourcing</h4>
                         <div class="grid gap-4 md:grid-cols-2">
                             <div class="principle-card">
                                 <h5 class="font-bold mb-2">CQRS</h5>
-                                <p class="text-sm" style="color: var(--fg-muted);">Разделение Command/Query. Разные модели для чтения и записи.</p>
+                                <p class="text-sm" style="color: var(--fg-muted);">Разделение Command/Query. Разные модели для чтения и записи. Позволяет оптимизировать read и write независимо.</p>
                             </div>
                             <div class="principle-card">
                                 <h5 class="font-bold mb-2">Event Sourcing</h5>
-                                <p class="text-sm" style="color: var(--fg-muted);">Храним события, а не состояние. Audit log, time travel.</p>
+                                <p class="text-sm" style="color: var(--fg-muted);">Храним события, а не состояние. Audit log, time travel, полная история изменений. Часто комбинируется с CQRS.</p>
                             </div>
                         </div>
                     </div>
