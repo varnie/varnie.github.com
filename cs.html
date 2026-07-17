@@ -311,7 +311,6 @@ const categories = [
     { id: 'databases',  title: 'Databases' },
     { id: 'system',     title: 'System Design' },
     { id: 'devops',     title: 'DevOps' },
-    { id: 'queues',     title: 'Message Queues' },
     { id: 'web',        title: 'Web Frameworks' },
     { id: 'tools',      title: 'Tools & Testing' },
 ];
@@ -1072,6 +1071,10 @@ results = await asyncio.gather(
             <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--accent)">
                 <p style="color:var(--fg-muted)">Итераторы и генераторы — основа ленивых вычислений в Python. Генераторы не хранят все данные в памяти сразу.</p>
             </div>
+            <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--warning)">
+                <p class="font-bold mb-1" style="color:var(--warning)">Почему это важно для собеседования</p>
+                <p class="text-sm" style="color:var(--fg-muted)">Генераторы и итераторы — одна из самых частых тем. Вас могут попросить: (1) объяснить разницу между <code>yield</code> и <code>return</code>, (2) написать генератор для обработки большого файла, (3) объяснить, чем генератор отличается от списка. Понимание <code>send()</code> — признак глубоких знаний.</p>
+            </div>
             <div>
                 <h4 class="font-bold mb-3 highlight">Iterator Protocol</h4>
                 <p class="mb-3" style="color:var(--fg-muted)">Объект с методами <code>__iter__</code> и <code>__next__</code>. При исчерпании бросает <code>StopIteration</code>.</p>
@@ -1152,6 +1155,10 @@ gen.send(20)       # 30</code></pre>
         <div class="space-y-6">
             <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--accent)">
                 <p style="color:var(--fg-muted)">Descriptor — объект, реализующий протокол доступа к атрибутам. Лежит в основе <code>@property</code>, <code>@classmethod</code>, <code>@staticmethod</code>.</p>
+            </div>
+            <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--warning)">
+                <p class="font-bold mb-1" style="color:var(--warning)">Где встречается в реальной жизни</p>
+                <p class="text-sm" style="color:var(--fg-muted)">ORM (SQLAlchemy, Django) используют дескрипторы для маппинга колонок БД на атрибуты Python. Pydantic использует дескрипторы для валидации полей. На собеседовании могут спросить: «В чём разница между data и non-data descriptor?» и «Почему нельзя хранить значение на <code>self</code> дескриптора?».</p>
             </div>
             <div>
                 <h4 class="font-bold mb-3 highlight">Descriptor Protocol</h4>
@@ -1273,10 +1280,108 @@ def say_hello():
     print("Hello!")</code></pre>
                 </div>
             </div>
-        </div>`
-},
-{
-    id: 'django-orm',
+            </div>`
+        },
+        {
+            id: 'import-system', category: 'python', title: 'Python Import System',
+            icon: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4',
+            content: `
+                    <div class="space-y-6">
+                        <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--accent)">
+                            <p style="color:var(--fg-muted)">Система импортов — механизм поиска и загрузки модулей. Понимание её работы спасает от циклических импортов, проблем с путями и неочевидных ошибок при запуске тестов.</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Как работает import</h4>
+                            <p class="mb-3" style="color:var(--fg-muted)">При <code>import X</code> Python ищет модуль по <code>sys.path</code> последовательно: сначала built-in, потом текущая директория, потом <code>PYTHONPATH</code>, затем site-packages. Если модуль уже загружен — он в <code>sys.modules</code>.</p>
+                            <pre><code class="language-python">import sys
+
+print(sys.path)
+# ['/current/dir', '/usr/lib/python3.12', ..., '/usr/lib/python3.12/site-packages']
+
+# Модуль загружается 1 раз, результат кешируется:
+import math         # загружает
+import math         # достаёт из sys.modules — быстро!</code></pre>
+                        </div>
+
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Абсолютные vs Относительные импорты</h5>
+                                <pre class="text-sm"><code class="language-python"># Абсолютный (рекомендуется)
+from mypackage.module import func
+from mypackage.subpackage import Klass
+
+# Относительный (только внутри пакета)
+from . import sibling         # соседний модуль
+from .submodule import func   # вложенный модуль
+from ..parent import func     # из родительского пакета</code></pre>
+                                <p class="text-xs mt-1" style="color:var(--fg-muted)">Относительные импорты ломаются при запуске модуля как скрипта (<code>python module.py</code>). В Python 3 абсолютные — стандарт.</p>
+                            </div>
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">__init__.py и __all__</h5>
+                                <pre class="text-sm"><code class="language-python"># mypackage/__init__.py
+from .module1 import func1
+from .module2 import func2
+
+__all__ = ["func1", "func2"]
+# from mypackage import *  → только func1, func2
+
+# Python 3.3+: namespace packages
+# можно создавать пакет без __init__.py</code></pre>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Circular Imports (и как их избежать)</h4>
+                            <div class="p-4 rounded-lg mb-4" style="background:var(--code-bg);border-left:3px solid var(--error)">
+                                <p class="font-bold mb-2" style="color:var(--error)">Проблема: A импортирует B, B импортирует A. При запуске — ImportError!</p>
+                                <p class="text-sm" style="color:var(--fg-muted)">Python не может завершить загрузку модуля, потому что каждый требует другой.</p>
+                            </div>
+                            <pre><code class="language-python"># module_a.py
+from module_b import func_b  # OK — 'func_b' не доступен,
+                             # но имя module_b в sys.modules уже есть
+
+def func_a():
+    func_b()
+
+# module_b.py
+from module_a import func_a  # ImportError — module_a ещё не загружен!
+
+# ✅ Решение: отложенный импорт
+# module_b.py
+def func_b():
+    from module_a import func_a  # импорт внутри функции
+    func_a()
+
+# Или: вынести общие зависимости в третий модуль</code></pre>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">sys.path, PYTHONPATH и запуск</h4>
+                            <pre><code class="language-python">import sys
+sys.path.insert(0, "/custom/path")  # добавить путь в начало
+
+# PYTHONPATH — env переменная
+# PYTHONPATH=/my/libs python my_script.py
+
+# При запуске через -m путь добавляется правильно:
+# python -m mypackage.module   # OK — sys.path включает родительский каталог
+# python mypackage/module.py   # ImportError — Python не ищет в mypackage/</code></pre>
+                        </div>
+
+                        <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--warning)">
+                            <p class="font-bold mb-2" style="color:var(--warning)">Import Hook-и и Lazy Loading</p>
+                            <pre class="text-sm"><code class="language-python"># importlib.import_module — динамический импорт
+mod = importlib.import_module("package.module")
+
+# Lazy loading для ускорения старта (PEP 690)
+# from _lazy import lazy
+# lazy_import = lazy("heavy_module")  # загрузится при первом использовании</code></pre>
+                        </div>
+                    </div>`
+        },
+        {
+            id: 'django-orm',
     category: 'python',
     title: 'Django ORM Essentials',
     icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4',
@@ -2128,59 +2233,7 @@ CREATE INDEX idx_orders_user_id ON orders(user_id);
             </div>
         </div>`
 },
-// ══════════════════════════════════════════════
-//  MESSAGE QUEUES (перенесён из databases)
-// ══════════════════════════════════════════════
-{
-    id: 'redis-queues', category: 'queues', title: 'Redis, RabbitMQ, Kafka, Celery',
-    icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4',
-    content: `
-        <div class="space-y-6">
-            <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--accent)">
-                <p class="font-bold mb-2 highlight">Redis — In-Memory Data Structure Store</p>
-                <p style="color:var(--fg-muted)">Сверхбыстрое хранилище «ключ-значение» в оперативной памяти. Ядро однопоточное (атомарность команд), но начиная с Redis 6.0 введена многопоточная обработка сетевого I/O.</p>
-                <ul class="mt-2 space-y-1 text-sm" style="color:var(--fg-muted)">
-                    <li>• <strong>Типы данных:</strong> Strings, Lists, Sets, Hashes, Sorted Sets (ZSet), Streams</li>
-                    <li>• <strong>Сценарии:</strong> кэш, сессии, счётчики, очереди (LPUSH/RPOP), Pub/Sub</li>
-                    <li>• <strong>Persistence:</strong> RDB (снимки по расписанию) или AOF (лог каждой операции)</li>
-                </ul>
-                <pre class="mt-3"><code class="language-python">r.set('user:1', 'active', ex=3600)          # кэш с TTL
-r.zadd('leaderboard', {'player1': 100})      # рейтинг с автосортировкой</code></pre>
-            </div>
-            <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--success)">
-                <p class="font-bold mb-2" style="color:var(--success)">RabbitMQ — Message Broker</p>
-                <p style="color:var(--fg-muted)">Умный брокер с гибкой маршрутизацией и гарантией доставки. Протокол AMQP.</p>
-                <ul class="mt-2 space-y-1 text-sm" style="color:var(--fg-muted)">
-                    <li>• <strong>Архитектура:</strong> Producer → Exchange → Binding → Queue → Consumer</li>
-                    <li>• <strong>Гарантия:</strong> ACK — если потребитель упал, сообщение вернётся в очередь</li>
-                    <li>• <strong>Когда:</strong> сложная бизнес-логика, транзакционные задачи</li>
-                </ul>
-                <pre class="mt-3"><code class="language-python">channel.basic_publish(exchange='logs', routing_key='', body='Hello!')
-channel.basic_consume(queue='hello', on_message_callback=callback, auto_ack=False)</code></pre>
-            </div>
-            <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--warning)">
-                <p class="font-bold mb-2" style="color:var(--warning)">Apache Kafka — Distributed Streaming Platform</p>
-                <p style="color:var(--fg-muted)">Огромный, быстрый, распределённый лог. Хранит сообщения на диске. Читатели управляют своим Offset самостоятельно.</p>
-                <ul class="mt-2 space-y-1 text-sm" style="color:var(--fg-muted)">
-                    <li>• <strong>Архитектура:</strong> Topic → Partitions → Offset. Хранение N дней (Retention).</li>
-                    <li>• <strong>Порядок:</strong> гарантирован только внутри одной партиции</li>
-                    <li>• <strong>Ключевое отличие:</strong> в Rabbit сообщение удаляется после чтения, в Kafka — лежит до истечения срока</li>
-                    <li>• <strong>Когда:</strong> логи, аналитика, Event Sourcing (миллионы событий/сек)</li>
-                </ul>
-            </div>
-            <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--accent)">
-                <p class="font-bold mb-2 highlight">Celery — Task Queue для Python</p>
-                <p style="color:var(--fg-muted)">Фреймворк для отложенных/фоновых задач. Надстройка над Redis или RabbitMQ.</p>
-                <ul class="mt-2 space-y-1 text-sm" style="color:var(--fg-muted)">
-                    <li>• <strong>Зачем:</strong> пользователь не ждёт 10 сек пока отправится email или сгенерируется PDF</li>
-                    <li>• <strong>Компоненты:</strong> Worker (выполняет), Broker (передаёт), Result Backend (хранит ответ)</li>
-                </ul>
-                <pre class="mt-3"><code class="language-python">@app.task
-def send_email(user_id):
-    pass</code></pre>
-            </div>
-        </div>`
-            },
+
             {
             id: 'sql-window-functions',
             category: 'databases',
@@ -2232,6 +2285,234 @@ FROM daily_sales;
                     </div>
                 </div>`
             },
+            {
+            id: 'sqlalchemy', category: 'databases', title: 'SQLAlchemy Essentials',
+            icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4',
+            content: `
+                    <div class="space-y-6">
+                        <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--accent)">
+                            <p style="color:var(--fg-muted)">SQLAlchemy — самый популярный Python ORM. Версия 2.0 (2023) полностью асинхронная, использует единый стиль через <code>select()</code>. Понимание SQLAlchemy — must-have для бэкенд-инженеров.</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Engine, Session, Connection</h4>
+                            <pre><code class="language-python">from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+
+# Engine — пул соединений, живёт всё время
+engine = create_async_engine(
+    "postgresql+asyncpg://user:pass@localhost:5432/db",
+    pool_size=10,
+    echo=True,  # логировать SQL
+)
+
+# Sessionmaker — фабрика сессий
+AsyncSession = async_sessionmaker(engine, expire_on_commit=False)
+
+# Connection — низкоуровневое сырое соединение
+async with engine.connect() as conn:
+    result = await conn.execute(text("SELECT 1"))
+    print(result.scalar())</code></pre>
+                        </div>
+
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Declarative Models (2.0 style)</h5>
+                                <pre class="text-sm"><code class="language-python">from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import String, ForeignKey
+from typing import Optional
+
+class Base(DeclarativeBase):
+    pass
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(100))
+    email: Mapped[str] = mapped_column(unique=True)
+    age: Mapped[Optional[int]]
+
+class Post(Base):
+    __tablename__ = "posts"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str]
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    author: Mapped[User] = relationship(back_populates="posts")
+
+User.posts = relationship("Post", back_populates="author")
+
+# Создание таблиц
+async with engine.begin() as conn:
+    await conn.run_sync(Base.metadata.create_all)</code></pre>
+                            </div>
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Session lifecycle</h5>
+                                <pre class="text-sm"><code class="language-python">async with AsyncSession() as session:
+    # session.add — добавить объект
+    user = User(name="Ivan", email="ivan@ex.com")
+    session.add(user)
+
+    # flush — отправить в БД (но не COMMIT)
+    await session.flush()
+    print(user.id)  # id уже есть
+
+    # commit — зафиксировать транзакцию
+    await session.commit()
+
+# expire_on_commit=False — объект остаётся доступным
+# после commit
+print(user.name)  # "Ivan"</code></pre>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">SQLAlchemy 2.0 Queries (select)</h4>
+                            <pre><code class="language-python">from sqlalchemy import select, func, and_, or_
+
+async with AsyncSession() as session:
+    # Простой SELECT
+    result = await session.execute(select(User).where(User.id == 1))
+    user = result.scalar_one()  # или scalar_one_or_none()
+
+    # Фильтры
+    result = await session.execute(
+        select(User).where(
+            and_(User.age >= 18, User.name.ilike("%ivan%"))
+        ).order_by(User.name).limit(10).offset(0)
+    )
+    users = result.scalars().all()
+
+    # JOIN
+    result = await session.execute(
+        select(Post).join(User).where(User.email == "ivan@ex.com")
+    )
+    posts = result.scalars().all()
+
+    # Агрегации
+    result = await session.execute(
+        select(User.name, func.count(Post.id))
+        .outerjoin(Post, User.id == Post.user_id)
+        .group_by(User.id)
+    )
+    for name, count in result:
+        print(f"{name}: {count} posts")</code></pre>
+                        </div>
+
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Eager Loading (N+1 prevention)</h5>
+                                <pre class="text-sm"><code class="language-python">from sqlalchemy.orm import joinedload, selectinload
+
+# joinedload — JOIN (для FK, O2O)
+result = await session.execute(
+    select(Post).options(joinedload(Post.author))
+)
+
+# selectinload — IN clause (для M2M, reverse)
+result = await session.execute(
+    select(User).options(selectinload(User.posts))
+)
+
+# Вложенные загрузки
+from sqlalchemy.orm import Load
+result = await session.execute(
+    select(User).options(
+        selectinload(User.posts).joinedload(Post.comments)
+    )
+)</code></pre>
+                            </div>
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Alembic Migrations</h5>
+                                <pre class="text-sm"><code class="language-bash">alembic init alembic
+alembic revision --autogenerate -m "add users table"
+alembic upgrade head
+
+# Откат
+alembic downgrade -1
+
+# Просмотр истории
+alembic history</code></pre>
+                                <pre class="text-sm"><code class="language-python"># alembic/env.py
+from myapp.models import Base
+target_metadata = Base.metadata</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Repositories pattern</h5>
+                                <pre class="text-sm"><code class="language-python">class UserRepository:
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    async def get_by_id(self, user_id: int) -> User | None:
+        result = await self.session.execute(
+            select(User).where(User.id == user_id)
+        )
+        return result.scalar_one_or_none()
+
+    async def create(self, user: User) -> User:
+        self.session.add(user)
+        await self.session.commit()
+        return user
+
+    async def search(self, query: str) -> list[User]:
+        result = await self.session.execute(
+            select(User).where(User.name.ilike(f"%{query}%"))
+        )
+        return list(result.scalars().all())</code></pre>
+                            </div>
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Async with FastAPI</h5>
+                                <pre class="text-sm"><code class="language-python">from fastapi import Depends, FastAPI
+
+app = FastAPI()
+
+async def get_session():
+    async with AsyncSession() as session:
+        yield session
+
+@app.get("/users/{user_id}")
+async def get_user(
+    user_id: int,
+    session: AsyncSession = Depends(get_session)
+):
+    repo = UserRepository(session)
+    user = await repo.get_by_id(user_id)
+    if not user:
+        raise HTTPException(404)
+    return user</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead><tr><th>Feature</th><th>Django ORM</th><th>SQLAlchemy</th></tr></thead>
+                                <tbody>
+                                    <tr><td>Learning curve</td><td>Low (batteries included)</td><td>Higher (needs setup)</td></tr>
+                                    <tr><td>Async</td><td>3rd-party (database_url)</td><td>Native (asyncpg)</td></tr>
+                                    <tr><td>Query style</td><td>Filter-based</td><td>select() composable</td></tr>
+                                    <tr><td>Eager loading</td><td>select_related / prefetch_related</td><td>joinedload / selectinload</td></tr>
+                                    <tr><td>Migrations</td><td>Built-in (makemigrations)</td><td>Alembic (separate)</td></tr>
+                                    <tr><td>Flexibility</td><td>Opinionated</td><td>Full SQL control</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--warning)">
+                            <p class="font-bold mb-2" style="color:var(--warning)">Best Practices</p>
+                            <ul class="text-sm space-y-1" style="color:var(--fg-muted)">
+                                <li>• Всегда используй <b>async</b> (asyncpg + sqlalchemy.ext.asyncio)</li>
+                                <li>• <code>expire_on_commit=False</code> — чтобы объекты жили после commit</li>
+                                <li>• <code>selectinload</code> для большинства eager-loading случаев (он генерирует IN-запрос)</li>
+                                <li>• Repository pattern — для тестируемости и отделения бизнес-логики</li>
+                                <li>• Autogenerate миграции, но проверяй их вручную</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+        },,
             {
             id: 'caching',
             category: 'system',
@@ -2910,7 +3191,179 @@ jobs:
       - uses: codecov/codecov-action@v3</code></pre>
                         </div>
 
-                        <div class="grid gap-4 md:grid-cols-2">
+<div>
+                            <h4 class="font-bold mb-3 highlight">GitLab CI</h4>
+                            <pre><code class="language-yaml"># .gitlab-ci.yml
+stages:
+  - lint
+  - test
+  - build
+  - deploy
+
+variables:
+  PYTHON_VERSION: "3.12"
+  POSTGRES_VERSION: "16"
+
+lint:
+  stage: lint
+  image: python:$PYTHON_VERSION-slim
+  before_script:
+    - pip install ruff mypy
+  script:
+    - ruff check src/
+    - mypy src/
+  cache:
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+      - .cache/pip
+
+test:
+  stage: test
+  image: python:$PYTHON_VERSION-slim
+  services:
+    - postgres:$POSTGRES_VERSION
+  variables:
+    DATABASE_URL: "postgresql+asyncpg://postgres:postgres@postgres:5432/test"
+    POSTGRES_PASSWORD: postgres
+    POSTGRES_DB: test
+  before_script:
+    - pip install -r requirements.txt
+  script:
+    - pytest --cov=src --cov-report=term --junitxml=report.xml
+  coverage: '/TOTAL.*s+(d+%)/'
+  artifacts:
+    reports:
+      junit: report.xml
+
+build-docker:
+  stage: build
+  image: docker:27
+  services:
+    - docker:dind
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY_IMAGE:latest
+  only:
+    - main</code></pre>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Docker Build & Push (GitHub)</h4>
+                            <pre><code class="language-yaml"># .github/workflows/docker.yml
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: \${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: \${{ env.REGISTRY }}
+          username: \${{ github.actor }}
+          password: \${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: \${{ env.REGISTRY }}/\${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=sha,prefix=,suffix=,format=short
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: \${{ steps.meta.outputs.tags }}
+          labels: \${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max</code></pre>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Deployment Strategies</h4>
+                            <div class="grid gap-4 md:grid-cols-3">
+                                <div class="principle-card" style="border-left: 3px solid var(--success);">
+                                    <p class="font-bold mb-1" style="color: var(--success);">Rolling Update</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Постепенная замена старых экземпляров новыми. Нет downtime, но есть смесь версий во время деплоя. Стандарт для Kubernetes Deployment.</p>
+                                </div>
+                                <div class="principle-card" style="border-left: 3px solid var(--accent);">
+                                    <p class="font-bold mb-1" style="color: var(--accent);">Blue-Green</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Два одинаковых окружения. Трафик переключается мгновенно. Быстрый rollback (просто включить старый). Требует 2x ресурсов.</p>
+                                </div>
+                                <div class="principle-card" style="border-left: 3px solid var(--warning);">
+                                    <p class="font-bold mb-1" style="color: var(--warning);">Canary Release</p>
+                                    <p class="text-sm" style="color: var(--fg-muted);">Новая версия получает % трафика (напр. 5%). Мониторинг ошибок → gradual increase. Самый безопасный, но сложный в настройке (service mesh, feature flags).</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 overflow-x-auto">
+                                <table class="data-table">
+                                    <thead><tr><th>Strategy</th><th>Downtime</th><th>Rollback speed</th><th>Resource cost</th><th>Complexity</th></tr></thead>
+                                    <tbody>
+                                        <tr><td>Rolling</td><td style="color: var(--success);">None</td><td>Medium</td><td>Low</td><td>Low</td></tr>
+                                        <tr><td>Blue-Green</td><td style="color: var(--success);">None</td><td style="color: var(--success);">Instant</td><td style="color: var(--warning);">High (2x)</td><td>Low</td></tr>
+                                        <tr><td>Canary</td><td style="color: var(--success);">None</td><td style="color: var(--success);">Instant</td><td>High</td><td style="color: var(--warning);">High</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">Docker Compose for CI</h4>
+                            <pre><code class="language-yaml"># docker-compose.ci.yml — легковесная версия для CI
+version: "3.9"
+services:
+  app:
+    build:
+      context: .
+      target: test  # multi-stage target
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://user:pass@db:5432/test
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  db:
+    image: postgres:16-alpine
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: test
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]</code></pre>
+                        </div>
+
+                                                <div class="grid gap-4 md:grid-cols-2">
                             <div class="principle-card">
                                 <h5 class="font-bold mb-2">Docker Compose Multi-Service</h5>
                                 <pre class="text-sm"><code class="language-yaml">version: "3.9"
@@ -3859,6 +4312,10 @@ with grpc.insecure_channel("localhost:50051") as ch:
                     <div class="space-y-6">
                         <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
                             <p style="color: var(--fg-muted);">Паттерны GoF (Gang of Four) делятся на 3 категории: <span class="highlight">Порождающие</span> (Creational), <span class="highlight">Структурные</span> (Structural) и <span class="highlight">Поведенческие</span> (Behavioral). В Python многие паттерны упрощаются или заменяются языковыми конструкциями.</p>
+                            <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--accent)">
+                                <p class="font-bold mb-1 highlight">Зачем учить паттерны?</p>
+                                <p class="text-sm" style="color:var(--fg-muted)">Design patterns — это общий язык для описания решений. На собеседованиях вас могут попросить спроектировать систему — знание паттернов показывает глубину понимания. Но важнее не заучивать, а понимать проблему, которую решает паттерн.</p>
+                            </div>
                         </div>
 
                         <!-- Creational -->
@@ -4119,7 +4576,7 @@ def test_output(capsys):
                 </div>
                 <div class="principle-card">
                     <h5 class="font-bold mb-2">Pytest plugins</h5>
-                    <pre class="text-sm"><code># pytest-cov, pytest-xdist, pytest-asyncio
+                    <pre class="text-sm"><code class="language-plaintext"># pytest-cov, pytest-xdist, pytest-asyncio
 # pytest-timeout, freezegun, pytest-mock
 
 @pytest.mark.asyncio
@@ -4228,6 +4685,132 @@ class Point:
             </div>
         </div>`
             },
+
+        {
+            id: 'python-packaging', category: 'tools', title: 'Python Packaging', isNew: true,
+            icon: 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4',
+            content: `
+                    <div class="space-y-6">
+                        <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--accent)">
+                            <p style="color:var(--fg-muted)">Современная упаковка Python-проектов строится вокруг стандарта <code>pyproject.toml</code> (PEP 517/518/621). Он заменяет <code>setup.py</code>, <code>setup.cfg</code>, <code>requirements.txt</code> и <code>MANIFEST.in</code>.</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">pyproject.toml</h4>
+                            <pre><code class="language-toml">[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "my-package"
+version = "0.1.0"
+description = "A useful Python package"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27",
+    "click>=8.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.3"]
+
+[project.urls]
+Homepage = "https://github.com/user/my-package"
+
+[tool.setuptools.packages.find]
+where = ["src"]  # src-layout</code></pre>
+                        </div>
+
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Менеджеры зависимостей</h5>
+                                <pre class="text-sm"><code class="language-bash"># pip + venv (классика)
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+
+# uv (быстрый, Rust)
+uv venv
+uv pip install -e ".[dev]"
+uv lock  # uv.lock как в cargo
+
+# poetry
+poetry add httpx
+poetry install</code></pre>
+                            </div>
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">src-layout vs flat-layout</h5>
+                                <pre class="text-sm"><code class="language-plaintext"># src-layout (рекомендуется)
+my-project/
+  src/
+    my_package/
+      __init__.py
+      core.py
+  pyproject.toml
+  tests/
+    test_core.py
+
+# flat-layout (простой, но путает импорт)
+my-project/
+  my_package/
+    __init__.py
+  pyproject.toml
+  tests/</code></pre>
+                                <p class="text-xs mt-1" style="color:var(--fg-muted)">src-layout гарантирует, что тесты импортируют установленный пакет, а не локальную копию.</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold mb-3 highlight">entry_points и CLI-утилиты</h4>
+                            <pre><code class="language-toml">[project.scripts]
+my-cli = "my_package.cli:main"
+
+# После pip install -e . команда my-cli будет доступна в PATH</code></pre>
+                            <pre><code class="language-python"># my_package/cli.py
+def main():
+    print("Hello from CLI!")</code></pre>
+                        </div>
+
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Type Checking and Distribution</h5>
+                                <pre class="text-sm"><code class="language-toml"># pyproject.toml -- py.typed marker
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
+
+# После сборки:
+# pip install my-package
+# mypy поймёт, что типы есть</code></pre>
+                            </div>
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Билд и публикация</h5>
+                                <pre class="text-sm"><code class="language-bash">pip install build twine
+
+# Собрать wheel + sdist
+python -m build
+
+# Загрузить на PyPI
+twine upload dist/*
+
+# TestPyPI
+twine upload --repository testpypi dist/*</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--warning)">
+                            <p class="font-bold mb-2" style="color:var(--warning)">Best Practices</p>
+                            <ul class="text-sm space-y-1" style="color:var(--fg-muted)">
+                                <li>• Всегда используй <code>pyproject.toml</code> -- это PEP 517/518/621 стандарт</li>
+                                <li>• <code>src-layout</code> -- для production проектов, flat -- для скриптов</li>
+                                <li>• Пингуй версии зависимостей: <code>>=</code>, не <code>==</code></li>
+                                <li>• Добавь <code>py.typed</code> для mypy/pyright</li>
+                                <li>• uv в 10-100x быстрее pip -- стоит попробовать</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+        },
+
 // ══════════════════════════════════════════════
 //  NEW SECTION: Git workflow
 // ══════════════════════════════════════════════
@@ -4266,13 +4849,13 @@ class Point:
                     <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--success)">
                         <p class="font-bold mb-2" style="color:var(--success)">git merge</p>
                         <p class="text-sm mb-2" style="color:var(--fg-muted)">Создаёт merge commit. Сохраняет полную историю. Безопасен для shared ветвей.</p>
-                        <pre class="text-sm"><code>git checkout main
+                        <pre class="text-sm"><code class="language-bash">git checkout main
 git merge feature</code></pre>
                     </div>
                     <div class="p-4 rounded-lg" style="background:var(--code-bg);border-left:3px solid var(--warning)">
                         <p class="font-bold mb-2" style="color:var(--warning)">git rebase</p>
                         <p class="text-sm mb-2" style="color:var(--fg-muted)">Перемещает коммиты поверх другой ветви. Линейная история. <b>Не rebase shared branches!</b></p>
-                        <pre class="text-sm"><code>git checkout feature
+                        <pre class="text-sm"><code class="language-bash">git checkout feature
 git rebase main</code></pre>
                     </div>
                 </div>
