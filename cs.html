@@ -2474,6 +2474,139 @@ api_pool = httpx.AsyncClient(limits=Limits(max_keepalive=10))</code></pre>
                 `
             },
             {
+            id: 'outbox-cdc',
+            category: 'system',
+            title: 'Transactional Outbox & CDC',
+            icon: 'M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3',
+            content: `
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="font-bold mb-3 highlight">Dual Write Problem</h4>
+                        <p class="mb-3" style="color: var(--fg-muted);">Когда сервис пишет в БД и брокер — если один из write'ов падает, данные теряются или расходятся. 2PC не подходит для high-load (блокировки, SPOF).</p>
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="principle-card" style="border-left: 3px solid var(--error);">
+                                <p class="font-bold mb-1" style="color: var(--error);">Проблема</p>
+                                <pre class="text-sm mt-2"><code class="language-python"># БД упала — payload отправлен, но заказа нет
+async def create_order(user_id, items):
+    await broker.send("order_created", payload)  # ok
+    await db.execute("INSERT INTO orders ...", ...)  # crash!
+    # Теперь есть событие, но нет данных</code></pre>
+                            </div>
+                            <div class="principle-card" style="border-left: 3px solid var(--success);">
+                                <p class="font-bold mb-1" style="color: var(--success);">Решение</p>
+                                <p class="text-sm" style="color: var(--fg-muted);">Транзакционный outbox — пишем событие в БД в той же транзакции, что и бизнес-данные. Отдельный процесс гарантирует доставку.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-3 highlight">Transactional Outbox</h4>
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Схема таблицы</h5>
+                                <pre class="text-sm"><code class="language-sql">CREATE TABLE outbox (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    aggregate_type TEXT NOT NULL,
+    aggregate_id   TEXT NOT NULL,
+    event_type     TEXT NOT NULL,
+    payload        JSONB NOT NULL,
+    created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    processed_at   TIMESTAMPTZ
+);
+
+CREATE INDEX idx_outbox_unprocessed
+    ON outbox (created_at)
+    WHERE processed_at IS NULL;</code></pre>
+                            </div>
+                            <div class="principle-card">
+                                <h5 class="font-bold mb-2">Бизнес-транзакция</h5>
+                                <pre class="text-sm"><code class="language-python">async def create_order(user_id, items):
+    async with conn.transaction():
+        order_id = await conn.fetchval(
+            "INSERT INTO orders (user_id, items) VALUES ($1, $2) RETURNING id",
+            user_id, items
+        )
+        await conn.execute(
+            """INSERT INTO outbox
+               (aggregate_type, aggregate_id, event_type, payload)
+               VALUES ($1, $2, $3, $4)""",
+            "order", str(order_id), "order.created",
+            json.dumps({"user_id": user_id, "items": items})
+        )</code></pre>
+                            </div>
+                        </div>
+                        <div class="mt-4 principle-card">
+                            <h5 class="font-bold mb-2">Outbox Publisher (polling)</h5>
+                            <pre class="text-sm"><code class="language-python">async def publish_outbox(pool, producer):
+    while True:
+        async with pool.acquire() as conn:
+            rows = await conn.fetch(
+                """SELECT * FROM outbox
+                   WHERE processed_at IS NULL
+                   ORDER BY created_at
+                   LIMIT 100 FOR UPDATE SKIP LOCKED"""
+            )
+            for row in rows:
+                try:
+                    await producer.send(row["event_type"], row["payload"])
+                    await conn.execute(
+                        "UPDATE outbox SET processed_at = now() WHERE id = $1",
+                        row["id"]
+                    )
+                except Exception:
+                    await conn.execute(
+                        "UPDATE outbox SET retry_count = retry_count + 1 WHERE id = $1",
+                        row["id"]
+                    )
+        await asyncio.sleep(0.1)</code></pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-3 highlight">CDC (Change Data Capture)</h4>
+                        <p class="mb-3" style="color: var(--fg-muted);">Вместо polling'а читаем WAL базы данных. Каждое изменение — поток событий без нагрузки на БД.</p>
+                        <div class="grid gap-4 md:grid-cols-3">
+                            <div class="p-3 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                                <p class="font-bold text-sm mb-1" style="color: var(--accent);">Debezium</p>
+                                <p class="text-xs" style="color: var(--fg-muted);">Kafka Connect connector. Читает WAL PostgreSQL/Mongo/MySQL.</p>
+                            </div>
+                            <div class="p-3 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--warning);">
+                                <p class="font-bold text-sm mb-1" style="color: var(--warning);">pglogical</p>
+                                <p class="text-xs" style="color: var(--fg-muted);">Нативный PostgreSQL logical replication.</p>
+                            </div>
+                            <div class="p-3 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--success);">
+                                <p class="font-bold text-sm mb-1" style="color: var(--success);">AWS DMS</p>
+                                <p class="text-xs" style="color: var(--fg-muted);">Managed CDC. Интеграция с S3/Kinesis.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-3 highlight">Сравнение подходов</h4>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead><tr><th>Аспект</th><th>Outbox Polling</th><th>CDC</th><th>2PC</th></tr></thead>
+                                <tbody>
+                                    <tr><td>Задержка</td><td>Секунды</td><td>Миллисекунды</td><td>Миллисекунды</td></tr>
+                                    <tr><td>Нагрузка на БД</td><td>SELECT + UPDATE</td><td>Нет (WAL)</td><td>Блокировки</td></tr>
+                                    <tr><td>Инфраструктура</td><td>Нет</td><td>Kafka Connect</td><td>TM</td></tr>
+                                    <tr><td>Гарантия</td><td>At-least-once</td><td>At-least-once</td><td>ACID</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-lg" style="background: var(--code-bg); border-left: 3px solid var(--accent);">
+                        <p class="font-bold mb-2 highlight">Exactly-Once: Outbox + Idempotent Consumer</p>
+                        <pre class="text-sm"><code class="language-python">async def handle_event(conn, event):
+    await conn.execute(
+        """INSERT INTO processed_events (event_id, processed_at)
+           VALUES ($1, now()) ON CONFLICT DO NOTHING""",
+        event["id"]
+    )
+    if conn.rowcount == 0:
+        return
+    await process_order(event["payload"])</code></pre>
+                    </div>
+                </div>`
+            },
+            {
             id: 'distributed-systems',
             category: 'system',
             title: 'Distributed Systems Patterns',
