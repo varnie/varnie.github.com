@@ -1957,11 +1957,24 @@ COMMIT;  -- блокировка снимается</code></pre>
             </div>
             <div class="overflow-x-auto">
                 <table class="data-table">
+                    <thead><tr><th>Уровень</th><th>Dirty Read</th><th>Non-repeatable Read</th><th>Phantom Read</th><th>Write Skew (Serialization Anomaly)</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>Read Uncommitted*</code></td><td><span style="color:var(--success)">✅</span></td><td><span style="color:var(--error)">❌</span></td><td><span style="color:var(--error)">❌</span></td><td><span style="color:var(--error)">❌</span></td></tr>
+                        <tr><td><code>Read Committed</code></td><td><span style="color:var(--success)">✅</span></td><td><span style="color:var(--error)">❌</span></td><td><span style="color:var(--error)">❌</span></td><td><span style="color:var(--error)">❌</span></td></tr>
+                        <tr><td><code>Repeatable Read</code></td><td><span style="color:var(--success)">✅</span></td><td><span style="color:var(--success)">✅</span></td><td><span style="color:var(--success)">✅</span></td><td><span style="color:var(--error)">❌</span></td></tr>
+                        <tr><td><code>Serializable</code></td><td><span style="color:var(--success)">✅</span></td><td><span style="color:var(--success)">✅</span></td><td><span style="color:var(--success)">✅</span></td><td><span style="color:var(--success)">✅</span></td></tr>
+                    </tbody>
+                </table>
+                <p class="mt-2 text-xs" style="color:var(--fg-muted)">* В PostgreSQL Read Uncommitted работает как Read Committed — dirty reads невозможны физически.</p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="data-table">
                     <thead><tr><th>Уровень</th><th>Снимок</th><th>Когда использовать</th></tr></thead>
                     <tbody>
-                        <tr><td><code>Read Committed</code></td><td>На каждый запрос</td><td>90% задач + FOR UPDATE</td></tr>
-                        <tr><td><code>Repeatable Read</code></td><td>Один на транзакцию</td><td>Отчёты, консистентная «картинка»</td></tr>
-                        <tr><td><code>Serializable</code></td><td>Глобальный трекинг</td><td>Сложные системы, финтех (редко)</td></tr>
+                        <tr><td><code>Read Committed</code></td><td>На каждый запрос</td><td>90% задач + FOR UPDATE. Стандарт по умолчанию.</td></tr>
+                        <tr><td><code>Repeatable Read</code></td><td>Один на транзакцию</td><td>Отчёты, консистентная «картинка» данных.</td></tr>
+                        <tr><td><code>Serializable</code></td><td>Глобальный трекинг</td><td>Финтех, критичные операции (редко из-за оверхеда).</td></tr>
                     </tbody>
                 </table>
             </div>
