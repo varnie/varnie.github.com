@@ -148,11 +148,18 @@
         }
         [data-theme="light"] .theme-toggle::after { transform: translateX(1.5rem); }
 
+        .mobile-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease;
+        }
+        .mobile-overlay.open { opacity: 1; visibility: visible; }
         .mobile-menu {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg);
+            position: fixed; top: 0; left: 0; width: 85%; max-width: 320px; height: 100%; background: var(--bg-secondary);
             z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.3);
         }
         .mobile-menu.open { transform: translateX(0); }
+        [data-theme="light"] .mobile-menu { box-shadow: 4px 0 24px rgba(0,0,0,0.1); }
 
         .sidebar { position: sticky; top: 5rem; height: calc(100vh - 6rem); overflow-y: auto; }
 
@@ -360,6 +367,9 @@
         </div>
     </div>
 </header>
+
+<!-- Mobile Overlay -->
+<div id="mobileOverlay" class="mobile-overlay lg:hidden"></div>
 
 <!-- Mobile Menu -->
 <nav id="mobileMenu" class="mobile-menu lg:hidden">
@@ -5007,6 +5017,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
     document.getElementById('mobileMenuBtn').addEventListener('click', () => toggleMobileMenu(true));
     document.getElementById('closeMobileMenu').addEventListener('click', () => toggleMobileMenu(false));
+    document.getElementById('mobileOverlay').addEventListener('click', () => toggleMobileMenu(false));
 
     const handleNavClick = (e) => {
         const link = e.target.closest('.nav-link');
@@ -5042,6 +5053,7 @@ function toggleTheme() {
 function toggleMobileMenu(open) {
     mobileMenuOpen = open;
     document.getElementById('mobileMenu').classList.toggle('open', open);
+    document.getElementById('mobileOverlay').classList.toggle('open', open);
     document.body.style.overflow = open ? 'hidden' : '';
 }
 
