@@ -2059,15 +2059,14 @@ COMMIT;  -- блокировка снимается</code></pre>
             </div>
             <div class="overflow-x-auto">
                 <table class="data-table">
-                    <thead><tr><th>Уровень</th><th>Dirty Read</th><th>Non-repeatable Read</th><th>Phantom Read</th><th>Write Skew (Serialization Anomaly)</th></tr></thead>
+                    <thead><tr><th>Уровень изоляции</th><th>Грязное чтение<br>(Dirty Read)</th><th>Неповторяющееся чтение<br>(Non-Repeatable Read)</th><th>Фантомное чтение<br>(Phantom Read)</th><th>Перекос записи<br>(Write Skew)</th></tr></thead>
                     <tbody>
-                        <tr><td><code>Read Uncommitted*</code></td><td><span style="color:var(--success)">✅</span></td><td><span style="color:var(--error)">❌</span></td><td><span style="color:var(--error)">❌</span></td><td><span style="color:var(--error)">❌</span></td></tr>
-                        <tr><td><code>Read Committed</code></td><td><span style="color:var(--success)">✅</span></td><td><span style="color:var(--error)">❌</span></td><td><span style="color:var(--error)">❌</span></td><td><span style="color:var(--error)">❌</span></td></tr>
-                        <tr><td><code>Repeatable Read</code></td><td><span style="color:var(--success)">✅</span></td><td><span style="color:var(--success)">✅</span></td><td><span style="color:var(--success)">✅</span></td><td><span style="color:var(--error)">❌</span></td></tr>
-                        <tr><td><code>Serializable</code></td><td><span style="color:var(--success)">✅</span></td><td><span style="color:var(--success)">✅</span></td><td><span style="color:var(--success)">✅</span></td><td><span style="color:var(--success)">✅</span></td></tr>
+                        <tr><td><code>Read Uncommitted</code></td><td><span style="color:var(--error)">❌</span> Возможна<br><span class="text-xs" style="color:var(--fg-muted)">(В Postgres: <span style="color:var(--success)">🔒</span> Защищено)</span></td><td><span style="color:var(--error)">❌</span> Возможна</td><td><span style="color:var(--error)">❌</span> Возможна</td><td><span style="color:var(--error)">❌</span> Возможна</td></tr>
+                        <tr><td><code>Read Committed</code></td><td><span style="color:var(--success)">🔒</span> Защищено</td><td><span style="color:var(--error)">❌</span> Возможна</td><td><span style="color:var(--error)">❌</span> Возможна</td><td><span style="color:var(--error)">❌</span> Возможна</td></tr>
+                        <tr><td><code>Repeatable Read</code></td><td><span style="color:var(--success)">🔒</span> Защищено</td><td><span style="color:var(--success)">🔒</span> Защищено</td><td><span style="color:var(--success)">🔒</span> Защищено<br><span class="text-xs" style="color:var(--fg-muted)">(В стандартах SQL: <span style="color:var(--error)">❌</span>)</span></td><td><span style="color:var(--error)">❌</span> Возможна</td></tr>
+                        <tr><td><code>Serializable</code></td><td><span style="color:var(--success)">🔒</span> Защищено</td><td><span style="color:var(--success)">🔒</span> Защищено</td><td><span style="color:var(--success)">🔒</span> Защищено</td><td><span style="color:var(--success)">🔒</span> Защищено</td></tr>
                     </tbody>
                 </table>
-                <p class="mt-2 text-xs" style="color:var(--fg-muted)">* В PostgreSQL Read Uncommitted работает как Read Committed — dirty reads невозможны физически.</p>
             </div>
 
             <div class="overflow-x-auto">
